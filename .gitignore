@@ -51,7 +51,7 @@ bin/
 obj/
 
 # Ignore Makefiles and Autotools-generated files
-Makefile
+# Makefile
 Makefile.in
 *.make
 *.mk
@@ -82,6 +82,7 @@ Makefile.in
 *.cache
 *.vscodeignore
 *.code-workspace
+/geologic
 
 # ==================================================
 # 🔹 Package manager files (vcpkg, Conan)
