@@ -1,12 +1,10 @@
 #pragma once
 
-
+#include <format>
 #include <iomanip>
 #include <sstream>
-#include <format>
 
 #include "coordinates.hpp"
-
 
 // Formatter implementation based on the example found at:
 // https://www.en.cppreference.com/w/cpp/utility/format/formatter.html
@@ -42,7 +40,6 @@ struct std::formatter<jt::coordinate, char> {
             const float lat_f = coord.latitude;
             const std::string direction = lat_f >= 0 ? "N" : "S";
             const float trunc_lat_f = std::trunc(std::abs(lat_f));
-            //out << std::setprecision(2);
             out << trunc_lat_f << "° ";
             const float fraction_lat_f =
                 std::round((lat_f - trunc_lat_f) * 60.0f);
