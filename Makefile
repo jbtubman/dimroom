@@ -2,4 +2,12 @@
 CPP = /usr/bin/c++
 
 geologic: main.cpp
-	$(CPP) -std=c++23 -o geologic main.cpp
+	$(CPP) -std=c++23 main.cpp -o geologic
+
+main.cpp: contains.hpp
+
+test/test: test/*.cpp
+	$(CPP) -std=c++23 -I../CppUnitTestFramework $(?) -o test/test
+
+do_test: test/test test/*.cpp
+	./test/test
