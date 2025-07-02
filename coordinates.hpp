@@ -3,10 +3,10 @@
 #include <cmath>
 #include <cstdlib>
 #include <expected>
-#include <iomanip>
+// #include <iomanip>
 #include <print>
 #include <regex>
-#include <sstream>
+//#include <sstream>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -90,39 +90,34 @@ class coordinate {
    public:
     enum class format { invalid, decimal, degrees_minutes };
 
+    // Default initialization provides an invalid coordinate.
     format coordinate_format{format::invalid};
     float latitude{0};
     float longitude{0};
 
+    // Constructor that takes values for all the fields.
     coordinate(format fmt, float lat_f, float long_f)
         : coordinate_format{fmt}, latitude{lat_f}, longitude{long_f} {};
 
-    constexpr std::string_view coordinate_format_str() const {
-        using namespace std::literals::string_view_literals;
-        switch (coordinate_format) {
-            case format::invalid:
-                return "invalid"sv;
+    coordinate() = default;
+    coordinate(const coordinate&) = default;
+    coordinate(coordinate&&) = default;
+    coordinate& operator=(const coordinate&) = default;
+    coordinate& operator=(coordinate&&) = default;
 
-            case format::decimal:
-                return "decimal"sv;
 
-            case format::degrees_minutes:
-                return "degrees_minutes"sv;
-        }
-    }
-
-    static coordinate make_coordinate(const std::string& s) {
-        auto coordinates = parse_decimal_coordinate<format>(s);
-        if (coordinates) {
-            float lat_f{std::get<0>(*coordinates)};
-            float long_f{std::get<1>(*coordinates)};
-            if (is_valid(lat_f, long_f)) {
-                return coordinate(format::decimal, lat_f, long_f);
-            }
-        }
-        // default-constructed coordinate is invalid.
-        return coordinate();
-    }
+    // static coordinate make_coordinate(const std::string& s) {
+    //     auto coordinates = parse_decimal_coordinate<format>(s);
+    //     if (coordinates) {
+    //         float lat_f{std::get<0>(*coordinates)};
+    //         float long_f{std::get<1>(*coordinates)};
+    //         if (is_valid(lat_f, long_f)) {
+    //             return coordinate(format::decimal, lat_f, long_f);
+    //         }
+    //     }
+    //     // default-constructed coordinate is invalid.
+    //     return coordinate();
+    // }
 
     constexpr static bool is_valid(float lat_f, float long_f) {
         if (lat_f > 90.0 || lat_f < -90.0) return false;
@@ -133,13 +128,6 @@ class coordinate {
     constexpr bool is_valid() const {
         return coordinate::is_valid(latitude, longitude);
     }
-
-    // private:
-    coordinate() = default;
-    coordinate(const coordinate&) = default;
-    coordinate(coordinate&&) = default;
-    coordinate& operator=(const coordinate&) = default;
-    coordinate& operator=(coordinate&&) = default;
 };
 
 struct _coordinate_format_regex {
@@ -279,80 +267,3 @@ inline coordinate make_coordinate(const std::string& s) {
 }
 
 };  // namespace jt
-
-// Formatter implementation based on the example found at:
-// https://www.en.cppreference.com/w/cpp/utility/format/formatter.html
-template <>
-struct std::formatter<jt::coordinate, char> {
-    template <class ParseContext>
-    constexpr ParseContext::iterator parse(ParseContext& ctx) {
-        auto it = ctx.begin();
-        if (it == ctx.end()) return it;
-        if (it != ctx.end() && *it != '}')
-            throw std::format_error("Invalid format args for coordinate.");
-
-        return it;
-    }
-
-    template <class FmtContext>
-    FmtContext::iterator format(jt::coordinate coord, FmtContext& ctx) const {
-        std::ostringstream out;
-
-        if (coord.coordinate_format == jt::coordinate::format::decimal) {
-            out << "\"";
-            const bool lat_negative = coord.latitude < 0;
-            out << std::setprecision(5);
-            out << std::fixed;
-            out << coord.latitude << ", ";
-
-            const bool long_negative = coord.longitude < 0;
-            out << coord.longitude;
-            out << "\"";
-        } else if (coord.coordinate_format ==
-                   jt::coordinate::format::degrees_minutes) {
-            out << "\"";
-            const float lat_f = coord.latitude;
-            const std::string direction = lat_f >= 0 ? "N" : "S";
-            const float trunc_lat_f = std::trunc(std::abs(lat_f));
-            //out << std::setprecision(2);
-            out << trunc_lat_f << "° ";
-            const float fraction_lat_f =
-                std::round((lat_f - trunc_lat_f) * 60.0f);
-            out << std::setw(2);
-            out << std::setfill('0');
-            out << fraction_lat_f << "' " << direction << ", ";
-
-            const float long_f = coord.longitude;
-            const std::string long_direction = long_f >= 0 ? "E" : "W";
-            const int trunc_long_f = std::truncf(std::abs(long_f));
-
-            out << trunc_long_f << "° ";
-            out << std::setw(2);
-            out << std::setfill('0');
-            const float fraction_long_f =
-                std::round((std::abs(long_f) - trunc_long_f) * 60.0f);
-            out << fraction_long_f << "' " << long_direction;
-            out << "\"";
-        } else {
-            out << "INVALID_COORDINATE";
-        }
-
-        // out << "coordinate{ ";
-        // out << "coordinate_format: \"" << coord.coordinate_format_str()
-        //     << "\", ";
-        // out << std::setprecision(8);
-        // if (coord.coordinate_format == jt::coordinate::format::decimal) {
-        //     out << "latitude: " << coord.latitude << ", ";
-        //     out << "longitude: " << coord.longitude << " }";
-        // } else if (coord.coordinate_format ==
-        //            jt::coordinate::format::degrees_minutes) {
-        //     out << "latitude: " << "TBD" << ", ";
-        //     out << "longitude: " << "TBD" << " }";
-        // } else {
-        //     out << "latitude: " << NAN << ", ";
-        //     out << "longitude: " << NAN << " }";
-        // }
-
-        return std::ranges::copy(std::move(out).str(), ctx.out()).out;
-    }
-};

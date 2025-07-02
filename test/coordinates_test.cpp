@@ -1,11 +1,11 @@
-#include "../coordinates.hpp"
-
 #include <cmath>
 #include <concepts>
 #include <print>
 #include <string>
 #include <type_traits>
 
+#include "../coordinates.hpp"
+#include "../coordinate_formatter.hpp"
 #include "CppUnitTestFramework.hpp"
 
 namespace {
