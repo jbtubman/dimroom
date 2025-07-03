@@ -19,8 +19,14 @@ namespace jt {
 const std::string deg_min_lat_s{R"(((\d{1,2})° (\d{2})' ([NS])))"};
 const std::regex deg_min_lat_rx{deg_min_lat_s};
 
+const std::string deg_min_lat_starts_s{R"(("(\d{1,2})° (\d{2})' ([NS])))"};
+const std::regex deg_min_lat_starts_rx{deg_min_lat_starts_s};
+
 const std::string deg_min_long_s(R"(((\d{1,3})° (\d{2})' ([EW])))");
 const std::regex deg_min_long_rx{deg_min_long_s};
+
+const std::string deg_min_long_end_s(R"(\s\d{1,3}° \d{2}' [EW]")");
+const std::regex deg_min_long_end_rx{deg_min_long_end_s};
 
 // A complete coordinate has double quote marks around it.
 const std::string deg_min_cooordinate_s("(\"" + deg_min_lat_s + ", " +
@@ -44,8 +50,14 @@ const int long_dir{8};
 const std::string decimal_lat_s{R"((-?\d{1,2}\.\d{5}))"};
 const std::regex decimal_lat_rx{decimal_lat_s};
 
+const std::string decimal_lat_starts_s{R"(("-?\d{1,2}\.\d{5}))"};
+const std::regex decimal_lat_starts_rx{decimal_lat_starts_s};
+
 const std::string decimal_long_s{R"((-?\d{1,3}\.\d{5}))"};
 const std::regex decimal_long_rx{decimal_long_s};
+
+const std::string decimal_long_end_s{R"((\s-?\d{1,3}\.\d{5}"))"};
+const std::regex decimal_long_end_rx{decimal_long_end_s};
 
 const std::string decimal_coordinate_s("(\"" + decimal_lat_s + ", " +
                                        decimal_long_s + "\")");
@@ -68,6 +80,16 @@ inline bool is_deg_min_coordinate(const std::string& s) {
 
 inline bool is_decimal_coordinate(const std::string& s) {
     return std::regex_match(s, decimal_coordinate_rx);
+}
+
+inline bool starts_with_coordinate(const std::string& s) {
+    return std::regex_match(s, decimal_lat_starts_rx) ||
+           std::regex_match(s, deg_min_lat_starts_rx);
+}
+
+inline bool ends_with_coordinate(const std::string& s) {
+    return std::regex_match(s, decimal_long_end_rx) ||
+           std::regex_match(s, deg_min_long_end_rx);
 }
 
 class coordinate {

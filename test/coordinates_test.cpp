@@ -22,6 +22,12 @@ struct MyFixture {
 
     const string invalid_decimal_coord{"\"51.05011 -114.08529\""};
     const string invalid_deg_min_coord{"\"36° 00' K, 138° 00' E\""};
+
+    const string dec_cord_start{"\"51.05011"};
+    const string dec_cord_end{" -114.08529\""};
+
+    const string dms_cord_start{"\"36° 00' N"};
+    const string dms_cord_end{" 138° 00' E\""};
 };
 }  // namespace
 
@@ -36,6 +42,21 @@ bool close(T l, U r) {
     const TC epsilon = 0.00001f;
 
     return (std::abs(lc - rc) < epsilon);
+}
+
+TEST_CASE(MyFixture, StartEndCoordinates) {
+  SECTION("starts with") {
+    CHECK_TRUE(starts_with_coordinate(MyFixture::dec_cord_start));
+    CHECK_TRUE(starts_with_coordinate(MyFixture::dms_cord_start));
+    CHECK_TRUE(!starts_with_coordinate("banana"));
+  }
+
+  SECTION("ends with") {
+    CHECK_TRUE(ends_with_coordinate(" -114.08529\""));
+    CHECK_TRUE(ends_with_coordinate(MyFixture::dec_cord_end));
+    CHECK_TRUE(ends_with_coordinate(MyFixture::dms_cord_end));
+    CHECK_TRUE(!ends_with_coordinate("banana"));
+  }
 }
 
 TEST_CASE(MyFixture, ParseLatitude) {
