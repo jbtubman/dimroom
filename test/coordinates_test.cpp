@@ -203,7 +203,7 @@ TEST_CASE(MyFixture, Coordinate) {
 
     SECTION("parse deg min coordinates") {
         auto result =
-            jt::parse_deg_min_coordinate(MyFixture::valid_deg_min_coord);
+            parse_deg_min_coordinate(MyFixture::valid_deg_min_coord);
         CHECK_TRUE(result);
 
         const auto lat = std::get<0>(*result);
