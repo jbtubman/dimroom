@@ -4,6 +4,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <regex>
 
 #include "column.hpp"
 
@@ -11,6 +12,7 @@ namespace jt {
 using std::string;
 using std::string_view;
 using std::vector;
+using std::regex;
 namespace ranges = std::ranges;
 namespace views = std::views;
 
