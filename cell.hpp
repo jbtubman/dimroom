@@ -26,11 +26,13 @@ constexpr string comma_sub{"<<<COMMA>>>"};
 constexpr string tags_regex_s{R"(""".*(,.*)*""")"};
 static const regex tags_regex(tags_regex_s);
 
-string fix_pesky_commas(const string& row_s) {
+inline string fix_pesky_commas(const string& row_s) {
   // find the triple-quoted fields and fix them.
+  // TODO: fix_pesky_commas
+  return "";
 }
 
-value_type determine_cell_type(const string& cell_s) {
+inline value_type determine_cell_type(const string& cell_s) {
     // enum class value_type {
     //     undetermined,
     //     invalid,
