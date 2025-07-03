@@ -147,6 +147,9 @@ class coordinate {
     }
 };
 
+/// @brief Polygon represented by a vector of coordinates. Assumed to be a closed polygon.
+using polygon = std::vector<coordinate>;
+
 inline coordinate::format coordinate_format(const std::string& s) noexcept {
     return is_deg_min_coordinate(s)
                ? coordinate::format::degrees_minutes
