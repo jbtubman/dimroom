@@ -2,14 +2,21 @@
 
 // Defines columns and their properties.
 
+#include <algorithm>
 #include <map>
+#include <ranges>
 #include <string>
+#include <vector>
 
 #include "cell_types.hpp"
 
 namespace jt {
 using std::string;
+using std::vector;
+namespace ranges = std::ranges;
 
+/// @brief Holds information about columns: name, position, and possible cell
+/// data type.
 class column {
    public:
     string name{};
@@ -49,30 +56,62 @@ class column {
     }
 };
 
-// inline bool operator==(const column& lhs, const column& rhs) {
-//   return lhs.operator==(rhs);
-// }
-
+/// @brief list of columns in the table.
 class columns {
    public:
-    std::vector<column> cols;
-    // Allows quick acess to column information.
-    std::map<string, column> name_to_column{};
-    using mapped_type = std::map<string, column>::mapped_type;
+    using container_type = std::vector<column>;
+
+    container_type cols;
+
+    using value_type = column;
+    using allocator_type = container_type::allocator_type;
+    using size_type = container_type::size_type;
+    using difference_type = container_type::difference_type;
+    using iterator = container_type::iterator;
+    using const_iterator = container_type::const_iterator;
+    using reverse_iterator = container_type::reverse_iterator;
+    using const_reverse_iterator = container_type::const_reverse_iterator;
+
+    iterator begin() { return cols.begin(); }
+    iterator end() { return cols.end(); }
+
+    const_iterator cbegin() const noexcept { return cols.cbegin(); }
+    const_iterator cend() const noexcept { return cols.cend(); }
+
+    const_iterator begin() const { return cols.begin(); }
+    const_iterator end() const { return cols.end(); }
+
+    reverse_iterator rbegin() { return cols.rbegin(); }
+
+    reverse_iterator rend() { return cols.rend(); }
+
+    const_reverse_iterator rbegin() const { return cols.rbegin(); }
+
+    const_reverse_iterator rend() const { return cols.rend(); }
+
+    const_reverse_iterator crbegin() const noexcept { return cols.crbegin(); }
+
+    const_reverse_iterator crend() const noexcept { return cols.crend(); }
+
+    auto size() const { return cols.size(); }
+
+    bool empty() const { return cols.empty(); }
 
     columns& add(column& col) {
         cols.push_back(col);
-        name_to_column.insert({col.name, col});
         return *this;
     }
 
-    auto find(const string& field_name) -> std::optional<mapped_type> {
-        auto it = name_to_column.find(field_name);
-        if (it == name_to_column.end()) {
+    auto find(const string& field_name) -> std::optional<column> {
+        auto it = std::ranges::find_if(
+            cols, [field_name](column c) { return c.name == field_name; });
+        if (it == cols.end()) {
             return {};
         }
-        return it->second;
+        return *it;
     }
+
+    // TODO: Delete colummns.
 };
 
 }  // namespace jt
