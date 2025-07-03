@@ -37,11 +37,10 @@ TEST_CASE(MyFixture, Columns) {
   SECTION("add some") {
     column col_0{"Filename", 0};
     column col_1{"Type", 1};
-    columns cols{};
-    cols.add(col_0);
-    cols.add(col_1);
+    columns colms;
+    colms.add(col_0).add(col_1);
 
-    auto filename_col = cols.find("Filename");
+    auto filename_col = colms.find("Filename");
     CHECK_TRUE(filename_col);
     CHECK_TRUE(*filename_col == col_0);
     CHECK_TRUE(filename_col->name == col_0.name);

@@ -3,9 +3,10 @@
 // Defines columns and their properties.
 
 #include <algorithm>
-#include <map>
+#include <iterator>
 #include <ranges>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "cell_types.hpp"
@@ -23,10 +24,12 @@ class column {
     std::size_t position{};
     cell_type column_type{};
 
-    column(const string& nm, std::size_t pos, cell_type ctype = {})
+    column(const string& nm, std::size_t pos, cell_type ctype)
         : name(nm), position(pos), column_type{ctype} {}
 
-    column() = default;
+    column(const string& nm, std::size_t pos) : name(nm), position(pos) {}
+
+    column() {};
     column(const column&) = default;
     column(column&&) = default;
     ~column() = default;
@@ -44,15 +47,24 @@ class column {
         return *this;
     }
 
-    bool operator==(const column& other) const {
-        return (position == other.position) &&
-               (column_type == other.column_type) && (name == other.name);
-    }
-
     column& operator=(column&& other) noexcept {
         column tmp{std::move(other)};
         swap(tmp);
         return *this;
+    }
+
+    bool operator==(const column& other) const {
+        if (position != other.position) return false;
+        if (name != other.name) return false;
+        return (column_type == other.column_type);
+    }
+
+    /// @brief Like operator== but ignores the column_type field.
+    /// @param other
+    /// @return bool
+    bool mostly_equal(const column& other) const {
+        if (position != other.position) return false;
+        return (name == other.name);
     }
 };
 
@@ -71,6 +83,16 @@ class columns {
     using const_iterator = container_type::const_iterator;
     using reverse_iterator = container_type::reverse_iterator;
     using const_reverse_iterator = container_type::const_reverse_iterator;
+
+    /// @brief Construct a columns object from a range of column objects.
+    /// @tparam Container
+    /// @param container
+    template <class Container>
+        requires ranges::range<Container> || ranges::view<Container>
+    columns(Container&& container)
+        : cols(std::from_range, std::forward<Container>(container)) {}
+
+    columns() {}
 
     iterator begin() { return cols.begin(); }
     iterator end() { return cols.end(); }
@@ -97,7 +119,22 @@ class columns {
 
     bool empty() const { return cols.empty(); }
 
-    columns& add(column& col) {
+    /// @brief True if all the corresponding elements in each are mostly_equal.
+    /// @param other
+    /// @return bool
+    bool mostly_equal(const columns& other) const {
+        if (size() != other.size()) return false;
+        auto self_it = begin();
+        auto other_it = other.begin();
+        while (self_it != end()) {
+            if (!self_it->mostly_equal(*other_it)) return false;
+            ++self_it;
+            ++other_it;
+        }
+        return true;
+    }
+
+    auto& add(column& col) {
         cols.push_back(col);
         return *this;
     }
