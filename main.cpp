@@ -6,6 +6,7 @@
 #include "contains.hpp"
 #include "coordinates.hpp"
 #include "coordinate_formatter.hpp"
+#include "cell_types.hpp"
 
 int main() {
   std::println("Hello, GeoLOGIC Systems!");
