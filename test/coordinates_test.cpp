@@ -1,6 +1,5 @@
 #include <cmath>
 #include <concepts>
-#include <print>
 #include <string>
 #include <type_traits>
 
@@ -261,9 +260,7 @@ TEST_CASE(MyFixture, Create) {
         CHECK_TRUE(coord.coordinate_format == jt::coordinate::format::decimal);
         CHECK_TRUE(close(coord.latitude, MyFixture::valid_decimal_lat));
         CHECK_TRUE(close(coord.longitude, MyFixture::valid_decimal_long));
-        std::println(stderr, "decimal coord: {}", coord);
         coord.coordinate_format = jt::coordinate::format::degrees_minutes;
-        std::println(stderr, "deg/min coord: {}", coord);
     }
 
     SECTION("valid degree/minute coordinates") {
@@ -272,6 +269,5 @@ TEST_CASE(MyFixture, Create) {
                    jt::coordinate::format::degrees_minutes);
         CHECK_TRUE(close(coord.latitude, MyFixture::valid_deg_min_lat));
         CHECK_TRUE(close(coord.longitude, MyFixture::valid_deg_min_long));
-        std::println(stderr, "deg/min coord: {}", coord);
     }
 }
