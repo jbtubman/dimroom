@@ -6,6 +6,7 @@
 #include <string_view>
 #include <vector>
 
+#include "cell_types.hpp"
 #include "coordinates.hpp"
 
 namespace jt {
@@ -101,26 +102,21 @@ inline vector<string> fix_quoted_fields(const string& row_s) {
     return result;
 }
 
-inline auto find_triple_quotes(const string& row_s) {
-    string fixed_row_s(row_s);
-    // regex triple_quote_rx(R"("""(.+)(,(.+))*""")");
-    regex triple_quote_rx("(\"\"\")");
-    auto beginning = std::sregex_iterator(fixed_row_s.begin(),
-                                          fixed_row_s.end(), triple_quote_rx);
-    return beginning;
-}
+// Turn a CSV data line into a vector of tuples that represent
+// type, position, and value.
+inline vector<string_cvt_pos_tuple> parse_row(const string& row_s) {
+    std::size_t starting_value{0};
+    auto infinite_ints_vw = views::iota(starting_value);
+    auto split_fields = fix_quoted_fields(row_s);
+    // row result;
+    vector<cell_value_type> cell_types_vec =
+        split_fields |
+        views::transform([](string s) { return determine_cell_type(s); }) |
+        ranges::to<vector<cell_value_type>>();
 
-inline string fix_triple_quotes(const string& row_s) {
-    string fixed_row_s(row_s);
-    regex triple_quote_rx(R"("""(.+)(,(.+))*""")");
-    auto beginning = regex_search(fixed_row_s, triple_quote_rx);
-    return "";
-}
+    auto result = views::zip(split_fields, cell_types_vec, infinite_ints_vw) |
+                  ranges::to<vector<string_cvt_pos_tuple>>();
 
-inline string fix_pesky_commas(const string& row_s) {
-    // find the triple-quoted fields and fix them.
-    // TODO: fix_pesky_commas
-
-    return "";
+    return result;
 }
 }  // namespace jt

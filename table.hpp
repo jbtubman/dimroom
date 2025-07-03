@@ -6,6 +6,7 @@
 
 #include "column.hpp"
 #include "cell.hpp"
+#include "row.hpp"
 
 namespace jt {
   using std::vector;

@@ -1,29 +1,26 @@
-#include "../parser.hpp"
-#include "../parse_utils.hpp"
+#pragma once
 
-#include <algorithm>
-#include <print>
-#include <ranges>
-#include <sstream>
+/**
+ * Provides sample data to be used in the test fixtures.
+ */
+
 #include <string>
-#include <string_view>
-#include <tuple>
-#include <type_traits>
 #include <vector>
+#include <ranges>
 
-#include "CppUnitTestFramework.hpp"
+#include "../column.hpp"
 
 namespace {
-using std::string;
-using std::vector;
-using namespace jt;
-namespace ranges = std::ranges;
-namespace views = std::views;
+  using std::string;
+  using std::vector;
+  using namespace jt;
+  namespace ranges = std::ranges;
+  namespace views = std::ranges::views;
+}
 
-struct MyFixture {
-    //...
+struct general_fixture {
 
-    const string sample_header{
+      const string sample_header{
         "Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) "
         "Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags"};
 
@@ -58,35 +55,3 @@ struct MyFixture {
     const vector<string> sample_rows = {
         sample_row_0, sample_row_1, sample_row_2, sample_row_3, sample_row_4};
 };
-}  // namespace
-
-using std::string;
-using std::vector;
-
-using std::println;
-using namespace jt;
-namespace ranges = std::ranges;
-namespace views = std::views;
-
-TEST_CASE(MyFixture, ParseHeader) {
-    SECTION("parse sample header") {
-        using std::operator""sv;
-
-        auto parsed_columns = parse_header(MyFixture::sample_header);
-
-        CHECK_TRUE(parsed_columns.mostly_equal(MyFixture::sample_columns));
-    }
-
-    SECTION("find triple-quoted fields") {}
-}
-
-TEST_CASE(MyFixture, ParseRow) {
-  SECTION("row value types") {
-    auto parsed_strings = fix_quoted_fields(MyFixture::sample_row_3);
-    auto val_types = row_value_types(parsed_strings);
-    int i = 0;
-    for (auto v : val_types) {
-      println(stderr, "row value types - val_types[{}]: {}", i++, str(v));
-    }
-  }
-}

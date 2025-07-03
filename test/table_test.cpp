@@ -3,8 +3,10 @@
 
 #include "CppUnitTestFramework.hpp"
 
+#include "general_fixture.hpp"
+
 namespace {
-  struct MyFixture {
+  struct MyFixture : general_fixture {
     // TODO: table_test MyFixture.
   };
 }

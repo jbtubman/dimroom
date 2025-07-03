@@ -16,11 +16,11 @@ struct MyFixture {
 
 TEST_CASE(MyFixture, Column) {
     SECTION("creation") {
-        using cv_type = cell_value_type_t<value_type::integer>;
+        using cv_type = cell_cpp_value_type_t<cell_value_type::integer>;
         string nm{"Filename"};
         cv_type test_int{0};
         std::size_t pos{0};
-        cell_type ct{test_int};
+        cell_content ct{test_int};
         column col{nm, pos, ct};
         CHECK_TRUE(col.name == nm);
         CHECK_TRUE(col.position == pos);
