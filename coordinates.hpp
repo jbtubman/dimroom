@@ -63,11 +63,11 @@ const std::regex coordinate_rx{coordinate_s};
 const int lat_decimal{1};
 const int long_decimal{2};
 
-bool is_deg_min_coordinate(const std::string& s) {
+inline bool is_deg_min_coordinate(const std::string& s) {
     return std::regex_match(s, deg_min_cooordinate_rx);
 }
 
-bool is_decimal_coordinate(const std::string& s) {
+inline bool is_decimal_coordinate(const std::string& s) {
     return std::regex_match(s, decimal_coordinate_rx);
 }
 
@@ -126,15 +126,17 @@ class coordinate {
     }
 };
 
-coordinate::format coordinate_format(const std::string& s) noexcept {
+inline coordinate::format coordinate_format(const std::string& s) noexcept {
     return is_deg_min_coordinate(s)
                ? coordinate::format::degrees_minutes
                : (is_decimal_coordinate(s) ? coordinate::format::decimal
                                            : coordinate::format::invalid);
 }
 
-std::expected<std::pair<float, float>, coordinate::format>
-parse_decimal_coordinate(const std::string& coord) {
+std::expected<
+    std::pair<float, float>,
+    coordinate::format> inline parse_decimal_coordinate(const std::string&
+                                                            coord) {
     const auto subexpression_count = jt::decimal_coordinate_rx.mark_count();
     std::vector<std::sregex_token_iterator> rti_vec;
     auto dec_end = std::sregex_token_iterator();
@@ -169,8 +171,10 @@ parse_decimal_coordinate(const std::string& coord) {
     return std::unexpected(coordinate::format::invalid);
 }
 
-std::expected<std::pair<float, float>, coordinate::format>
-parse_deg_min_coordinate(const std::string& deg_min_coord) {
+std::expected<
+    std::pair<float, float>,
+    coordinate::format> inline parse_deg_min_coordinate(const std::string&
+                                                            deg_min_coord) {
     // create a vector of regex token iterators that point to the
     // subexpressions found in the pattern matching.
     std::vector<std::sregex_token_iterator> rti_vec;
@@ -208,8 +212,8 @@ parse_deg_min_coordinate(const std::string& deg_min_coord) {
     return std::pair{lat_f, long_f};
 }
 
-std::expected<std::pair<float, float>, coordinate::format> parse_coordinate(
-    const std::string& coord) {
+inline std::expected<std::pair<float, float>, coordinate::format>
+parse_coordinate(const std::string& coord) {
     switch (coordinate_format(coord)) {
         case coordinate::format::decimal:
             return parse_decimal_coordinate(coord);
