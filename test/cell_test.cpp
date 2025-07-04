@@ -102,9 +102,6 @@ TEST_CASE(MyFixture, Cell) {
                                                  }
                                              });
                 println(stderr, "res: {}", res);
-
-                // auto tav_vec_join_view = tag_vec | views::join_with(","sv);
-                // ranges::join_view joined_view{beginning_tags, ending_tags};
             }
         }
     }

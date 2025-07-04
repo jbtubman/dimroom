@@ -31,6 +31,7 @@ namespace views = std::views;
 // TODO: proper tests in parse_utils_test.cpp.
 
 TEST_CASE(MyFixture, ParseUtils) {
+    // TODO: proper test for "split row"
     SECTION("split row") {
         string row_s(MyFixture::sample_row_3);
         auto result = split_row(row_s);
@@ -39,6 +40,7 @@ TEST_CASE(MyFixture, ParseUtils) {
         }
     }
 
+    // TODO: proper test for "combine tag fields"
     SECTION("combine tag fields") {
         string row_s(MyFixture::sample_row_3);
         auto ss = split_row(row_s);
@@ -46,6 +48,7 @@ TEST_CASE(MyFixture, ParseUtils) {
         println(stderr, "combine tag fields result: \"{}\"", result);
     }
 
+    // TODO: proper test for "combine coordinate fields"
     SECTION("combine coordinate fields") {
         string row_s(MyFixture::sample_row_3);
         auto ss = split_row(row_s);

@@ -14,7 +14,7 @@ namespace {
 
 using namespace jt;
 
-// TODO: tests for row_test.cpp.
+// TODO: proper tests for row_test.cpp.
 
 TEST_CASE(MyFixture, Row) {
   // TODO: TEST_CASE Row.
