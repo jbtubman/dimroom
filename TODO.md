@@ -21,6 +21,26 @@ As of July 3, 2025.
 * Parsing the CSV file and determining the data types of the columns was a lot of work.
   * CSV parsing libraries that I found could not handle geographic coordinates and tags lists.
 
+## Overhaul cell_types.hpp
+
+There's a lot going on in this file.
+
+Some things should be moved over to the parser. They do not belong here.
+
+## Overhaul Parser
+
+Need a parser class.
+
+Need supporting classes:
+
+(In cell_type?) The data_value_type variant, and the optional of that.
+
+* header_field
+  * name
+
+* data_field
+  * text
+  * optional
 
 ## Overhaul Cells
 
