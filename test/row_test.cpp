@@ -8,11 +8,13 @@
 
 namespace {
   struct MyFixture : general_fixture {
-    // TODO: row_test MyFixture.
+    // ...
   };
 }
 
 using namespace jt;
+
+// TODO: tests for row_test.cpp.
 
 TEST_CASE(MyFixture, Row) {
   // TODO: TEST_CASE Row.

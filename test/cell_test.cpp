@@ -7,21 +7,17 @@
 #include <string_view>
 #include <vector>
 
-#include "../cell_types.hpp"
 #include "CppUnitTestFramework.hpp"
+#include "../cell_types.hpp"
+#include "general_fixture.hpp"
 
 namespace {
 using std::string;
 using namespace jt;
 
-struct MyFixture {
-    // Fill in.
-    const string row_1 =
-        "Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,\"\"\"Johnson, "
-        "Volcano, Dusk\"\"\"";
-    const string row_3 =
-        "Japan.jpeg,jpeg,26.4,600,800,600,\"36° 00' N, 138° 00' "
-        "E\",,Asia,,,,\"\"\"Mt Fuji, Fog\"\"\"";
+struct MyFixture : general_fixture {
+    // ...
+
 };
 }  // namespace
 
@@ -36,6 +32,7 @@ namespace views = std::views;
 
 using namespace jt;
 
+// TODO: Surely there is something in the STL to do this.
 template <class Collection>
 auto find_final(Collection&& collection) {
     auto col = std::forward<Collection>(collection);
@@ -49,11 +46,13 @@ auto find_final(Collection&& collection) {
     return current;
 }
 
+// TODO: proper tests in cell_test.cpp.
+
 TEST_CASE(MyFixture, Cell) {
     SECTION("splitting") {
         using std::operator""sv;
 
-        string_view sample_row_sv{MyFixture::row_3};
+        string_view sample_row_sv{MyFixture::sample_row_3};
 
         auto fields_view = sample_row_sv | views::split(","sv) |
                            views::transform([](auto field_sv) {

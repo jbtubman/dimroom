@@ -1,85 +1,60 @@
 #include <cmath>
 #include <concepts>
+#include <print>
 #include <string>
 #include <type_traits>
 
+#include "CppUnitTestFramework.hpp"
 #include "../coordinates.hpp"
 #include "../coordinate_formatter.hpp"
-#include "CppUnitTestFramework.hpp"
+#include "general_fixture.hpp"
 
 namespace {
+using std::println;
 using std::string;
-struct MyFixture {
-    //...
-
-    const float valid_decimal_lat{51.5};
-    const float valid_decimal_long{-114.0};
-    const string valid_decimal_coord{"\"51.50000, -114.00000\""};
-
-    const float valid_deg_min_lat{6.0};
-    const float valid_deg_min_long{-138.0};
-    const string valid_deg_min_coord{"\"6° 00' N, 138° 00' W\""};
-
-    const string invalid_decimal_coord{"\"51.05011 -114.08529\""};
-    const string invalid_deg_min_coord{"\"36° 00' K, 138° 00' E\""};
-
-    const string dec_cord_start{"\"51.05011"};
-    const string dec_cord_end{" -114.08529\""};
-
-    const string dms_cord_start{"\"36° 00' N"};
-    const string dms_cord_end{" 138° 00' E\""};
+using namespace jt;
+struct MyFixture : general_fixture {
+    // ...
 };
 }  // namespace
 
 using namespace jt;
 using std::string;
 
-template <std::floating_point T, std::floating_point U>
-bool close(T l, U r) {
-    using TC = std::common_type_t<T, U, decltype(0.00001f)>;
-    const TC lc = l;
-    const TC rc = r;
-    const TC epsilon = 0.00001f;
-
-    return (std::abs(lc - rc) < epsilon);
-}
-
 TEST_CASE(MyFixture, StartEndCoordinates) {
-  SECTION("starts with") {
-    CHECK_TRUE(starts_with_coordinate(MyFixture::dec_cord_start));
-    CHECK_TRUE(starts_with_coordinate(MyFixture::dms_cord_start));
-    CHECK_TRUE(!starts_with_coordinate("banana"));
-  }
+    SECTION("starts with") {
+        CHECK_TRUE(starts_with_coordinate(MyFixture::dec_cord_start));
+        CHECK_TRUE(starts_with_coordinate(MyFixture::dms_cord_start));
+        CHECK_TRUE(!starts_with_coordinate("banana"));
+    }
 
-  SECTION("ends with") {
-    CHECK_TRUE(ends_with_coordinate(" -114.08529\""));
-    CHECK_TRUE(ends_with_coordinate(MyFixture::dec_cord_end));
-    CHECK_TRUE(ends_with_coordinate(MyFixture::dms_cord_end));
-    CHECK_TRUE(!ends_with_coordinate("banana"));
-  }
+    SECTION("ends with") {
+        CHECK_TRUE(ends_with_coordinate(" -114.08529\""));
+        CHECK_TRUE(ends_with_coordinate(MyFixture::dec_cord_end));
+        CHECK_TRUE(ends_with_coordinate(MyFixture::dms_cord_end));
+        CHECK_TRUE(!ends_with_coordinate("banana"));
+    }
 }
 
 TEST_CASE(MyFixture, ParseLatitude) {
     SECTION("negative decimal") {
-        string lat{"-51.50000"};
-
-        auto match_begin =
-            std::sregex_iterator(lat.begin(), lat.end(), jt::decimal_lat_rx);
+        auto match_begin = std::sregex_iterator(valid_neg_decimal_lat_s.begin(),
+                                                valid_neg_decimal_lat_s.end(),
+                                                jt::decimal_lat_rx);
         auto match_end = std::sregex_iterator();
 
         CHECK_TRUE(match_begin != match_end);
-        CHECK_TRUE(match_begin->str() == lat);
+        CHECK_TRUE(match_begin->str() == valid_neg_decimal_lat_s);
     }
 
     SECTION("positive decimal") {
-        string lat{"51.50000"};
-
-        auto match_begin =
-            std::sregex_iterator(lat.begin(), lat.end(), jt::decimal_lat_rx);
+        auto match_begin = std::sregex_iterator(valid_pos_decimal_lat_s.begin(),
+                                                valid_pos_decimal_lat_s.end(),
+                                                jt::decimal_lat_rx);
         auto match_end = std::sregex_iterator();
 
         CHECK_TRUE(match_begin != match_end);
-        CHECK_TRUE(match_begin->str() == lat);
+        CHECK_TRUE(match_begin->str() == valid_pos_decimal_lat_s);
     }
 
     SECTION("bad input decimal") {
@@ -117,7 +92,7 @@ TEST_CASE(MyFixture, ParseLatitude) {
 
 TEST_CASE(MyFixture, ParseLongitude) {
     SECTION("negative decimal") {
-        string lng{"-114.08529"};
+        string lng{R"(-114.08529)"};
 
         auto match_begin =
             std::sregex_iterator(lng.begin(), lng.end(), jt::decimal_long_rx);
@@ -128,7 +103,7 @@ TEST_CASE(MyFixture, ParseLongitude) {
     }
 
     SECTION("positive decimal") {
-        string lng{"51.50000"};
+        string lng{"51.05011"};
 
         auto match_begin =
             std::sregex_iterator(lng.begin(), lng.end(), jt::decimal_long_rx);
@@ -222,8 +197,7 @@ TEST_CASE(MyFixture, Coordinate) {
     }
 
     SECTION("parse deg min coordinates") {
-        auto result =
-            parse_deg_min_coordinate(MyFixture::valid_deg_min_coord);
+        auto result = parse_deg_min_coordinate(MyFixture::valid_deg_min_coord);
         CHECK_TRUE(result);
 
         const auto lat = std::get<0>(*result);

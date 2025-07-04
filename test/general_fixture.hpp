@@ -4,42 +4,23 @@
  * Provides sample data to be used in the test fixtures.
  */
 
+#include <cfloat>
+#include <concepts>
+#include <ranges>
 #include <string>
 #include <vector>
-#include <ranges>
-
-#include "../column.hpp"
 
 namespace {
-  using std::string;
-  using std::vector;
-  using namespace jt;
-  namespace ranges = std::ranges;
-  namespace views = std::ranges::views;
-}
+using std::string;
+using std::vector;
+using namespace jt;
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+}  // namespace
 
 struct general_fixture {
-
-      const string sample_header{
-        "Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) "
-        "Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags"};
-
-    const vector<column> sample_cols = {column("Filename", 0),
-                                        column("Type", 1),
-                                        column("Image Size (MB)", 2),
-                                        column("Image X", 3),
-                                        column("Image Y", 4),
-                                        column("DPI", 5),
-                                        column("(Center) Coordinate", 6),
-                                        column("Favorite", 7),
-                                        column("Continent", 8),
-                                        column("Bit color", 9),
-                                        column("Alpha", 10),
-                                        column("Hockey Team", 11),
-                                        column("User Tags", 12)};
-    using cols_view_t = decltype(views::all(sample_cols));
-    cols_view_t sample_cols_view = views::all(sample_cols);
-    const columns sample_columns{sample_cols_view};
+    const string sample_header =
+        R"(Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags)";
 
     const string sample_row_0 =
         R"(Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk""")";
@@ -54,4 +35,71 @@ struct general_fixture {
 
     const vector<string> sample_rows = {
         sample_row_0, sample_row_1, sample_row_2, sample_row_3, sample_row_4};
+
+    const float valid_decimal_lat{51.05011};
+    const float valid_decimal_long{-114.08529};
+    const string valid_decimal_coord{R"("51.05011, -114.08529")"};
+    const string valid_pos_decimal_lat_s{R"(51.05011)"};
+    const string valid_neg_decimal_lat_s{R"(-51.05011)"};
+
+    const float valid_deg_min_lat{6.0};
+    const float valid_deg_min_long{-138.0};
+    const string valid_deg_min_coord{R"("6° 00' N, 138° 00' W")"};
+
+    const string invalid_decimal_coord{R"("51.05011 -114.08529")"};
+    const string invalid_deg_min_coord{R"("36° 00' K, 138° 00' E")"};
+
+    const string dec_cord_start{R"("51.05011)"};
+    const string dec_cord_end{R"( -114.08529")"};
+
+    const string dms_cord_start{R"("36° 00' N)"};
+    const string dms_cord_end{R"( 138° 00' E")"};
+
+    const string valid_tag_sample_row_0 = R"("""Johnson, Volcano, Dusk""")";
+    const string valid_tag_sample_row_2 = R"("""Mt Fuji, Fog""")";
+    const string valid_tag_sample_row_3 = R"("""Urban, Dusk""")";
+
+    constexpr auto valid_lat_range() { return views::iota(0, 90); }
+
+    const vector<float> decimals{0.0, 0.05011, 0.08529, 0.5,
+                                 (1.0 - FLT_DECIMAL_DIG)};
 };
+
+// Utilities to check floating point numbers for closeness.
+namespace jt {
+template <std::floating_point T>
+consteval T epsilon();
+
+template <>
+consteval float epsilon<float>() {
+    return (0.00002f - 0.00001f);
+}
+
+template <>
+consteval double epsilon<double>() {
+    return (0.00002 - 0.00001);
+}
+
+template <>
+consteval long double epsilon<long double>() {
+    return (0.00002l - 0.00001l);
+}
+
+/// @brief Returns true if the difference between two floating point numbers is
+/// less than 0.00001.
+/// @tparam CommonT
+/// @tparam T1
+/// @tparam T2
+/// @param lhs
+/// @param rhs
+/// @return bool
+template <std::floating_point T1, std::floating_point T2,
+          typename CommonT = std::common_type_t<T1, T2>>
+constexpr bool close(T1 lhs, T2 rhs) {
+    const CommonT clhs{lhs};
+    const CommonT crhs{rhs};
+    const CommonT cepsilon{epsilon<CommonT>()};
+
+    return (std::abs(clhs - crhs) < cepsilon);
+}
+}  // namespace jt

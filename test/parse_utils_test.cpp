@@ -7,27 +7,14 @@
 #include <vector>
 
 #include "CppUnitTestFramework.hpp"
+#include "general_fixture.hpp"
 
 namespace {
 using std::string;
 using std::vector;
 
-struct MyFixture {
-    const string sample_row_0 =
-        R"(Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk""")";
-    const string sample_row_1 =
-        R"(Italy.png,png,10.5,600,800,96,,Yes,Europe,,,,)";
-    const string sample_row_2 =
-        R"(Japan.jpeg,jpeg,26.4,600,800,600,"36° 00' N, 138° 00' E",,Asia,,,,"""Mt Fuji, Fog""")";
-    const string sample_row_3 =
-        R"(Calgary.tif,tiff,30.6,600,800,1200,"51.05011, -114.08529",Yes,,32,Y,Flames,"""Urban, Dusk""")";
-    const string sample_row_3_coord{R"("51.05011, -114.08529")"};
-    const string sample_row_3_tags{R"("""Urban, Dusk""")"};
-    const string sample_row_4 =
-        R"(Edmonton.jpg,jpeg,5.6,900,400,72,"53.55014, -113.46871",,,,,Oilers,)";
-
-    const vector<string> sample_rows = {
-        sample_row_0, sample_row_1, sample_row_2, sample_row_3, sample_row_4};
+struct MyFixture : general_fixture {
+  // ...
 };
 }  // namespace
 
@@ -41,7 +28,7 @@ using namespace jt;
 namespace ranges = std::ranges;
 namespace views = std::views;
 
-constexpr auto comma_substitute = "<<<COMMA>>>";
+// TODO: proper tests in parse_utils_test.cpp.
 
 TEST_CASE(MyFixture, ParseUtils) {
     SECTION("split row") {
@@ -73,7 +60,7 @@ TEST_CASE(MyFixture, ParseUtils) {
         for (auto s : result) {
             println(stderr, "fix quoted fields result[{}]: \"{}\"", i++, s);
         }
-        CHECK_TRUE(sample_row_3_coord == result[6]);
-        CHECK_TRUE(sample_row_3_tags == result[12]);
+        CHECK_TRUE(valid_decimal_coord == result[6]);
+        CHECK_TRUE(valid_tag_sample_row_3 == result[12]);
     }
 }

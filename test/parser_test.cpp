@@ -1,6 +1,3 @@
-#include "../parser.hpp"
-#include "../parse_utils.hpp"
-
 #include <algorithm>
 #include <print>
 #include <ranges>
@@ -12,6 +9,9 @@
 #include <vector>
 
 #include "CppUnitTestFramework.hpp"
+#include "../parser.hpp"
+#include "../parse_utils.hpp"
+#include "general_fixture.hpp"
 
 namespace {
 using std::string;
@@ -20,13 +20,10 @@ using namespace jt;
 namespace ranges = std::ranges;
 namespace views = std::views;
 
-struct MyFixture {
+struct MyFixture : general_fixture {
     //...
 
-    const string sample_header{
-        "Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) "
-        "Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags"};
-
+    // TODO: move column-related stuff to the column tests.
     const vector<column> sample_cols = {column("Filename", 0),
                                         column("Type", 1),
                                         column("Image Size (MB)", 2),
@@ -44,19 +41,6 @@ struct MyFixture {
     cols_view_t sample_cols_view = views::all(sample_cols);
     const columns sample_columns{sample_cols_view};
 
-    const string sample_row_0 =
-        R"(Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk""")";
-    const string sample_row_1 =
-        R"(Italy.png,png,10.5,600,800,96,,Yes,Europe,,,,)";
-    const string sample_row_2 =
-        R"(Japan.jpeg,jpeg,26.4,600,800,600,"36° 00' N, 138° 00' E",,Asia,,,,"""Mt Fuji, Fog""")";
-    const string sample_row_3 =
-        R"(Calgary.tif,tiff,30.6,600,800,1200,"51.05011, -114.08529",Yes,,32,Y,Flames,"""Urban, Dusk""")";
-    const string sample_row_4 =
-        R"(Edmonton.jpg,jpeg,5.6,900,400,72,"53.55014, -113.46871",,,,,Oilers,)";
-
-    const vector<string> sample_rows = {
-        sample_row_0, sample_row_1, sample_row_2, sample_row_3, sample_row_4};
 };
 }  // namespace
 
