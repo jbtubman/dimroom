@@ -20,3 +20,14 @@ As of July 3, 2025.
 
 * Parsing the CSV file and determining the data types of the columns was a lot of work.
   * CSV parsing libraries that I found could not handle geographic coordinates and tags lists.
+
+
+## Overhaul Cells
+
+Do we really need to know the position of the cell?
+
+We could determine the data type to associate with the column after all the data rows
+have been read in. Then go row by row through the data until all the data types have been
+deduced, or we run out of rows.
+
+Have a new class - parsed_data_field. This holds the text and the guessed data type.
