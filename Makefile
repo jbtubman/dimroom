@@ -4,10 +4,7 @@ CPP = /usr/bin/c++
 geologic: main.cpp
 	$(CPP) -std=c++23 main.cpp -o geologic
 
-main.cpp: coordinates.hpp coordinate_formatter.hpp \
-	column.hpp parser.hpp cell.hpp table.hpp row.hpp parse_utils.hpp \
-	command_handler.hpp command_interpreter.hpp file_io.hpp \
-	query.hpp
+main.cpp: *.hpp
 
 test/main.cpp:  test/general_fixture.hpp
 

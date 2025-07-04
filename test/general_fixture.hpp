@@ -22,6 +22,22 @@ struct general_fixture {
     const string sample_header =
         R"(Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags)";
 
+    const vector<string> sample_header_fields = {
+        "Filename",
+        "Type",
+        "Image Size (MB)",
+        "Image X",
+        "Image Y",
+        "DPI",
+        "(Center) Coordinate",
+        "Favorite",
+        "Continent",
+        "Bit color",
+        "Alpha",
+        "Hockey Team",
+        "User Tags"
+    };
+
     const string sample_row_0 =
         R"(Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk""")";
     const string sample_row_1 =

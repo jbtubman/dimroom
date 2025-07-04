@@ -1,3 +1,5 @@
+#include "../parser.hpp"
+
 #include <algorithm>
 #include <print>
 #include <ranges>
@@ -8,10 +10,10 @@
 #include <type_traits>
 #include <vector>
 
-#include "CppUnitTestFramework.hpp"
-#include "../parser.hpp"
 #include "../parse_utils.hpp"
+#include "CppUnitTestFramework.hpp"
 #include "general_fixture.hpp"
+#include "../parser_formatter.hpp"
 
 namespace {
 using std::string;
@@ -40,7 +42,6 @@ struct MyFixture : general_fixture {
     using cols_view_t = decltype(views::all(sample_cols));
     cols_view_t sample_cols_view = views::all(sample_cols);
     const columns sample_columns{sample_cols_view};
-
 };
 }  // namespace
 
@@ -55,6 +56,29 @@ namespace views = std::views;
 // TODO: proper tests for parser_test.cpp
 TEST_CASE(MyFixture, ParseHeader) {
     SECTION("parse sample header") {
+        parser::header_fields result =
+            parser::parse_header(MyFixture::sample_header);
+        vector<string> expected = MyFixture::sample_header_fields;
+
+        CHECK_TRUE(result.size() == expected.size());
+        if (result.size() != expected.size()) {
+            println(stderr, "result.size() {} != expected.size() {}", result.size(), expected.size());
+            println(stderr, "result: {}", result);
+        }
+        println(stderr, "result: {}", result);
+
+        CHECK_TRUE(ranges::all_of(
+            ranges::zip_view(result, expected),
+            [](auto r_e_pair) {
+                return r_e_pair.first.name == r_e_pair.second;
+            }));
+
+        CHECK_TRUE(ranges::all_of(result, [](auto h) {
+            return h.data_type == e_cell_data_type::undetermined;
+        }));
+    }
+
+    SECTION("parse sample header as columns") {
         using std::operator""sv;
 
         auto parsed_columns = parse_header(MyFixture::sample_header);
@@ -66,12 +90,12 @@ TEST_CASE(MyFixture, ParseHeader) {
 }
 
 TEST_CASE(MyFixture, ParseRow) {
-  SECTION("row value types") {
-    auto parsed_strings = fix_quoted_fields(MyFixture::sample_row_3);
-    auto val_types = row_value_types(parsed_strings);
-    int i = 0;
-    for (auto v : val_types) {
-      println(stderr, "row value types - val_types[{}]: {}", i++, str(v));
+    SECTION("row value types") {
+        auto parsed_strings = fix_quoted_fields(MyFixture::sample_row_3);
+        auto val_types = row_value_types(parsed_strings);
+        int i = 0;
+        for (auto v : val_types) {
+            println(stderr, "row value types - val_types[{}]: {}", i++, str(v));
+        }
     }
-  }
 }

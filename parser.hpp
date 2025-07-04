@@ -22,11 +22,48 @@ inline static auto infinite_ints_vw() {
     return views::iota(zero);
 }
 
+class parser {
+   public:
+    class header_field {
+       public:
+        string name;
+        e_cell_data_type data_type{e_cell_data_type::undetermined};
+    };
+
+    using header_fields = vector<header_field>;
+
+    class data_field {
+       public:
+        string text{""};
+        e_cell_data_type data_type{e_cell_data_type::undetermined};
+    };
+
+    static header_fields parse_header(const string& header) {
+        using std::operator""sv;
+
+        header_fields result;
+
+        std::string_view header_sv{header};
+
+        auto split_header =
+            header_sv | views::split(","sv) | ranges::to<vector<string>>();
+
+        ranges::transform(split_header, std::back_inserter(result),
+                          [](auto header_text) {
+                              return header_field{
+                                  header_text, e_cell_data_type::undetermined};
+                          });
+
+        return result;
+    }
+};
+
 // Parse first line to get the column names and positions.
 // Parse the following lines.
 //   This may involve determining the data type for the columns, based on what
 //   is parsed.
 
+// __deprecated
 inline columns parse_header(const string& header) {
     using std::operator""sv;
     string_view header_sv{header};
