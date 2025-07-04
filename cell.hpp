@@ -26,9 +26,9 @@ using std::vector;
 class cell {
    public:
     std::size_t position{};
-    cell_content column_type{};
+    cell_data_type column_type{};
 
-    cell(std::size_t pos, cell_content cc) : position{pos}, column_type{cc} {}
+    cell(std::size_t pos, cell_data_type cc) : position{pos}, column_type{cc} {}
 
     constexpr explicit operator bool() const noexcept {
         return column_type.has_value();
@@ -38,111 +38,111 @@ class cell {
         return column_type.has_value();
     }
 
-    static cell_content make_cell_content(const string& s, std::size_t pos,
-                                          cell_value_type v) {
+    static cell_data_type make_cell_data_type(const string& s, std::size_t pos,
+                                              e_cell_data_type v) {
         switch (v) {
-            case cell_value_type::undetermined:
-                return cell_content{};
+            case e_cell_data_type::undetermined:
+                return cell_data_type{};
 
-            case cell_value_type::invalid:
-                return cell_content{};
+            case e_cell_data_type::invalid:
+                return cell_data_type{};
 
-            case cell_value_type::floating: {
-                _base_cell_types bct = std::stof(s);
-                return cell_content{bct};
+            case e_cell_data_type::floating: {
+                cell_data_types bct = std::stof(s);
+                return cell_data_type{bct};
             }
 
-            case cell_value_type::boolean: {
-                _base_cell_types bct = s == "Yes" ? true : false;
-                return cell_content{bct};
+            case e_cell_data_type::boolean: {
+                cell_data_types bct = s == "Yes" ? true : false;
+                return cell_data_type{bct};
             }
 
-            case cell_value_type::integer: {
-                _base_cell_types bct = std::stoi(s);
-                return cell_content{bct};
+            case e_cell_data_type::integer: {
+                cell_data_types bct = std::stoi(s);
+                return cell_data_type{bct};
             }
 
-            case cell_value_type::text: {
-                _base_cell_types bct = s;
-                return cell_content{bct};
+            case e_cell_data_type::text: {
+                cell_data_types bct = s;
+                return cell_data_type{bct};
             }
 
-            case cell_value_type::geo_coordinate: {
-                _base_cell_types bct = make_coordinate(s);
-                return cell_content{bct};
+            case e_cell_data_type::geo_coordinate: {
+                cell_data_types bct = make_coordinate(s);
+                return cell_data_type{bct};
             }
 
-            case cell_value_type::tags: {
+            case e_cell_data_type::tags: {
                 using std::operator""sv;
 
                 auto len = s.size();
                 string trimmed_string(s.begin() + 3, s.begin() + len - 3);
                 auto tags = trimmed_string | std::views::split(", "sv) |
                             std::ranges::to<vector<string>>();
-                _base_cell_types bct = tags;
-                return cell_content{bct};
+                cell_data_types bct = tags;
+                return cell_data_type{bct};
             }
         }
     }
 
-    template <cell_value_type V>
-    static cell_content make_cell(const string& s, std::size_t pos) {
-        return cell_content{};
+    template <e_cell_data_type V>
+    static cell_data_type make_cell(const string& s, std::size_t pos) {
+        return cell_data_type{};
     }
 
     template <>
-    cell_content make_cell<cell_value_type::boolean>(const string& s,
+    cell_data_type make_cell<e_cell_data_type::boolean>(const string& s,
+                                                        std::size_t pos) {
+        cell_data_types bct = s == "Yes" ? true : false;
+        return cell_data_type{bct};
+    }
+
+    template <>
+    cell_data_type make_cell<e_cell_data_type::floating>(const string& s,
+                                                         std::size_t pos) {
+        cell_data_types bct = std::stof(s);
+        return cell_data_type{bct};
+    }
+
+    template <>
+    cell_data_type make_cell<e_cell_data_type::geo_coordinate>(
+        const string& s, std::size_t pos) {
+        cell_data_types bct = make_coordinate(s);
+        return cell_data_type{bct};
+    }
+
+    template <>
+    cell_data_type make_cell<e_cell_data_type::integer>(const string& s,
+                                                        std::size_t pos) {
+        cell_data_types bct = std::stoi(s);
+        return cell_data_type{bct};
+    }
+
+    template <>
+    cell_data_type make_cell<e_cell_data_type::tags>(const string& s,
                                                      std::size_t pos) {
-        _base_cell_types bct = s == "Yes" ? true : false;
-        return cell_content{bct};
-    }
-
-    template <>
-    cell_content make_cell<cell_value_type::floating>(const string& s,
-                                                      std::size_t pos) {
-        _base_cell_types bct = std::stof(s);
-        return cell_content{bct};
-    }
-
-    template <>
-    cell_content make_cell<cell_value_type::geo_coordinate>(const string& s,
-                                                            std::size_t pos) {
-        _base_cell_types bct = make_coordinate(s);
-        return cell_content{bct};
-    }
-
-    template <>
-    cell_content make_cell<cell_value_type::integer>(const string& s,
-                                                     std::size_t pos) {
-        _base_cell_types bct = std::stoi(s);
-        return cell_content{bct};
-    }
-
-    template <>
-    cell_content make_cell<cell_value_type::tags>(const string& s,
-                                                  std::size_t pos) {
         using std::operator""sv;
 
         auto len = s.size();
         string trimmed_string(s.begin() + 3, s.begin() + len - 3);
         auto tags = trimmed_string | std::views::split(", "sv) |
                     std::ranges::to<vector<string>>();
-        _base_cell_types bct = tags;
-        return cell_content{bct};
+        cell_data_types bct = tags;
+        return cell_data_type{bct};
     }
 
     template <>
-    cell_content make_cell<cell_value_type::text>(const string& s,
-                                                  std::size_t pos) {
-        _base_cell_types bct = s;
-        return cell_content{bct};
+    cell_data_type make_cell<e_cell_data_type::text>(const string& s,
+                                                     std::size_t pos) {
+        cell_data_types bct = s;
+        return cell_data_type{bct};
     }
 
     template <>
-    cell_content make_cell<cell_value_type::undetermined>(const string& s,
-                                                          std::size_t pos) {
-        _base_cell_types bct;
-        return cell_content{bct};
+    cell_data_type make_cell<e_cell_data_type::undetermined>(const string& s,
+                                                             std::size_t pos) {
+        cell_data_types bct;
+        return cell_data_type{bct};
     }
 
     // Deliberately excluding cell_value_type::invalid;

@@ -47,12 +47,12 @@ inline columns parse_header(const string& header) {
     return parsed_columns;
 }
 
-inline vector<cell_value_type> row_value_types(
+inline vector<e_cell_data_type> row_value_types(
     const vector<string>& split_fields) {
     auto result = split_fields | views::transform([](const string& s) {
-                      return determine_cell_type(s);
+                      return determine_data_field_e_cell_data_type(s);
                   }) |
-                  ranges::to<vector<cell_value_type>>();
+                  ranges::to<vector<e_cell_data_type>>();
     return result;
 }
 

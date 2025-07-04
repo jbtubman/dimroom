@@ -109,10 +109,11 @@ inline vector<string_cvt_pos_tuple> parse_row(const string& row_s) {
     auto infinite_ints_vw = views::iota(starting_value);
     auto split_fields = fix_quoted_fields(row_s);
     // row result;
-    vector<cell_value_type> cell_types_vec =
-        split_fields |
-        views::transform([](string s) { return determine_cell_type(s); }) |
-        ranges::to<vector<cell_value_type>>();
+    vector<e_cell_data_type> cell_types_vec =
+        split_fields | views::transform([](string s) {
+            return determine_data_field_e_cell_data_type(s);
+        }) |
+        ranges::to<vector<e_cell_data_type>>();
 
     auto result = views::zip(split_fields, cell_types_vec, infinite_ints_vw) |
                   ranges::to<vector<string_cvt_pos_tuple>>();

@@ -22,9 +22,9 @@ class column {
    public:
     string name{};
     std::size_t position{};
-    cell_content column_type{};
+    cell_data_type column_type{};
 
-    column(const string& nm, std::size_t pos, cell_content ctype)
+    column(const string& nm, std::size_t pos, cell_data_type ctype)
         : name(nm), position(pos), column_type{ctype} {}
 
     column(const string& nm, std::size_t pos) : name(nm), position(pos) {}
