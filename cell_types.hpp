@@ -23,10 +23,6 @@ using std::regex;
 using std::string;
 using std::vector;
 
-constexpr string comma_sub{"<<<COMMA>>>"};
-constexpr string tags_regex_s{R"(""".*(,.*)*""")"};
-static const regex tags_regex(tags_regex_s);
-
 /// @brief Determines what kind of data is in the cells of a column.
 enum class e_cell_data_type {
     undetermined,
@@ -39,66 +35,50 @@ enum class e_cell_data_type {
     tags
 };
 
-// TODO: move determine_data_field_cell_type to the parser.
-
-// Given a string that contains text from a CSV data field, determine its data
-// type. If the string is empty, data type is cell_data_type::undetermined.
-inline e_cell_data_type determine_data_field_e_cell_data_type(
-    const string& cell_s) {
-    if (cell_s.empty()) return e_cell_data_type::undetermined;
-
-    if (cell_s == "Yes" or cell_s == "No") return e_cell_data_type::boolean;
-
-    if (is_decimal_coordinate(cell_s) || is_deg_min_coordinate(cell_s))
-        return e_cell_data_type::geo_coordinate;
-
-    e_cell_data_type vt = e_cell_data_type::undetermined;
-    try {
-        std::regex float_rx{R"(-?((\d+\.)|(\.\d+)|(\d+\.\d+)))"};
-        if (std::regex_match(cell_s, float_rx)) {
-            float f = std::stof(cell_s);
-            vt = e_cell_data_type::floating;
-        }
-    } catch (const std::exception& e) {
-#if DEBUG
-        std::println(stderr, "{}: {}", cell_s, e.what());
-#endif
-    }
-    if (vt == e_cell_data_type::floating) return vt;
-
-    vt = e_cell_data_type::undetermined;
-    try {
-        int i = std::stoi(cell_s);
-        vt = e_cell_data_type::integer;
-    } catch (const std::exception& e) {
-#if DEBUG
-        std::println(stderr, "{}: {}", cell_s, e.what());
-#endif
-    }
-    if (vt == e_cell_data_type::integer) return vt;
-
-    if (std::regex_match(cell_s, tags_regex)) return e_cell_data_type::tags;
-
-    // Otherwise, it is some kind of text string.
-    return e_cell_data_type::text;
+inline consteval vector<e_cell_data_type> e_cell_data_types() {
+    return {e_cell_data_type::undetermined,   e_cell_data_type::invalid,
+            e_cell_data_type::floating,       e_cell_data_type::boolean,
+            e_cell_data_type::integer,        e_cell_data_type::text,
+            e_cell_data_type::geo_coordinate, e_cell_data_type::tags};
 }
 
-// TODO: move this to the parser. Is it even used?
-/// @brief Type to hold intermediate parsing results.
-struct string_cvt_pos {
-    string str;
-    e_cell_data_type cvt;
-    std::size_t pos;
-};
+/**
+ * @brief "type-OR" for e_cell_data_type.
+ * If two types are the same, return that type.
+ * If either type is invalid, return invalid.
+ * If one type is undetermined and the other is any type but invalid, return the
+ * other type. Otherwise, if the types are different, return invalid.
+ */
+constexpr inline e_cell_data_type operator||(e_cell_data_type lhs,
+                                             e_cell_data_type rhs) {
+    if (lhs == rhs) {
+        return lhs;
+    }
 
-// TODO: move this to the parser.
-/// @brief Intermediate parsing results produced by zip functions.
-using string_cvt_pos_tuple = std::tuple<string, e_cell_data_type, std::size_t>;
+    if (lhs == e_cell_data_type::invalid || rhs == e_cell_data_type::invalid) {
+        return e_cell_data_type::invalid;
+    }
 
-/// @brief Returns a string representation of a cell_data_type enum.
+    if (lhs == e_cell_data_type::undetermined &&
+        rhs != e_cell_data_type::undetermined) {
+        return rhs;
+    }
+
+    if (rhs == e_cell_data_type::undetermined &&
+        lhs != e_cell_data_type::undetermined) {
+        return lhs;
+    }
+
+    if (lhs != rhs) {
+        return e_cell_data_type::invalid;
+    }
+    // The code above should cover all cases but the compiler complains
+    // that not all paths return a value.
+    return e_cell_data_type::invalid;
+}  /// @brief Returns a string representation of a cell_data_type enum.
 /// @param v
 /// @return
-inline string str(e_cell_data_type v) {
+inline constexpr string str(e_cell_data_type v) {
     switch (v) {
         case e_cell_data_type::undetermined:
             return "undetermined";
