@@ -8,13 +8,49 @@
 
 #include "CppUnitTestFramework.hpp"
 #include "general_fixture.hpp"
+using namespace std::string_literals;
 
 namespace {
 using std::string;
 using std::vector;
 
 struct MyFixture : general_fixture {
-    // ...
+    // values for testing determine_data_field_e_cell_data_type.
+    const string undetermined{""};
+    const string floating_positive{"12.34"};
+    const string floating_zero{"0.0"};
+    const string floating_negative{"-2.34835"};
+    const string boolean_true{"Yes"};
+    const string boolean_false{"No"};
+    const string integer_positive{"42"};
+    const string integer_zero{"0"};
+    const string integer_negative{"-9"};
+    const string text{"Howdy! 🤠"};
+    const string geo_decimal{R"("-1.23456, 179.99999")"};
+    const string geo_dms{R"("89° 59' N, 0° 00' W")"};
+    const string tags_0{R"("""""")"};
+    const string tags_1{R"("""Tag A""")"};
+    const string tags_2{R"("""Tag A, Tag B""")"};
+    const string tags_3{R"("""Tag A, Tag B, Tag C""")"};
+    using result_expected_t = std::pair<string, e_cell_data_type>;
+
+    const vector<result_expected_t> determining_test_vec{
+        {undetermined, e_cell_data_type::undetermined},
+        {floating_positive, e_cell_data_type::floating},
+        {floating_zero, e_cell_data_type::floating},
+        {floating_negative, e_cell_data_type::floating},
+        {boolean_true, e_cell_data_type::boolean},
+        {boolean_false, e_cell_data_type::boolean},
+        {integer_positive, e_cell_data_type::integer},
+        {integer_zero, e_cell_data_type::integer},
+        {integer_negative, e_cell_data_type::integer},
+        {text, e_cell_data_type::text},
+        {geo_decimal, e_cell_data_type::geo_coordinate},
+        {geo_dms, e_cell_data_type::geo_coordinate},
+        {tags_0, e_cell_data_type::tags},
+        {tags_1, e_cell_data_type::tags},
+        {tags_2, e_cell_data_type::tags},
+        {tags_3, e_cell_data_type::tags}};
 };
 }  // namespace
 
@@ -120,13 +156,41 @@ TEST_CASE(MyFixture, ParseUtils) {
         }
     }
 
-    SECTION("combine tag fields") {
-        const vector<string> input{"Yes"s, ""s,          "32",
-                                   "Y",    "Flames",     R"("""Urban)",
-                                   " B&W",  R"( Dusk""")"};
+    SECTION("combine tag fields 0") {
+        // Empty tag list.
+        const vector<string> input({R"("""""")"});
+        const string expected{R"("""""")"};
+        const string result = combine_tag_fields(input);
+        CHECK_TRUE(result == expected);
+        if (result != expected) {
+            println(stderr, "\ncombine tag fields");
+            println(stderr, "input:    \"{}\"", input);
+            println(stderr, "result:   \"{}\"", result);
+            println(stderr, "expected: \"{}\"\n", expected);
+        }
+    }
+
+    SECTION("combine tag fields 1") {
+        // Empty tag list.
+        const vector<string> input({R"("""OneTag""")"});
+        const string expected{R"("""OneTag""")"};
+        const string result = combine_tag_fields(input);
+        CHECK_TRUE(result == expected);
+        if (result != expected) {
+            println(stderr, "\ncombine tag fields");
+            println(stderr, "input:    \"{}\"", input);
+            println(stderr, "result:   \"{}\"", result);
+            println(stderr, "expected: \"{}\"\n", expected);
+        }
+    }
+
+    SECTION("combine tag fields 3") {
+        const vector<string> input{"Yes"s,       ""s,          "32",
+                                   "Y",          "Flames",     R"("""Urban)",
+                                   " B&W Photo", R"( Dusk""")"};
         const string expected = R"(Yes,,32,Y,Flames,"""Urban)" +
-                                comma_substitute + " B&W" + comma_substitute +
-                                R"( Dusk""")";
+                                comma_substitute + " B&W Photo" +
+                                comma_substitute + R"( Dusk""")";
         const string result = combine_tag_fields(input);
         CHECK_TRUE(result == expected);
         if (result != expected) {
@@ -150,5 +214,22 @@ TEST_CASE(MyFixture, ParseUtils) {
             println(stderr, "result[6]:           \"{}\"", result[6]);
         }
         CHECK_TRUE(valid_tag_sample_row_3 == result[12]);
+    }
+
+    SECTION("test determine_data_field_e_cell_data_type") {
+        for (MyFixture::result_expected_t string_type_pair :
+             determining_test_vec) {
+            const string input = string_type_pair.first;
+            const e_cell_data_type expected = string_type_pair.second;
+            const e_cell_data_type result =
+                determine_data_field_e_cell_data_type(input);
+            CHECK_TRUE(result == expected);
+            if (result != expected) {
+                println(stderr, "\ntest determine_data_field_e_cell_data_type");
+                println(stderr, "input:    \"{}\"", input);
+                println(stderr, "result:   {}", str(result));
+                println(stderr, "expected: {}\n", str(expected));
+            }
+        }
     }
 }
