@@ -2,12 +2,17 @@
 
 #include <algorithm>
 #include <functional>
-#include <print>
 #include <ranges>
 #include <regex>
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include "cell_types.hpp"
+#include "coordinates.hpp"
+#include "jt_concepts.hpp"
+#include "utility.hpp"
+
 // turn on cassert.
 #if defined(NDEBUG)
 #define NDEBUG_WAS_DEFINED
@@ -15,13 +20,7 @@
 #endif
 #include <cassert>
 
-#include "cell_types.hpp"
-#include "coordinates.hpp"
-#include "jt_concepts.hpp"
-#include "utility.hpp"
-
 namespace jt {
-using std::println;
 using std::regex;
 using std::string;
 using std::string_view;
@@ -85,63 +84,45 @@ inline string combine_tag_fields(const vector<string>& ss) {
     string result("");
     bool in_tag = false;
     bool at_beginning = true;
-    println(stderr, "");
     for (auto s : ss) {
         if (s.starts_with(R"(""")")) {
             assert(!in_tag);
-            println(stderr, "combine_tag_fields: entering tag with \"{}\"", s);
             in_tag = true;
             if (!at_beginning) {
-                println(stderr, "combine_tag_fields: appending comma");
                 result.append(",");
             }
-            println(stderr, "combine_tag_fields: appending \"{}\"", s);
             result.append(s);
         } else if (in_tag) {
-            println(stderr, "combine_tag_fields: inside tag with \"{}\"", s);
             assert(!at_beginning);
             if (!at_beginning) {
-                println(stderr,
-                        "combine_tag_fields: appending comma substitute");
                 result.append(comma_substitute);
             }
-            println(stderr, "combine_tag_fields: appending \"{}\"", s);
             result.append(s);
             if (s.ends_with(R"(""")")) {
-                println(stderr, "combine_tag_fields: exiting tag with \"{}\"",
-                        s);
                 in_tag = false;
             }
         } else {
-            println(stderr, "combine_tag_fields: outside tag with \"{}\"", s);
             assert(!in_tag);
             if ((!at_beginning) && (!in_tag)) {
-                println(stderr, "combine_tag_fields: appending comma");
                 result.append(",");
             }
-            println(stderr, "combine_tag_fields: appending \"{}\"", s);
             result.append(s);
         }
         at_beginning = false;
     }
 
-    println(stderr, "");
     return result;
 }
 
 inline vector<string> fix_quoted_fields(const string& row_s) {
     using std::operator""sv;
-    println(stderr, "\nrow_s: \"{}\"\n", row_s);
 
     // Split into strings with broken tags and coordinates;
     vector<string> broken_tags_coordinates_vec = split_row(row_s);
-    println(stderr, "\nbroken_tags_coordinates_vec: {}\n",
-            broken_tags_coordinates_vec);
 
     // Fix the coordinates and recombine into a string with broken tags.
     string broken_tags_s =
         combine_coordinate_fields(broken_tags_coordinates_vec);
-    println(stderr, "\nbroken_tags_s: \"{}\"\n", broken_tags_s);
 
     // Split into strings with broken tags.
     vector<string> broken_tags_vec = split_row(broken_tags_s);
@@ -160,8 +141,6 @@ inline vector<string> fix_quoted_fields(const string& row_s) {
     }
     return result;
 }
-
-// TODO: move determine_data_field_cell_type to the parser.
 
 // Given a string that contains text from a CSV data field, determine its data
 // type. If the string is empty, data type is cell_data_type::undetermined.
@@ -182,9 +161,6 @@ inline e_cell_data_type determine_data_field_e_cell_data_type(
             vt = e_cell_data_type::floating;
         }
     } catch (const std::exception& e) {
-#if DEBUG
-        std::println(stderr, "{}: {}", cell_s, e.what());
-#endif
     }
     if (vt == e_cell_data_type::floating) return vt;
 
@@ -193,9 +169,6 @@ inline e_cell_data_type determine_data_field_e_cell_data_type(
         int i = std::stoi(cell_s);
         vt = e_cell_data_type::integer;
     } catch (const std::exception& e) {
-#if DEBUG
-        std::println(stderr, "{}: {}", cell_s, e.what());
-#endif
     }
     if (vt == e_cell_data_type::integer) return vt;
 
@@ -234,6 +207,8 @@ inline vector<string_cvt_pos_tuple> parse_row(const string& row_s) {
     return result;
 }
 }  // namespace jt
+
+// turn off cassert.
 #if defined(NDEBUG_WAS_DEFINED)
 #define NDEBUG
 #undef NDEBUG_WAS_DEFINED
