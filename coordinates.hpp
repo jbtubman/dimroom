@@ -3,6 +3,7 @@
 #include <expected>
 #include <regex>
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 // Geographical coordinates.
@@ -16,22 +17,26 @@
 namespace jt {
 // degrees/minutes regexps.
 
-const std::string deg_min_lat_s{R"(((\d{1,2})° (\d{2})' ([NS])))"};
-const std::regex deg_min_lat_rx{deg_min_lat_s};
+using std::string;
+using std::string_view;
+using std::regex;
 
-const std::string deg_min_lat_starts_s{R"(("(\d{1,2})° (\d{2})' ([NS])))"};
-const std::regex deg_min_lat_starts_rx{deg_min_lat_starts_s};
+const string deg_min_lat_s{R"(((\d{1,2})° (\d{2})' ([NS])))"};
+const regex deg_min_lat_rx{deg_min_lat_s};
 
-const std::string deg_min_long_s(R"(((\d{1,3})° (\d{2})' ([EW])))");
-const std::regex deg_min_long_rx{deg_min_long_s};
+const string deg_min_lat_starts_s{R"(("(\d{1,2})° (\d{2})' ([NS])))"};
+const regex deg_min_lat_starts_rx{deg_min_lat_starts_s};
 
-const std::string deg_min_long_end_s(R"(\s\d{1,3}° \d{2}' [EW]")");
-const std::regex deg_min_long_end_rx{deg_min_long_end_s};
+const string deg_min_long_s(R"(((\d{1,3})° (\d{2})' ([EW])))");
+const regex deg_min_long_rx{deg_min_long_s};
+
+const string deg_min_long_end_s(R"(\s\d{1,3}° \d{2}' [EW]")");
+const regex deg_min_long_end_rx{deg_min_long_end_s};
 
 // A complete coordinate has double quote marks around it.
-const std::string deg_min_cooordinate_s("(\"" + deg_min_lat_s + ", " +
+const string deg_min_cooordinate_s("(\"" + deg_min_lat_s + ", " +
                                         deg_min_long_s + "\")");
-const std::regex deg_min_cooordinate_rx{deg_min_cooordinate_s};
+const regex deg_min_cooordinate_rx{deg_min_cooordinate_s};
 
 // These constants give the index to the iterator in the formatter that
 // contains the subexpression for that part of the degree/minute coordinate.
@@ -47,25 +52,25 @@ const int long_dir{8};
 
 // decimal coordinates regexps.
 
-const std::string decimal_lat_s{R"((-?\d{1,2}\.\d{5}))"};
-const std::regex decimal_lat_rx{decimal_lat_s};
+const string decimal_lat_s{R"((-?\d{1,2}\.\d{5}))"};
+const regex decimal_lat_rx{decimal_lat_s};
 
-const std::string decimal_lat_starts_s{R"(("-?\d{1,2}\.\d{5}))"};
-const std::regex decimal_lat_starts_rx{decimal_lat_starts_s};
+const string decimal_lat_starts_s{R"(("-?\d{1,2}\.\d{5}))"};
+const regex decimal_lat_starts_rx{decimal_lat_starts_s};
 
-const std::string decimal_long_s{R"((-?\d{1,3}\.\d{5}))"};
-const std::regex decimal_long_rx{decimal_long_s};
+const string decimal_long_s{R"((-?\d{1,3}\.\d{5}))"};
+const regex decimal_long_rx{decimal_long_s};
 
-const std::string decimal_long_end_s{R"((\s-?\d{1,3}\.\d{5}"))"};
-const std::regex decimal_long_end_rx{decimal_long_end_s};
+const string decimal_long_end_s{R"((\s-?\d{1,3}\.\d{5}"))"};
+const regex decimal_long_end_rx{decimal_long_end_s};
 
-const std::string decimal_coordinate_s("(\"" + decimal_lat_s + ", " +
+const string decimal_coordinate_s("(\"" + decimal_lat_s + ", " +
                                        decimal_long_s + "\")");
-const std::regex decimal_coordinate_rx{decimal_coordinate_s};
+const regex decimal_coordinate_rx{decimal_coordinate_s};
 
-const std::string coordinate_s("^" + deg_min_cooordinate_s + "|" +
+const string coordinate_s("^" + deg_min_cooordinate_s + "|" +
                                decimal_coordinate_s + "$");
-const std::regex coordinate_rx{coordinate_s};
+const regex coordinate_rx{coordinate_s};
 
 // These constants give the index to the iterator in the formatter that
 // contains the subexpression for that part of the decimal coordinate.
@@ -74,22 +79,22 @@ const std::regex coordinate_rx{coordinate_s};
 const int lat_decimal{1};
 const int long_decimal{2};
 
-inline bool is_deg_min_coordinate(const std::string& s) {
-    return std::regex_match(s, deg_min_cooordinate_rx);
+inline bool is_deg_min_coordinate(const string& s) {
+    return regex_match(s, deg_min_cooordinate_rx);
 }
 
-inline bool is_decimal_coordinate(const std::string& s) {
-    return std::regex_match(s, decimal_coordinate_rx);
+inline bool is_decimal_coordinate(const string& s) {
+    return regex_match(s, decimal_coordinate_rx);
 }
 
-inline bool starts_with_coordinate(const std::string& s) {
-    return std::regex_match(s, decimal_lat_starts_rx) ||
-           std::regex_match(s, deg_min_lat_starts_rx);
+inline bool starts_with_coordinate(const string& s) {
+    return regex_match(s, decimal_lat_starts_rx) ||
+           regex_match(s, deg_min_lat_starts_rx);
 }
 
-inline bool ends_with_coordinate(const std::string& s) {
-    return std::regex_match(s, decimal_long_end_rx) ||
-           std::regex_match(s, deg_min_long_end_rx);
+inline bool ends_with_coordinate(const string& s) {
+    return regex_match(s, decimal_long_end_rx) ||
+           regex_match(s, deg_min_long_end_rx);
 }
 
 class coordinate {
@@ -150,7 +155,7 @@ class coordinate {
 /// @brief Polygon represented by a vector of coordinates. Assumed to be a closed polygon.
 using polygon = std::vector<coordinate>;
 
-inline coordinate::format coordinate_format(const std::string& s) noexcept {
+inline coordinate::format coordinate_format(const string& s) noexcept {
     return is_deg_min_coordinate(s)
                ? coordinate::format::degrees_minutes
                : (is_decimal_coordinate(s) ? coordinate::format::decimal
@@ -159,7 +164,7 @@ inline coordinate::format coordinate_format(const std::string& s) noexcept {
 
 std::expected<
     std::pair<float, float>,
-    coordinate::format> inline parse_decimal_coordinate(const std::string&
+    coordinate::format> inline parse_decimal_coordinate(const string&
                                                             coord) {
     const auto subexpression_count = jt::decimal_coordinate_rx.mark_count();
     std::vector<std::sregex_token_iterator> rti_vec;
@@ -197,7 +202,7 @@ std::expected<
 
 std::expected<
     std::pair<float, float>,
-    coordinate::format> inline parse_deg_min_coordinate(const std::string&
+    coordinate::format> inline parse_deg_min_coordinate(const string&
                                                             deg_min_coord) {
     // create a vector of regex token iterators that point to the
     // subexpressions found in the pattern matching.
@@ -222,22 +227,22 @@ std::expected<
     }
 
     const float lat_direction = rti_vec[lat_dir]->str() == "N" ? 1.0 : -1.0;
-    const std::string lat_min_s = rti_vec[lat_min]->str();
+    const string lat_min_s = rti_vec[lat_min]->str();
     const float lat_min_f = std::stof(lat_min_s) / 60.0;
-    const std::string lat_deg_s = rti_vec[lat_deg]->str();
+    const string lat_deg_s = rti_vec[lat_deg]->str();
     const float lat_f = (std::stof(lat_deg_s) + lat_min_f) * lat_direction;
 
     const float long_direction = rti_vec[long_dir]->str() == "E" ? 1.0 : -1.0;
-    const std::string long_min_s = rti_vec[long_min]->str();
+    const string long_min_s = rti_vec[long_min]->str();
     const float long_min_f = std::stof(long_min_s) / 60.0;
-    const std::string long_deg_s = rti_vec[long_deg]->str();
+    const string long_deg_s = rti_vec[long_deg]->str();
     const float long_f = (std::stof(long_deg_s) + long_min_f) * long_direction;
 
     return std::pair{lat_f, long_f};
 }
 
 inline std::expected<std::pair<float, float>, coordinate::format>
-parse_coordinate(const std::string& coord) {
+parse_coordinate(const string& coord) {
     switch (coordinate_format(coord)) {
         case coordinate::format::decimal:
             return parse_decimal_coordinate(coord);
@@ -250,7 +255,7 @@ parse_coordinate(const std::string& coord) {
     }
 }
 
-inline coordinate make_coordinate(const std::string& s) {
+inline coordinate make_coordinate(const string& s) {
     const coordinate::format fmt = coordinate_format(s);
 
     if (fmt == coordinate::format::decimal) {
