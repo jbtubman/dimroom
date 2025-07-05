@@ -65,10 +65,7 @@ using namespace std::string_literals;
 namespace ranges = std::ranges;
 namespace views = std::views;
 
-// TODO: proper tests in parse_utils_test.cpp.
-
 TEST_CASE(MyFixture, ParseUtils) {
-    // TODO: proper test for "split row"
     SECTION("split row 0") {
         const string input{""};
         const vector<string> expected({});
