@@ -205,9 +205,6 @@ TEST_CASE(MyFixture, ParseUtils) {
         string row_s(MyFixture::sample_row_3);
         auto result = fix_quoted_fields(row_s);
         int i = 0;
-        // for (auto s : result) {
-        //     println(stderr, "fix quoted fields result[{}]: \"{}\"", i++, s);
-        // }
         CHECK_TRUE(valid_decimal_coord == result[6]);
         if (valid_decimal_coord != result[6]) {
             println(stderr, "valid_decimal_coord: \"{}\"", valid_decimal_coord);

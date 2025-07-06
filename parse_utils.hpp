@@ -112,11 +112,9 @@ inline string combine_tag_fields(const vector<string>& ss) {
     return result;
 }
 
-inline vector<string> fix_quoted_fields(const string& row_s) {
+inline vector<string> fix_quoted_fields(
+    const vector<string>& broken_tags_coordinates_vec) {
     using std::operator""sv;
-
-    // Split into strings with broken tags and coordinates;
-    vector<string> broken_tags_coordinates_vec = split_row(row_s);
 
     // Fix the coordinates and recombine into a string with broken tags.
     string broken_tags_s =
@@ -139,6 +137,13 @@ inline vector<string> fix_quoted_fields(const string& row_s) {
     }
 
     return result;
+}
+
+inline vector<string> fix_quoted_fields(const string& row_s) {
+    // Split into strings with broken tags and coordinates;
+    vector<string> broken_tags_coordinates_vec = split_row(row_s);
+
+    return fix_quoted_fields(broken_tags_coordinates_vec);
 }
 
 // Given a string that contains text from a CSV data field, determine its data
