@@ -32,6 +32,8 @@ struct MyFixture : general_fixture {
     const string tags_1{R"("""Tag A""")"};
     const string tags_2{R"("""Tag A, Tag B""")"};
     const string tags_3{R"("""Tag A, Tag B, Tag C""")"};
+    const string bad_tag{R"("""Missing End Tag)"};
+
     using result_expected_t = std::pair<string, e_cell_data_type>;
 
     const vector<result_expected_t> determining_test_vec{
@@ -50,7 +52,8 @@ struct MyFixture : general_fixture {
         {tags_0, e_cell_data_type::tags},
         {tags_1, e_cell_data_type::tags},
         {tags_2, e_cell_data_type::tags},
-        {tags_3, e_cell_data_type::tags}};
+        {tags_3, e_cell_data_type::tags},
+        {bad_tag, e_cell_data_type::text}};
 };
 }  // namespace
 

@@ -43,36 +43,34 @@ inline auto split_row(const string& row_s) {
 }
 
 // Coordinate fields have a comma in them, so they must be found and glued
-// together. This could probably be done better with std::adjacent_find and an
-// appropriate helper function. Then do a transform on the pair.
+// together. Too bad that std::adjacent_find is not included in the library
+// on my machine.
 inline string combine_coordinate_fields(const vector<string>& ss) {
     bool in_coordinate = false;
     bool at_beginning = true;
 
-    string result = ranges::fold_left(
-        ss, string(), [&at_beginning, &in_coordinate](string acc, string s) {
+    return ranges::fold_left(
+        ss, string(), [&at_beginning, &in_coordinate](string result, string s) {
             if (starts_with_coordinate(s)) {
                 in_coordinate = true;
                 if (!at_beginning) {
-                    acc.append(",");
+                    result.append(",");
                 }
-                acc.append(s);
+                result.append(s);
             } else if (in_coordinate) {
-                acc.append(comma_substitute);
-                acc.append(s);
+                result.append(comma_substitute);
+                result.append(s);
                 in_coordinate = false;
             } else {
                 if (!at_beginning) {
-                    acc.append(",");
+                    result.append(",");
                 }
-                acc.append(s);
+                result.append(s);
             }
 
             at_beginning = false;
-            return acc;
+            return result;
         });
-
-    return result;
 }
 
 inline constexpr bool is_coordinate_pair(string_view lhs, string_view rhs) {
@@ -139,6 +137,7 @@ inline vector<string> fix_quoted_fields(const string& row_s) {
     for (auto qs : split_string_vec) {
         result.push_back(std::regex_replace(qs, quote_rx, ","));
     }
+
     return result;
 }
 
