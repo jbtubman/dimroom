@@ -11,16 +11,19 @@
 #include <vector>
 
 #include "../parse_utils.hpp"
+#include "../parser_formatter.hpp"
 #include "CppUnitTestFramework.hpp"
 #include "general_fixture.hpp"
-#include "../parser_formatter.hpp"
+#include "../cell_types.hpp"
 
 namespace {
+using std::println;
 using std::string;
 using std::vector;
 using namespace jt;
 namespace ranges = std::ranges;
 namespace views = std::views;
+using std::operator""s;
 
 struct MyFixture : general_fixture {
     //...
@@ -42,6 +45,30 @@ struct MyFixture : general_fixture {
     using cols_view_t = decltype(views::all(sample_cols));
     cols_view_t sample_cols_view = views::all(sample_cols);
     const columns sample_columns{sample_cols_view};
+
+    using ecdt = e_cell_data_type;
+    // const string sample_row_0 =
+    //     R"(Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson,
+    //     Volcano, Dusk""")";
+    const vector<string> sample_row_texts_0{"Iceland.png"s,
+                                            "png"s,
+                                            "8.35"s,
+                                            "600"s,
+                                            "800"s,
+                                            "72"s,
+                                            ""s,
+                                            ""s,
+                                            ""s,
+                                            ""s,
+                                            ""s,
+                                            "Team Iceland"s,
+                                            R"("""Johnson, Volcano, Dusk""")"};
+    const vector<ecdt> sample_row_types_0{
+        ecdt::text,         ecdt::text,         ecdt::floating,
+        ecdt::integer,      ecdt::integer,      ecdt::integer,
+        ecdt::undetermined, ecdt::undetermined, ecdt::undetermined,
+        ecdt::undetermined, ecdt::undetermined, ecdt::text,
+        ecdt::tags};
 };
 }  // namespace
 
@@ -56,20 +83,19 @@ namespace views = std::views;
 // TODO: proper tests for parser_test.cpp
 TEST_CASE(MyFixture, ParseHeader) {
     SECTION("parse sample header") {
-        parser::header_fields result =
-            parser::parse_header(MyFixture::sample_header);
-        vector<string> expected = MyFixture::sample_header_fields;
+        const string input = MyFixture::sample_header;
+        const vector<string> expected = MyFixture::sample_header_fields;
+        const parser::header_fields result = parser::parse_header(input);
 
         CHECK_TRUE(result.size() == expected.size());
         if (result.size() != expected.size()) {
-            println(stderr, "result.size() {} != expected.size() {}", result.size(), expected.size());
+            println(stderr, "result.size() {} != expected.size() {}",
+                    result.size(), expected.size());
             println(stderr, "result: {}", result);
         }
-        println(stderr, "result: {}", result);
 
         CHECK_TRUE(ranges::all_of(
-            ranges::zip_view(result, expected),
-            [](auto r_e_pair) {
+            ranges::zip_view(result, expected), [](auto r_e_pair) {
                 return r_e_pair.first.name == r_e_pair.second;
             }));
 
@@ -78,21 +104,47 @@ TEST_CASE(MyFixture, ParseHeader) {
         }));
     }
 
-    SECTION("parse sample header as columns") {
-        using std::operator""sv;
+    // SECTION("parse sample header as columns") {
+    //     using std::operator""sv;
 
-        auto parsed_columns = parse_header(MyFixture::sample_header);
+    //     auto parsed_columns = parse_header(MyFixture::sample_header);
 
-        CHECK_TRUE(parsed_columns.mostly_equal(MyFixture::sample_columns));
-    }
+    //     CHECK_TRUE(parsed_columns.mostly_equal(MyFixture::sample_columns));
+    // }
 
     SECTION("find triple-quoted fields") {}
 }
 
 TEST_CASE(MyFixture, ParseRow) {
+    SECTION("parse_data_row") {
+        using str_cell_pair = std::pair<string, e_cell_data_type>;
+        const string input = MyFixture::sample_row_0;
+        const auto expected =
+            ranges::zip_view(MyFixture::sample_row_texts_0,
+                             MyFixture::sample_row_types_0) |
+            views::transform([](std::pair<string, e_cell_data_type> pr) {
+                return parser::data_field{pr.first, pr.second};
+            }) |
+            ranges::to<parser::data_fields>();
+        const parser::data_fields result = parser::parse_data_row(input);
+        auto r_it = result.begin();
+        auto e_it = expected.begin();
+        size_t index = 0;
+        while (r_it != result.end() && e_it != expected.end()) {
+            CHECK_TRUE(*r_it == *e_it);
+            if (*r_it != *e_it) {
+                println(stderr, "\nparse_data_row");
+                println(stderr, "result[{}]:   {}", index, str(*r_it));
+                println(stderr, "expected[{}]: {}\n", index, str(*e_it));
+            }
+            ++r_it;
+            ++e_it;
+            ++index;
+        }
+    }
     SECTION("row value types") {
         auto parsed_strings = fix_quoted_fields(MyFixture::sample_row_3);
-        auto val_types = row_value_types(parsed_strings);
+        auto val_types = parser::row_value_types(parsed_strings);
         int i = 0;
         for (auto v : val_types) {
             println(stderr, "row value types - val_types[{}]: {}", i++, str(v));

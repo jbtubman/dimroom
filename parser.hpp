@@ -16,6 +16,7 @@ using std::string_view;
 using std::vector;
 namespace ranges = std::ranges;
 namespace views = std::views;
+using namespace std::string_literals;
 
 inline static auto infinite_ints_vw() {
     std::size_t zero{0};
@@ -28,6 +29,10 @@ class parser {
        public:
         string name;
         e_cell_data_type data_type{e_cell_data_type::undetermined};
+
+        bool operator==(const header_field& other) const {
+            return data_type == other.data_type && name == other.name;
+        }
     };
 
     using header_fields = vector<header_field>;
@@ -36,7 +41,13 @@ class parser {
        public:
         string text{""};
         e_cell_data_type data_type{e_cell_data_type::undetermined};
+
+        bool operator==(const data_field& other) const {
+            return data_type == other.data_type && text == other.text;
+        }
     };
+
+    using data_fields = vector<data_field>;
 
     static header_fields parse_header(const string& header) {
         using std::operator""sv;
@@ -56,41 +67,43 @@ class parser {
 
         return result;
     }
+
+    static data_fields parse_data_row(const string& data_row) {
+        data_fields result;
+
+        auto split_row =
+            data_row | views::split(","s) | ranges::to<vector<string>>();
+
+        auto fixed_split_row = fix_quoted_fields(split_row);
+
+        auto foo = ranges::transform(
+            fixed_split_row, std::back_inserter(result),
+            [](auto data_row_text) {
+                return data_field{
+                    data_row_text,
+                    determine_data_field_e_cell_data_type(data_row_text)};
+            });
+        return result;
+    }
+
+    static vector<e_cell_data_type> row_value_types(
+        const vector<string>& split_fields) {
+        auto result = split_fields | views::transform([](const string& s) {
+                          return determine_data_field_e_cell_data_type(s);
+                      }) |
+                      ranges::to<vector<e_cell_data_type>>();
+        return result;
+    }
 };
 
-// Parse first line to get the column names and positions.
-// Parse the following lines.
-//   This may involve determining the data type for the columns, based on what
-//   is parsed.
-
-// __deprecated
-inline columns parse_header(const string& header) {
-    using std::operator""sv;
-    string_view header_sv{header};
-    auto all_ints_view = views::iota(0ul);
-
-    auto column_names_view =
-        header_sv | views::split(","sv) | views::transform([](auto column_sv) {
-            return string(column_sv.begin(), column_sv.end());
-        });
-
-    auto parsed_columns =
-        views::zip(column_names_view, views::iota(0ul)) |
-        views::transform([](auto name_position) {
-            return column(name_position.first, name_position.second);
-        }) |
-        ranges::to<columns>();
-
-    return parsed_columns;
+inline string str(const parser::header_field& hf) {
+    return "header_field{ name: "s + hf.name + ", data_type: "s +
+           str(hf.data_type) + " }"s;
 }
 
-inline vector<e_cell_data_type> row_value_types(
-    const vector<string>& split_fields) {
-    auto result = split_fields | views::transform([](const string& s) {
-                      return determine_data_field_e_cell_data_type(s);
-                  }) |
-                  ranges::to<vector<e_cell_data_type>>();
-    return result;
+inline string str(const parser::data_field& df) {
+    return string{"data_field{ text: "s + df.text + ", data_type: "s +
+                  str(df.data_type) + " }"};
 }
 
 }  // namespace jt
