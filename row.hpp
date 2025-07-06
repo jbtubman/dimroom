@@ -27,7 +27,7 @@ struct row : vectorize<row, cell, vector<cell>> {
     static row make_row(const string& row_s) {
         vector<string> parsed_strings = fix_quoted_fields(row_s);
         // it thinks that function is undeclared.
-        auto val_types = row_value_types(parsed_strings);
+        auto val_types = parser::row_value_types(parsed_strings);
         size_type zero{0};
         auto all_ints_view = views::iota(zero);
         // using string_type_pos_t = std::tuple<string, jt::cell_value_type,
