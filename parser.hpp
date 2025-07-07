@@ -1,15 +1,19 @@
 #pragma once
 
+#include <print>
 #include <ranges>
 #include <regex>
 #include <string>
 #include <string_view>
 #include <vector>
 
+#include "cell_types.hpp"
 #include "column.hpp"
+#include "jt_concepts.hpp"
 #include "parse_utils.hpp"
 
 namespace jt {
+using std::println;
 using std::regex;
 using std::string;
 using std::string_view;
@@ -48,6 +52,70 @@ class parser {
     };
 
     using data_fields = vector<data_field>;
+    using all_data_fields = vector<data_fields>;
+
+    class header_and_data {
+       public:
+        header_fields header_fields_{};
+        all_data_fields data_fields_vec_{};
+
+        header_and_data() {}
+
+        header_and_data(const header_fields& hfs) : header_fields_{hfs} {}
+
+        header_and_data(header_fields&& hfs) : header_fields_{std::move(hfs)} {}
+
+        template <class HeaderFields, class AllDataFields>
+        header_and_data(HeaderFields&& hfs, AllDataFields&& adfs)
+            : header_fields_{std::forward<HeaderFields>(hfs)},
+              data_fields_vec_{std::forward<AllDataFields>(adfs)} {}
+
+        const all_data_fields& get_data_fields() const {
+            return data_fields_vec_;
+        }
+        all_data_fields& get_data_fields() { return data_fields_vec_; }
+    };
+
+    template <typename VecString>
+    static header_and_data _parse_lines(VecString&& input_lines) {
+        auto in_lines = std::move<VecString>(input_lines);
+        auto len = in_lines.size();
+        auto first = in_lines.begin();
+        auto last = in_lines.end();
+        if (first == last) {
+            return header_and_data();
+        }
+
+        auto second = ++first;
+        if (second == last) {
+            println(stderr, "No data rows");
+            return header_and_data(parse_header(in_lines[0]));
+        } else {
+            println(stderr, "{} data rows", last - second);
+        }
+
+        header_and_data result(parse_header(in_lines[0]));
+        auto data_range = ranges::subrange(second, last);
+
+        for (auto current = second; current != last; ++current) {
+            println(stderr, "data row: \"{}\"", *current);
+            const string& s = *current;
+            data_fields dfs = parse_data_row(s);
+            result.data_fields_vec_.push_back(dfs);
+            println(stderr, "result.data_fields_vec_.size(): {}",
+                    result.data_fields_vec_.size());
+        }
+
+        return result;
+    }
+
+    static header_and_data parse_lines(const vector<string>& input_lines) {
+        return _parse_lines(input_lines);
+    }
+
+    static header_and_data parse_lines(vector<string>&& input_lines) {
+        return _parse_lines(input_lines);
+    }
 
     static header_fields parse_header(const string& header) {
         using std::operator""sv;
@@ -96,14 +164,46 @@ class parser {
     }
 };
 
+// Free functions for converting the above classes to strings for debugging purposes.
+
 inline string str(const parser::header_field& hf) {
-    return "header_field{ name: "s + hf.name + ", data_type: "s +
+    return "header_field{ name: \""s + hf.name + "\", data_type: "s +
            str(hf.data_type) + " }"s;
 }
 
+inline string str(const parser::header_fields& hfs) {
+    string result("header_fields{ \n\t");
+    for (const parser::header_field& hf : hfs) {
+        result.append(str(hf) + ", "s);
+    }
+    result = string(result.begin(), result.begin() + result.find_last_of(","));
+    result.append(" }\n");
+    return result;
+}
+
 inline string str(const parser::data_field& df) {
-    return string{"data_field{ text: "s + df.text + ", data_type: "s +
+    return string{"data_field{ text: \""s + df.text + "\", data_type: "s +
                   str(df.data_type) + " }"};
+}
+
+inline string str(const parser::data_fields& dfs) {
+    string result{"[ "s};
+    for (const auto& df : dfs) {
+        result.append(str(df) + ", "s);
+    }
+    result = string(result.begin(), result.begin() + result.find_last_of(","));
+    result.append(" ]");
+    return result;
+}
+
+inline string str(const parser::all_data_fields& adfs) {
+    string result("{ \n\t");
+    for (const parser::data_fields& dfs : adfs) {
+        result.append(str(dfs) + ", \n"s);
+    }
+    result = string(result.begin(), result.begin() + result.find_last_of(","));
+    result.append(" }");
+    return result;
 }
 
 }  // namespace jt

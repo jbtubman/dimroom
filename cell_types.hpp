@@ -76,8 +76,8 @@ constexpr inline e_cell_data_type operator||(e_cell_data_type lhs,
     // that not all paths return a value.
     return e_cell_data_type::invalid;
 }  /// @brief Returns a string representation of a cell_data_type enum.
-/// @param v
-/// @return
+/// @param e_cell_data_type v
+/// @return string
 inline constexpr string str(e_cell_data_type v) {
     switch (v) {
         case e_cell_data_type::undetermined:

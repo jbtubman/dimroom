@@ -10,11 +10,11 @@
 #include <type_traits>
 #include <vector>
 
+#include "../cell_types.hpp"
 #include "../parse_utils.hpp"
 #include "../parser_formatter.hpp"
 #include "CppUnitTestFramework.hpp"
 #include "general_fixture.hpp"
-#include "../cell_types.hpp"
 
 namespace {
 using std::println;
@@ -69,6 +69,14 @@ struct MyFixture : general_fixture {
         ecdt::undetermined, ecdt::undetermined, ecdt::undetermined,
         ecdt::undetermined, ecdt::undetermined, ecdt::text,
         ecdt::tags};
+
+    const vector<string> sample_csv_rows{
+        R"(Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags)",
+        R"(Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk""")",
+        R"(Italy.png,png,10.5,600,800,96,,Yes,Europe,,,,)",
+        R"(Japan.jpeg,jpeg,26.4,600,800,600,"36° 00' N, 138° 00' E",,Asia,,,,"""Mt Fuji, Fog""")",
+        R"(Calgary.tif,tiff,30.6,600,800,1200,"51.05011, -114.08529",Yes,,32,Y,Flames,"""Urban, Dusk""")",
+        R"(Edmonton.jpg,jpeg,5.6,900,400,72,"53.55014, -113.46871",,,,,Oilers,)"};
 };
 }  // namespace
 
@@ -149,5 +157,14 @@ TEST_CASE(MyFixture, ParseRow) {
         for (auto v : val_types) {
             println(stderr, "row value types - val_types[{}]: {}", i++, str(v));
         }
+    }
+}
+
+TEST_CASE(MyFixture, ParseFile) {
+    SECTION("parse_lines") {
+        const vector<string> input = MyFixture::sample_csv_rows;
+        parser::header_and_data result = parser::parse_lines(input);
+        CHECK_TRUE(!result.header_fields_.empty());
+        CHECK_TRUE(result.data_fields_vec_.size() == input.size() - 1);
     }
 }
