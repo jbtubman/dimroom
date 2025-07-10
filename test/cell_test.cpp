@@ -10,6 +10,7 @@
 #include "CppUnitTestFramework.hpp"
 #include "../cell_types.hpp"
 #include "general_fixture.hpp"
+#include "../parser.hpp"
 
 namespace {
 using std::string;
@@ -17,7 +18,17 @@ using namespace jt;
 
 struct MyFixture : general_fixture {
     // ...
+    using data_field = parser::data_field;
+    using ecdt = e_cell_data_type;
 
+    const data_field sample_text_df{"Iceland.png", ecdt::text};
+    const data_field sample_float_df{"8.35", ecdt::floating};
+    const data_field sample_integer_df{"800", ecdt::integer};
+    const data_field sample_dec_coord_df{R"("51.05011, -114.08529")", ecdt::geo_coordinate};
+    const data_field sample_dms_coord_df{R"("36° 00' N, 138° 00' E")", ecdt::geo_coordinate};
+    const data_field sample_false_boolean_df{"No", ecdt::boolean};
+    const data_field sample_true_boolean_df{"Yes", ecdt::boolean};
+    const data_field sample_tag_df{R"("""Johnson, Volcano, Dusk""")", ecdt::tags};
 };
 }  // namespace
 
@@ -46,7 +57,56 @@ auto find_final(Collection&& collection) {
     return current;
 }
 
-// TODO: proper tests in cell_test.cpp.
+
+TEST_CASE(MyFixture, MakeCellTypes) {
+    SECTION("make_cell_value_type text") {
+        const auto& input = MyFixture::sample_text_df;
+        const auto result = data_cell::make_cell_value_type(input);
+        CHECK_TRUE(result);
+        CHECK_TRUE(*result == "Iceland.png");
+    }
+
+    // const data_field sample_float_df{"8.35", ecdt::floating};
+    SECTION("make_cell_value_type floating") {
+        const auto& input = MyFixture::sample_float_df;
+        const cell_value_type result = data_cell::make_cell_value_type(input);
+        CHECK_TRUE(result);
+        using foo = decltype(*result);
+        const float result_f = std::get<float>(*result);
+        CHECK_TRUE(close(result_f, 8.35));
+    }
+    // const data_field sample_integer_df{"800", ecdt::integer};
+    SECTION("make_cell_value_type integer") {
+        const auto& input = MyFixture::sample_integer_df;
+        const auto result = data_cell::make_cell_value_type(input);
+        CHECK_TRUE(result);
+        const int result_i = std::get<int>(*result);
+        CHECK_TRUE(result_i == 800);
+    }
+    // const data_field sample_dec_coord_df{R"("51.05011, -114.08529")", ecdt::geo_coordinate};
+    SECTION("make_cell_value_type decimal geo_coordinate") {
+        const auto& input = MyFixture::sample_dec_coord_df;
+        const auto result = data_cell::make_cell_value_type(input);
+        CHECK_TRUE(result);
+    }
+    // const data_field sample_dms_coord_df{R"("36° 00' N, 138° 00' E")", ecdt::geo_coordinate};
+    SECTION("make_cell_value_type dms geo_coordinate") {
+
+    }
+    // const data_field sample_boolean_df{"No", ecdt::boolean};
+    SECTION("make_cell_value_type false boolean") {
+
+    }
+    // const data_field sample_boolean_df{"Yes", ecdt::boolean};
+    SECTION("make_cell_value_type true boolean") {
+
+    }
+    // const data_field sample_tag_df{R"("""Johnson, Volcano, Dusk""")", ecdt::tags};
+    SECTION("make_cell_value_type tags") {
+
+    }
+
+}
 
 TEST_CASE(MyFixture, Cell) {
     SECTION("splitting") {

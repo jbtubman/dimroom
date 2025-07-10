@@ -12,7 +12,7 @@
 
 #include "coordinates.hpp"
 
-// Need to define what can be in a cell that is read in.
+// Need to define what can be in a data_cell that is read in.
 
 namespace jt {
 
@@ -76,6 +76,16 @@ constexpr inline e_cell_data_type operator||(e_cell_data_type lhs,
     // that not all paths return a value.
     return e_cell_data_type::invalid;
 }  /// @brief Returns a string representation of a cell_data_type enum.
+
+template <e_cell_data_type E>
+using e_cell_data_tag_type = std::integral_constant<e_cell_data_type, E>;
+
+template <e_cell_data_type E>
+using e_cell_data_tag_type_t = e_cell_data_tag_type<E>::type;
+
+template <e_cell_data_type E>
+using e_cell_data_tag_type_v = e_cell_data_tag_type<E>::value;
+
 /// @param e_cell_data_type v
 /// @return string
 inline constexpr string str(e_cell_data_type v) {
@@ -106,18 +116,18 @@ inline constexpr string str(e_cell_data_type v) {
     }
 }
 
-/// @brief Variant containing all the possible cell data value types.
-using cell_data_types =
+/// @brief Variant containing all the possible data_cell data value types.
+using cell_value_types =
     std::variant<float, bool, int, string, coordinate, vector<string> >;
 
-// If we know enough about a cell's contents to determine its type,
+// If we know enough about a data_cell's contents to determine its type,
 // or to know that its contents do not match a valid type,
 // the optional has a value.
 // If the type is not known yet, there is no value.
 
 /// @brief Cell data value type is optional because it might be determined
 /// later.
-using cell_data_type = std::optional<cell_data_types>;
+using cell_value_type = std::optional<cell_value_types>;
 
 // This could be templated and made generic to all optional types
 // if I had more time.
@@ -126,7 +136,7 @@ using cell_data_type = std::optional<cell_data_types>;
 /// @param lhs
 /// @param rhs
 /// @return bool
-inline bool operator==(const cell_data_type& lhs, const cell_data_type& rhs) {
+inline bool operator==(const cell_value_type& lhs, const cell_value_type& rhs) {
     const bool lhs_has_value = lhs.has_value();
     const bool rhs_has_value = rhs.has_value();
 
@@ -141,8 +151,8 @@ inline bool operator==(const cell_data_type& lhs, const cell_data_type& rhs) {
 }
 
 namespace ns_cpp_cell_data_type {
-/// @brief Finds the C++ type for a given cell data value type.
-/// @tparam V cell_value_type
+/// @brief Finds the C++ type for a given data_cell data value type.
+/// @tparam V e_cell_value_type
 template <e_cell_data_type V>
 struct cpp_cell_data_type {};
 
@@ -175,10 +185,20 @@ template <>
 struct cpp_cell_data_type<e_cell_data_type::tags> {
     using type = vector<string>;
 };
+
+template <>
+struct cpp_cell_data_type<e_cell_data_type::undetermined> {
+    using type = void;
+};
+
+template <>
+struct cpp_cell_data_type<e_cell_data_type::invalid> {
+    // No type defined.
+};
 }  // namespace ns_cpp_cell_data_type
 
-/// @brief Gets the C++ data type for the cell data type.
-/// @tparam V cell_value_type
+/// @brief Gets the C++ data type for the data_cell data type.
+/// @tparam V e_cell_value_type
 template <e_cell_data_type V>
 using cpp_cell_data_type_t = ns_cpp_cell_data_type::cpp_cell_data_type<V>::type;
 }  // namespace jt

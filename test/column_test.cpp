@@ -36,13 +36,13 @@ TEST_CASE(MyFixture, Column) {
         string nm{"Filename"};
         cv_type test_int{0};
         std::size_t pos{0};
-        cell_data_type ct{test_int};
+        cell_value_type ct{test_int};
         column col{nm, pos, ct};
         CHECK_TRUE(col.name == nm);
         CHECK_TRUE(col.position == pos);
         // see if the optional value is there.
-        CHECK_TRUE(col.column_type);
-        auto col_t_t = *(col.column_type);
+        CHECK_TRUE(col.value);
+        auto col_t_t = *(col.value);
         // see if the optional value is the right thing.
         auto col_v = std::get<cv_type>(col_t_t);
         CHECK_TRUE(col_v == test_int);

@@ -16,16 +16,16 @@ using std::string;
 using std::vector;
 namespace ranges = std::ranges;
 
-/// @brief Holds information about columns: name, position, and possible cell
+/// @brief Holds information about columns: name, position, and possible data_cell
 /// data type.
 class column {
    public:
     string name{};
     std::size_t position{};
-    cell_data_type column_type{};
+    cell_value_type value{};
 
-    column(const string& nm, std::size_t pos, cell_data_type ctype)
-        : name(nm), position(pos), column_type{ctype} {}
+    column(const string& nm, std::size_t pos, cell_value_type ctype)
+        : name(nm), position(pos), value{ctype} {}
 
     column(const string& nm, std::size_t pos) : name(nm), position(pos) {}
 
@@ -38,7 +38,7 @@ class column {
         using std::swap;
         swap(name, other.name);
         swap(position, other.position);
-        swap(column_type, other.column_type);
+        swap(value, other.value);
     }
 
     column& operator=(const column& other) noexcept {
@@ -56,10 +56,10 @@ class column {
     bool operator==(const column& other) const {
         if (position != other.position) return false;
         if (name != other.name) return false;
-        return (column_type == other.column_type);
+        return (value == other.value);
     }
 
-    /// @brief Like operator== but ignores the column_type field.
+    /// @brief Like operator== but ignores the value field.
     /// @param other
     /// @return bool
     bool mostly_equal(const column& other) const {

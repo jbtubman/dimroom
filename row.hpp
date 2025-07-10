@@ -19,7 +19,7 @@ using std::vector;
 namespace ranges = std::ranges;
 namespace views = std::ranges::views;
 
-struct row : vectorize<row, cell, vector<cell>> {
+struct row : vectorize<row, data_cell, vector<data_cell>> {
     auto& cells() { return container; }
 
     const auto& cells() const { return container; }
@@ -30,7 +30,7 @@ struct row : vectorize<row, cell, vector<cell>> {
         auto val_types = parser::row_value_types(parsed_strings);
         size_type zero{0};
         auto all_ints_view = views::iota(zero);
-        // using string_type_pos_t = std::tuple<string, jt::cell_value_type,
+        // using string_type_pos_t = std::tuple<string, jt::e_cell_value_type,
         // size_type>;
         using string_type_pos_vec_t = vector<string_cvt_pos_tuple>;
         string_type_pos_vec_t strings_and_types =
@@ -42,8 +42,8 @@ struct row : vectorize<row, cell, vector<cell>> {
             string field_s = std::get<0>(stp);
             jt::e_cell_data_type v = std::get<1>(stp);
             std::size_t pos = std::get<2>(stp);
-            auto cell_con = cell::make_cell_data_type(field_s, pos, v);
-            cell c(pos, cell_con);
+            auto cell_con = data_cell::make_cell_value_type(field_s, /* pos, */ v);
+            data_cell c(v, cell_con);
             result.push_back(c);
         }
         return result;

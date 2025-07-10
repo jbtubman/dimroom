@@ -163,8 +163,56 @@ TEST_CASE(MyFixture, ParseRow) {
 TEST_CASE(MyFixture, ParseFile) {
     SECTION("parse_lines") {
         const vector<string> input = MyFixture::sample_csv_rows;
-        parser::header_and_data result = parser::parse_lines(input);
+        parser::header_and_data result = parse_lines(input);
         CHECK_TRUE(!result.header_fields_.empty());
         CHECK_TRUE(result.data_fields_vec_.size() == input.size() - 1);
+    }
+}
+
+TEST_CASE(MyFixture, GetDataTypeForAllColumns) {
+    SECTION("get_data_types_for_all_columns") {
+        using ecdt = e_cell_data_type;
+        const vector<string> input = MyFixture::sample_csv_rows;
+        const parser::header_and_data hd = parse_lines(input);
+        println(stderr, "\nhd.size() = {}\n", hd.data_fields_vec_.size());
+        const parser::all_data_fields adf = hd.get_data_fields();
+        println(stderr, "\nadf.size() = {}\n", adf.size());
+        println(stderr, "\nnumber of columns: {}", adf[0].size());
+        const auto result = parser::get_data_types_for_all_columns(adf);
+        const vector<e_cell_data_type> expected = {
+            // Filename
+            ecdt::text,
+            // Type
+            ecdt::text,
+            // Image Size (MB)
+            ecdt::floating,
+            // Image X,
+            ecdt::integer,
+            // Image Y,
+            ecdt::integer,
+            // DPI,
+            ecdt::integer,
+            // (Center) Coordinate,
+            ecdt::geo_coordinate,
+            // Favorite,
+            ecdt::boolean,
+            // Continent,
+            ecdt::text,
+            // Bit color,
+            ecdt::integer,
+            // Alpha,
+            ecdt::text,
+            // Hockey Team,
+            ecdt::text,
+            // User Tags
+            ecdt::tags
+        };
+        CHECK_TRUE(result.size() == expected.size());
+        if (result.size() != expected.size()) {
+            println(stderr, "\nresult.size() = {}; expected.size() = {}\n", result.size(), expected.size());
+        }
+        for (size_t i = 0; i < result.size(); i++) {
+            CHECK_TRUE(result[i] == expected[i]);
+        }
     }
 }
