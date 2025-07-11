@@ -65,3 +65,10 @@ struct std::formatter<jt::coordinate, char> {
         return std::ranges::copy(std::move(out).str(), ctx.out()).out;
     }
 };
+
+namespace std {
+inline std::ostream& operator<<(std::ostream& os, const jt::coordinate& c) {
+    os << std::format("{}", c);
+    return os;
+}
+}
