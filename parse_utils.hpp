@@ -33,7 +33,7 @@ using std::operator""sv;
 using std::operator""s;
 
 constexpr string comma_substitute{"<<<COMMA>>>"};
-constexpr string tags_regex_s{R"(""".*(,.*)*""")"};
+constexpr string tags_regex_s{R"("""(.*)(,.*)*""")"};
 static const regex tags_regex(tags_regex_s);
 
 // Does a first pass at breaking a row on the commas.
@@ -159,7 +159,7 @@ inline e_cell_data_type determine_data_field_e_cell_data_type(
 
     e_cell_data_type vt = e_cell_data_type::undetermined;
     try {
-        std::regex float_rx{R"(-?((\d+\.)|(\.\d+)|(\d+\.\d+)))"};
+        regex float_rx{R"(-?((\d+\.)|(\.\d+)|(\d+\.\d+)))"};
         if (std::regex_match(cell_s, float_rx)) {
             float f = std::stof(cell_s);
             vt = e_cell_data_type::floating;
