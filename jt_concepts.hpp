@@ -2,6 +2,7 @@
 
 // Defines C++ 20 concepts for general use.
 
+#include <array>
 #include <concepts>
 #include <deque>
 #include <forward_list>
@@ -10,13 +11,14 @@
 #include <tuple>
 #include <type_traits>
 #include <vector>
-#include <array>
 
 namespace jt {
 
+using std::array;
 using std::deque;
 using std::forward_list;
 using std::list;
+using std::string;
 using std::tuple;
 using std::vector;
 
@@ -35,7 +37,7 @@ template <class Collection>
 concept HasForwardIterator =
     requires(Collection c) { std::forward_iterator<decltype(std::begin(c))>; };
 
-static_assert(HasForwardIterator<vector<std::string>>);
+static_assert(HasForwardIterator<vector<string>>);
 
 template <typename Collection>
 concept HasBidirectionalIterator = requires(Collection c) {
@@ -53,11 +55,12 @@ template <class Collection, typename T = Collection::value_type>
 concept HasPushBack = requires(Collection c, T v) { c.push_back(v); };
 
 static_assert(HasPushBack<vector<int>>);
-static_assert(!HasPushBack<std::array<int,5>>);
+static_assert(!HasPushBack<array<int, 5>>);
 
 template <typename Collection>
-concept HasSize = requires(Collection c) {
-    c.size();
-};
+concept HasSize = requires(Collection c) { c.size(); };
+
+template <typename Collection, typename Iterator = Collection::iterator>
+concept HasRandomAccessIterator = std::random_access_iterator<Iterator>;
 
 }  // namespace jt
