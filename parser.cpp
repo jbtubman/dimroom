@@ -1,6 +1,8 @@
 #include "parser.hpp"
 
 namespace jt {
+    using std::vector;
+    using std::string;
 
 // static inline parser::data_fields get_data_fields_for_one_column(
 //     const parser::all_data_fields& all_df, size_t column_index) {

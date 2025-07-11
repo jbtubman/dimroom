@@ -53,6 +53,31 @@ class parser {
         bool operator==(const data_field& other) const {
             return data_type == other.data_type && text == other.text;
         }
+
+        data_field(const string& s, e_cell_data_type ecdt)
+            : text{s}, data_type{ecdt} {}
+        data_field(const data_field& other)
+            : text{other.text}, data_type{other.data_type} {}
+        data_field(data_field&& other)
+            : text{std::move(other.text)},
+              data_type{std::move(other.data_type)} {}
+
+        void swap(data_field& other) {
+            std::swap(text, other.text);
+            std::swap(data_type, other.data_type);
+        }
+
+        data_field& operator=(const data_field& other) {
+            data_field tmp{other};
+            swap(tmp);
+            return *this;
+        }
+
+        data_field& operator=(data_field&& other) {
+            data_field tmp{std::move(other)};
+            swap(tmp);
+            return *this;
+        }
     };
 
     using data_fields = vector<data_field>;
@@ -109,7 +134,7 @@ class parser {
 
         header_fields result;
 
-        std::string_view header_sv{header};
+        string_view header_sv{header};
 
         auto split_header =
             header_sv | views::split(","sv) | ranges::to<vector<string>>();
@@ -255,7 +280,7 @@ parser::header_and_data _parse_lines(VecString&& input_lines) {
 
     auto zipped = ranges::zip_view(hfs, cell_data_types_vec);
 
-    for( std::pair<parser::header_field, e_cell_data_type> hf_cdt : zipped) {
+    for (std::pair<parser::header_field, e_cell_data_type> hf_cdt : zipped) {
         hfs_result.emplace_back(hf_cdt.first.name, hf_cdt.second);
         // hf_cdt.first.data_type = hf_cdt.second;
         // hfs_result.push_back(hf_cdt);
@@ -265,7 +290,7 @@ parser::header_and_data _parse_lines(VecString&& input_lines) {
     return result;
 }
 
-//static inline
+// static inline
 parser::header_and_data parse_lines(const vector<string>& input_lines);
 // {
 //     return _parse_lines<const vector<string>&>(input_lines);
