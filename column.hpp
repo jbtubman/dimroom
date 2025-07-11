@@ -16,8 +16,8 @@ using std::string;
 using std::vector;
 namespace ranges = std::ranges;
 
-/// @brief Holds information about columns: name, position, and possible data_cell
-/// data type.
+/// @brief Holds information about columns: name, position, and possible
+/// data_cell data type.
 class column {
    public:
     string name{};
@@ -71,7 +71,7 @@ class column {
 /// @brief list of columns in the table.
 class columns {
    public:
-    using container_type = std::vector<column>;
+    using container_type = vector<column>;
 
     container_type cols;
 
@@ -140,7 +140,7 @@ class columns {
     }
 
     auto find(const string& field_name) -> std::optional<column> {
-        auto it = std::ranges::find_if(
+        auto it = ranges::find_if(
             cols, [field_name](column c) { return c.name == field_name; });
         if (it == cols.end()) {
             return {};
