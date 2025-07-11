@@ -17,6 +17,11 @@ using std::vector;
 namespace ranges = std::ranges;
 namespace views = std::ranges::views;
 
+inline static auto infinite_ints_vw() {
+    std::size_t zero{0};
+    return views::iota(zero);
+}
+
 template <typename T1, typename T2 = T1>
 using cross_product_pair_t = std::pair<T1, T2>;
 
