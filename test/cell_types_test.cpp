@@ -53,8 +53,8 @@ struct MyFixture : general_fixture {
     // }
 
     static consteval cross_product_output_t<e_cell_data_type> all_cdt_combos() {
-        auto v1 = e_cell_data_types();
-        auto v2 = e_cell_data_types();
+        auto v1 = all_e_cell_data_types();
+        auto v2 = all_e_cell_data_types();
         return cross_product<e_cell_data_type>(v1, v2);
     }
 
