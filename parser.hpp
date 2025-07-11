@@ -23,11 +23,6 @@ namespace ranges = std::ranges;
 namespace views = std::views;
 using namespace std::string_literals;
 
-inline static auto infinite_ints_vw() {
-    std::size_t zero{0};
-    return views::iota(zero);
-}
-
 class parser {
    public:
     class header_field {
@@ -38,6 +33,40 @@ class parser {
         bool operator==(const header_field& other) const {
             return data_type == other.data_type && name == other.name;
         }
+
+        header_field() {}
+
+        header_field(const string& nm, e_cell_data_type e)
+            : name{nm}, data_type{e} {}
+
+        header_field(string&& nm, e_cell_data_type e)
+            : name{std::move(nm)}, data_type{e} {}
+
+        header_field(const header_field& other)
+            : name{other.name}, data_type{other.data_type} {}
+
+        header_field(header_field&& other)
+            : name{std::move(other.name)},
+              data_type{std::move(other.data_type)} {}
+
+        void swap(header_field& other) {
+            using std::swap;
+            header_field tmp{other};
+            swap(name, tmp.name);
+            swap(data_type, other.data_type);
+        }
+
+        header_field& operator=(const header_field& other) {
+            header_field tmp{other};
+            swap(tmp);
+            return *this;
+        }
+
+        header_field& operator=(header_field&& other) {
+            header_field tmp{std::move(other)};
+            swap(tmp);
+            return *this;
+        }
     };
 
     using header_fields = vector<header_field>;
@@ -45,6 +74,7 @@ class parser {
     /// A data field represents a single field read from a data row of a CSV
     /// file. It does not have the actual parsed value (int, geo-coordinate,
     /// whatever.)
+    /// This is the same as header_field, except how we refer to the string!
     class data_field {
        public:
         string text{""};
@@ -241,9 +271,8 @@ static inline e_cell_data_type get_data_type_for_column(
         });
 }
 
-template <typename VecString>
-parser::header_and_data _parse_lines(VecString&& input_lines) {
-    auto in_lines = std::move<VecString>(input_lines);
+static inline parser::header_and_data __parse_lines(
+    const vector<string>& in_lines) {
     auto len = in_lines.size();
     auto first = in_lines.begin();
     auto last = in_lines.end();
@@ -290,16 +319,10 @@ parser::header_and_data _parse_lines(VecString&& input_lines) {
     return result;
 }
 
-// static inline
-parser::header_and_data parse_lines(const vector<string>& input_lines);
-// {
-//     return _parse_lines<const vector<string>&>(input_lines);
-// }
-
-// static inline
-parser::header_and_data parse_lines(vector<string>&& input_lines);
-// {
-//     return _parse_lines(input_lines);
-// }
+template <typename VectorString>
+static parser::header_and_data parse_lines(VectorString&& input_lines) {
+    const VectorString in_lines{std::forward<VectorString>(input_lines)};
+    return __parse_lines(in_lines);
+}
 
 }  // namespace jt
