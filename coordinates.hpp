@@ -17,9 +17,9 @@
 namespace jt {
 // degrees/minutes regexps.
 
+using std::regex;
 using std::string;
 using std::string_view;
-using std::regex;
 
 const string deg_min_lat_s{R"(((\d{1,2})° (\d{2})' ([NS])))"};
 const regex deg_min_lat_rx{deg_min_lat_s};
@@ -35,7 +35,7 @@ const regex deg_min_long_end_rx{deg_min_long_end_s};
 
 // A complete coordinate has double quote marks around it.
 const string deg_min_cooordinate_s("(\"" + deg_min_lat_s + ", " +
-                                        deg_min_long_s + "\")");
+                                   deg_min_long_s + "\")");
 const regex deg_min_cooordinate_rx{deg_min_cooordinate_s};
 
 // These constants give the index to the iterator in the formatter that
@@ -65,11 +65,11 @@ const string decimal_long_end_s{R"((\s-?\d{1,3}\.\d{5}"))"};
 const regex decimal_long_end_rx{decimal_long_end_s};
 
 const string decimal_coordinate_s("(\"" + decimal_lat_s + ", " +
-                                       decimal_long_s + "\")");
+                                  decimal_long_s + "\")");
 const regex decimal_coordinate_rx{decimal_coordinate_s};
 
 const string coordinate_s("^" + deg_min_cooordinate_s + "|" +
-                               decimal_coordinate_s + "$");
+                          decimal_coordinate_s + "$");
 const regex coordinate_rx{coordinate_s};
 
 // These constants give the index to the iterator in the formatter that
@@ -152,7 +152,8 @@ class coordinate {
     }
 };
 
-/// @brief Polygon represented by a vector of coordinates. Assumed to be a closed polygon.
+/// @brief Polygon represented by a vector of coordinates. Assumed to be a
+/// closed polygon.
 using polygon = std::vector<coordinate>;
 
 inline coordinate::format coordinate_format(const string& s) noexcept {
@@ -162,10 +163,8 @@ inline coordinate::format coordinate_format(const string& s) noexcept {
                                            : coordinate::format::invalid);
 }
 
-std::expected<
-    std::pair<float, float>,
-    coordinate::format> inline parse_decimal_coordinate(const string&
-                                                            coord) {
+inline std::expected<std::pair<float, float>, coordinate::format>
+parse_decimal_coordinate(const string& coord) {
     const auto subexpression_count = jt::decimal_coordinate_rx.mark_count();
     std::vector<std::sregex_token_iterator> rti_vec;
     auto dec_end = std::sregex_token_iterator();
