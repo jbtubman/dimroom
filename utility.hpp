@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <concepts>
 #include <iterator>
 #include <ranges>
@@ -47,6 +48,7 @@ constexpr OutputCollection cross_product(Collection1 v1, Collection2 v2) {
     auto outer_fold_fn = [&v2, &inner_fold_fn](OutputCollection outer_acc,
                                                T1 dt1) {
         inner_accumulator_t inner_acc{dt1, outer_acc};
+        // auto ig = ranges::fold_left(v2, inner_acc, inner_fold_fn);
         auto ignore = ranges::fold_left(v2, inner_acc, inner_fold_fn);
         return inner_acc.second;
     };
@@ -105,20 +107,26 @@ auto shove_back(Container&& acc, T&& v) {
     return result;
 }
 
-/**
- * @brief Returns a container containing the `index`th element of each vector.
- * @attention Does not work yet!
- */
-template <typename T, HasPushBack Container = vector<T>,
-          HasForwardIterator SuperContainer = vector<Container>>
-Container slice(SuperContainer&& vec_of_vec, size_t index) {
-    auto super_container = std::forward<SuperContainer>(vec_of_vec);
-    return ranges::fold_left(super_container, Container({}),
-                             [&index](Container&& acc, Container&& val) {
-                                 auto the_acc = std::forward<Container>(acc);
-                                 auto the_val = std::forward<Container>(val);
-                                 return shove_back(the_acc, the_val[index]);
-                             });
-}
+// /**
+//  * @brief Returns a container containing the `index`th element of each
+//  vector.
+//  * @attention Does not work yet!
+//  */
+// template <typename T, HasPushBack Container = vector<T>,
+//           HasForwardIterator SuperContainer = vector<Container>>
+// Container slice(SuperContainer&& vec_of_vec, size_t index) {
+//     auto super_container = std::forward<SuperContainer>(vec_of_vec);
+//     return ranges::fold_left(super_container, Container({}),
+//                              [&index](Container&& acc, Container&& val) {
+//                                  auto the_acc = std::forward<Container>(acc);
+//                                  auto the_val = std::forward<Container>(val);
+//                                  return shove_back(the_acc, the_val[index]);
+//                              });
+// }
+
+// template<IsRandomAccess Container...>
+// Container superslice(Container ...c) {
+
+// }
 
 }  // namespace jt
