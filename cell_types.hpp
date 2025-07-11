@@ -40,6 +40,12 @@ enum class e_cell_data_type : size_t {
     SENTINEL
 };
 
+inline void swap(e_cell_data_type& lhs, e_cell_data_type& rhs) {
+    e_cell_data_type tmp = lhs;
+    lhs = rhs;
+    rhs = tmp;
+}
+
 using e_cell_data_type_sequence =
     std::integer_sequence<e_cell_data_type, e_cell_data_type::SENTINEL>;
 
