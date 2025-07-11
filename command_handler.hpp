@@ -20,31 +20,28 @@ struct tag_value {
 
 class command_handler {
    public:
-    table read_csv_file(const string& filename) {
-      return table();
-    }
+    table read_csv_file(const string& filename) { return table(); }
 
-    bool write_csv_file(const string& filname, table) {
-      return false;
-    }
+    bool write_csv_file(const string& filname, table) { return false; }
 
     query create_query(const string& query_text, table table_to_search) {
-      return query();
+        return query();
     }
 
-    query create_tags_query(vector<tag_value> tag_values, table table_to_search){
-      return query();
+    query create_tags_query(vector<tag_value> tag_values,
+                            table table_to_search) {
+        return query();
     }
 
     query create_geo_query(coordinate location, polygon bounding_polygon,
-                           table table_to_search){
-      return query();
+                           table table_to_search) {
+        return query();
     }
 
-    vector<row> run_query(query q, table table_to_search){
-      return vector<row>();
+    vector<row> run_query(query q, table table_to_search) {
+        return vector<row>();
     }
 
-    void exit_app();
+    void exit_app() {};
 };
 }  // namespace jt
