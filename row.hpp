@@ -40,7 +40,7 @@ struct row : vectorize<row, data_cell, vector<data_cell>> {
         row result;
         for (string_cvt_pos_tuple& stp : strings_and_types) {
             string field_s = std::get<0>(stp);
-            jt::e_cell_data_type v = std::get<1>(stp);
+             jt::e_cell_data_type v = std::get<1>(stp);
             std::size_t pos = std::get<2>(stp);
             auto cell_con = data_cell::make_cell_value_type(field_s, /* pos, */ v);
             data_cell c(v, cell_con);
