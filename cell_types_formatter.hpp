@@ -37,9 +37,8 @@ struct std::formatter<jt::e_cell_data_type, char> {
     FmtContext::iterator format(jt::e_cell_data_type ecdt,
                                 FmtContext& ctx) const {
         std::ostringstream out;
-        if (long_format) {
-            out << "e_cell_data_type::";
-        }
+        const string prefix = long_format ? "jt::e_cell_data_type::" : "";
+        out << "\"" << prefix;
 
         switch (ecdt) {
             case jt::e_cell_data_type::undetermined:
@@ -82,6 +81,7 @@ struct std::formatter<jt::e_cell_data_type, char> {
                 // This should not happen but it keeps the compiler happy.
                 out << "**UNKNOWNN**"s;
         }
+        out << "\"";
 
         return std::ranges::copy(std::move(out).str(), ctx.out()).out;
     }
