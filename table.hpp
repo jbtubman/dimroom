@@ -129,3 +129,9 @@ struct table {
     }
 };
 }  // namespace jt
+
+#define TABLE_INCLUDE_FORMATTER
+
+#include "table_formatter.hpp"
+
+#undef TABLE_INCLUDE_FORMATTER

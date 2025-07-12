@@ -44,6 +44,9 @@ TEST_CASE(MyFixture, Table) {
         println(stderr, "\n");
         println(stderr, "Index for \"Filename\": {}", test_table.column_name_index_map["Filename"]);
         println(stderr, "Index for \"Image Size (MB)\": {}", test_table.column_name_index_map["Image Size (MB)"]);
+        auto hd = test_table.header_fields_;
+        println(stderr,"test_table.header_fields_: {}", hd);
         // println(stderr, "\nmap: {}\n", test_table.column_name_index_map);
+        println(stderr, "\ntest_table: {}\n", test_table);
     }
 }
