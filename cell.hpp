@@ -38,6 +38,12 @@ class data_cell {
     e_cell_data_type data_type{e_cell_data_type::undetermined};
     cell_value_type value{};
 
+    void swap(data_cell& other) {
+        using std::swap;
+        swap(data_type, other.data_type);
+        swap(value, other.value);
+    }
+
     data_cell(const parser::data_field& df)
         : data_type{df.data_type},
           value{make_cell_value_type(df.text, df.data_type)} {
@@ -59,15 +65,13 @@ class data_cell {
 
     data_cell& operator=(const data_cell& other) {
         data_cell tmp{other};
-        swap(data_type, tmp.data_type);
-        swap(value, tmp.value);
+        swap(tmp);
         return *this;
     }
 
     data_cell& operator=(data_cell&& other) {
         data_cell tmp{std::move(other)};
-        swap(data_type, tmp.data_type);
-        swap(value, tmp.value);
+        swap(tmp);
         return *this;
     }
 
