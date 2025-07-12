@@ -21,6 +21,10 @@ struct std::formatter<jt::e_cell_data_type, char> {
         if (*it == '@') {
             long_format = true;
             ++it;
+            if (it == ctx.end()) {
+                throw std::format_error(
+                    "Unfinished format args for e_cell_data_type.");
+            }
         }
         if (it != ctx.end() && *it != '}')
             throw std::format_error(

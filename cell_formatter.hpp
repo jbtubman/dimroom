@@ -8,21 +8,38 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "cell_types.hpp"
 #include "coordinates.hpp"
 
+namespace {
+using namespace std::string_literals;
+using std::operator""s;
+using std::operator""sv;
+}  // namespace
+
 // Formatter implementation based on the example found at:
 // https://www.en.cppreference.com/w/cpp/utility/format/formatter.html
 template <>
 struct std::formatter<jt::data_cell, char> {
+    bool long_format = false;
+
     template <class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext& ctx) {
         auto it = ctx.begin();
         if (it == ctx.end()) return it;
+        if (*it == '#') {
+            long_format = true;
+            ++it;
+            if (it == ctx.end()) {
+                throw std::format_error(
+                    "Unfinished format args for data_cell.");
+            }
+        }
         if (it != ctx.end() && *it != '}')
-            throw std::format_error("Invalid format args for jt::data_cell.");
+            throw std::format_error("Invalid format args for data_cell.");
 
         return it;
     }
@@ -30,10 +47,15 @@ struct std::formatter<jt::data_cell, char> {
     template <class FmtContext>
     FmtContext::iterator format(jt::data_cell dc, FmtContext& ctx) const {
         std::ostringstream out;
+        if (long_format) out << "jt::";
 
-        out << "jt::data_cell{ ";
+        out << "data_cell{ ";
         out << "data_type: ";
-        out << dc.data_type << ", ";
+        if (long_format) {
+            out << std::vformat("{#}"sv, std::make_format_args(dc.data_type)) << ", ";
+        } else {
+            out << dc.data_type << ", ";
+        }
         out << "value: ";
         if (dc.value) {
             const auto variant_value = *(dc.value);
@@ -62,7 +84,6 @@ struct std::formatter<jt::data_cell, char> {
                 out << R"(""")";
             } else if (holds_alternative<jt::coordinate>(variant_value)) {
                 jt::coordinate coord{std::get<jt::coordinate>(variant_value)};
-                // const auto coord = std::get<jt::coordinate>(variant_value);
                 out << coord;
             } else {
                 out << dc.data_type;
