@@ -6,7 +6,7 @@ UPPER_DIR = ..
 
 .SUFFIXES : .o .cpp .hpp
 
-OBJS = main.o cell_test.o cell_types_test.o column_test.o coordinates_test.o parse_utils_test.o parser_test.o row_test.o table_test.o
+OBJS = main.o cell_test.o cell_types_test.o column_test.o coordinates_test.o parse_utils_test.o parser_test.o row_test.o table_test.o utility_test.o
 
 SRCS := $(patsubst %.o,%.cpp,$(OBJS))
 
@@ -19,9 +19,26 @@ test: $(OBJS) ../parser.o $(TEST_INCS)
 	$(CPP) $(CFLAGS) -o $@ $(OBJS) ../parser.o
 
 *_test.cpp : $(TEST_INCS)
-#	$(CPP) $(CFLAGS) -c $<
 
-# $(OBJS) : $(SRCS)
+main.cpp:
+
+main.o: main.cpp
+	$(CPP) $(CFLAGS) -c $<
+
+table_test.cpp: ../table.hpp ../parser.hpp
+
+table_test.o: table_test.cpp
+	$(CPP) $(CFLAGS) -c $<
+
+cell_test.cpp: ../cell.hpp ../parser.hpp
+
+cell_test.o: cell_test.cpp ../cell.hpp ../parser.hpp
+	$(CPP) $(CFLAGS) -c $<
+
+parser_test.cpp: ../parser.hpp ../parser.cpp
+
+parser_test.o: parser_test.cpp
+	$(CPP) $(CFLAGS) -c $<
 
 .cpp.o :
 	$(CPP) $(CFLAGS) -c $<
