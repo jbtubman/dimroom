@@ -32,7 +32,7 @@ struct std::formatter<jt::parser::header_field, char> {
         out << "jt::parser::header_field{ ";
         out << "name: " << hf.name << ", ";
         out << "data_type: ";
-        out << jt::str(hf.data_type) << " }";
+        out << hf.data_type << " }";
 
         return std::ranges::copy(std::move(out).str(), ctx.out()).out;
     }
@@ -109,7 +109,7 @@ struct std::formatter<jt::parser::data_field, char> {
         out << "jt::parser::data_field{ ";
         out << "text: " << df.text << ", ";
         out << "data_type: ";
-        out << jt::str(df.data_type) << " }";
+        out << df.data_type << " }";
 
         return std::ranges::copy(std::move(out).str(), ctx.out()).out;
     }

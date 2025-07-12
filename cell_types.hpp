@@ -292,39 +292,6 @@ using tag_sequence = type_sequence<undetermined_tag, invalid_tag, floating_tag,
 template <class T>
 using tag_cell_value_type_t = T::value_type;
 
-/// @param e_cell_data_type ecdt
-/// @return string
-inline constexpr string str(e_cell_data_type ecdt) {
-    switch (ecdt) {
-        case e_cell_data_type::undetermined:
-            return "undetermined";
-
-        case e_cell_data_type::invalid:
-            return "invalid";
-
-        case e_cell_data_type::floating:
-            return "floating";
-
-        case e_cell_data_type::boolean:
-            return "boolean";
-
-        case e_cell_data_type::integer:
-            return "integer";
-
-        case e_cell_data_type::text:
-            return "text";
-
-        case e_cell_data_type::geo_coordinate:
-            return "geo_coordinate";
-
-        case e_cell_data_type::tags:
-            return "tags";
-
-        case e_cell_data_type::SENTINEL:
-            return "SENTINEL";
-    }
-}
-
 /// @brief Variant containing all the possible data_cell data value types.
 using cell_value_types =
     std::variant<std::monostate, std::monostate, float, bool, int, std::string,

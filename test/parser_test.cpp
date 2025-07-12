@@ -134,8 +134,8 @@ TEST_CASE(MyFixture, ParseRow) {
             CHECK_TRUE(*r_it == *e_it);
             if (*r_it != *e_it) {
                 println(stderr, "\nparse_data_row");
-                println(stderr, "result[{}]:   {}", index, str(*r_it));
-                println(stderr, "expected[{}]: {}\n", index, str(*e_it));
+                println(stderr, "result[{}]:   {}", index, *r_it);
+                println(stderr, "expected[{}]: {}\n", index, *e_it);
             }
             ++r_it;
             ++e_it;
@@ -147,7 +147,7 @@ TEST_CASE(MyFixture, ParseRow) {
         auto val_types = parser::row_value_types(parsed_strings);
         int i = 0;
         for (auto v : val_types) {
-            println(stderr, "row value types - val_types[{}]: {}", i++, str(v));
+            println(stderr, "row value types - val_types[{}]: {}", i++, v);
         }
     }
 }

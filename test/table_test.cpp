@@ -5,9 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../cell_formatter.hpp"
 #include "../parser.hpp"
-#include "../parser_formatter.hpp"
 #include "CppUnitTestFramework.hpp"
 #include "general_fixture.hpp"
 
@@ -34,8 +32,8 @@ TEST_CASE(MyFixture, Table) {
         println(stderr, "\nheader_fields_: {}\n", test_table.header_fields_);
         println(stderr, "\ndata_fields: {}\n", test_table.cell_rows_);
         println(stderr, "\ntype_fieldname_map:\n");
-        for (const auto& v : test_table.type_to_column_name_map) {
-            const auto v_first = str(v.first);
+        for (const auto& v : test_table.column_name_to_type_map) {
+            const auto v_first = v.first;
             const auto v_second = v.second;
             println(stderr, "\ndata_fields: {}\n", v_first);
             // const string prefix{"\t{"};

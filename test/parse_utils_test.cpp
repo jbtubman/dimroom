@@ -224,8 +224,8 @@ TEST_CASE(MyFixture, ParseUtils) {
             if (result != expected) {
                 println(stderr, "\ntest determine_data_field_e_cell_data_type");
                 println(stderr, "input:    \"{}\"", input);
-                println(stderr, "result:   {}", str(result));
-                println(stderr, "expected: {}\n", str(expected));
+                println(stderr, "result:   {}", result);
+                println(stderr, "expected: {}\n", expected);
             }
         }
     }

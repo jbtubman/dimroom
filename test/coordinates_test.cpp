@@ -5,7 +5,6 @@
 
 #include "CppUnitTestFramework.hpp"
 #include "../coordinates.hpp"
-#include "../coordinate_formatter.hpp"
 #include "general_fixture.hpp"
 
 namespace {

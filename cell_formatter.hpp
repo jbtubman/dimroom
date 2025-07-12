@@ -33,7 +33,7 @@ struct std::formatter<jt::data_cell, char> {
 
         out << "jt::data_cell{ ";
         out << "data_type: ";
-        out << jt::str(dc.data_type) << ", ";
+        out << dc.data_type << ", ";
         out << "value: ";
         if (dc.value) {
             const auto variant_value = *(dc.value);
@@ -65,7 +65,7 @@ struct std::formatter<jt::data_cell, char> {
                 // const auto coord = std::get<jt::coordinate>(variant_value);
                 out << coord;
             } else {
-                out << jt::str(dc.data_type);
+                out << dc.data_type;
             }
         } else {
             out << "nullopt";

@@ -211,49 +211,6 @@ class parser {
     }
 };
 
-// Free functions for converting the above classes to strings for debugging
-// purposes.
-
-inline string str(const parser::header_field& hf) {
-    return "header_field{ name: \""s + hf.name + "\", data_type: "s +
-           str(hf.data_type) + " }"s;
-}
-
-inline string str(const parser::header_fields& hfs) {
-    string result("header_fields{ \n\t");
-    for (const parser::header_field& hf : hfs) {
-        result.append(str(hf) + ", "s);
-    }
-    result = string(result.begin(), result.begin() + result.find_last_of(","));
-    result.append(" }\n");
-    return result;
-}
-
-inline string str(const parser::data_field& df) {
-    return string{"data_field{ text: \""s + df.text + "\", data_type: "s +
-                  str(df.data_type) + " }"};
-}
-
-inline string str(const parser::data_fields& dfs) {
-    string result{"[ "s};
-    for (const auto& df : dfs) {
-        result.append(str(df) + ", "s);
-    }
-    result = string(result.begin(), result.begin() + result.find_last_of(","));
-    result.append(" ]");
-    return result;
-}
-
-inline string str(const parser::all_data_fields& adfs) {
-    string result("{ \n\t");
-    for (const parser::data_fields& dfs : adfs) {
-        result.append(str(dfs) + ", \n"s);
-    }
-    result = string(result.begin(), result.begin() + result.find_last_of(","));
-    result.append(" }");
-    return result;
-}
-
 static inline parser::data_fields get_data_fields_for_one_column(
     const parser::all_data_fields& all_df, size_t column_index) {
     return ranges::fold_left(all_df, parser::data_fields{},
