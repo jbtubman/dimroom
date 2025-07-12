@@ -1,6 +1,7 @@
 #include "../cell.hpp"
 
 #include <algorithm>
+#include <print>
 #include <ranges>
 #include <regex>
 #include <string>
@@ -16,6 +17,7 @@ namespace {
 using std::string;
 using std::vector;
 using namespace jt;
+using std::println;
 
 struct MyFixture : general_fixture {
     // ...
@@ -197,5 +199,7 @@ TEST_CASE(MyFixture, Cell) {
         CHECK_TRUE(filename);
         CHECK_TRUE(true);
         CHECK_TRUE(filename.get_string() == "Japan.jpeg");
+        println(stderr, "\nfilename cell: {}", filename);
+        println(stderr, "cells: {}\n", cells);
     }
 }
