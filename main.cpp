@@ -8,7 +8,6 @@
 #include "cell_types.hpp"
 #include "command_interpreter.hpp"
 #include "contains.hpp"
-#include "coordinate_formatter.hpp"
 #include "coordinates.hpp"
 #include "table.hpp"
 
