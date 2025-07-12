@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <map>
+#include <optional>
 #include <ranges>
 #include <set>
 #include <string>
@@ -45,6 +46,7 @@ struct table {
     parser::header_fields header_fields_{};
 
     using cell_rows = vector<data_cells>;
+    using opt_cell_rows = std::optional<cell_rows>;
 
     using cell_column = vector<data_cell>;
 
@@ -203,7 +205,39 @@ struct table {
                 return acc;
             });
     }
+
+    cell_rows string_match(const string& col_name, const string& query_value,
+                           opt_cell_rows query_targets = opt_cell_rows{}) {
+        cell_rows targets = query_targets ? *query_targets : cell_rows_;
+
+        return targets;
+    }
 };
+
+static inline table::cell_column get_data_column(table& t, size_t column_idx) {
+    return t.get_data_column(column_idx);
+}
+
+static inline table::cell_rows string_match(
+    table& t, const string& col_name, const string& query_value,
+    table::opt_cell_rows rows_to_query = table::opt_cell_rows{}) {
+    table::cell_rows targets = rows_to_query ? *rows_to_query : t.cell_rows_;
+    const auto col_idx = t.index_for_column_name(col_name);
+    auto result = ranges::fold_left(
+        targets, table::cell_rows{},
+        [&query_value, &col_idx](table::cell_rows acc, data_cells dcs) {
+            const cell_value_type cvt = dcs[col_idx].value;
+            if (cvt) {
+                const string s = std::get<string>(*cvt);
+                if (s == query_value) {
+                    acc.push_back(dcs);
+                }
+            }
+            return acc;
+        });
+    return result;
+}
+
 }  // namespace jt
 
 #define TABLE_INCLUDE_FORMATTER

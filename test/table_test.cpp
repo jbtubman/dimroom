@@ -48,5 +48,13 @@ TEST_CASE(MyFixture, Table) {
         println(stderr,"test_table.header_fields_: {}", hd);
         // println(stderr, "\nmap: {}\n", test_table.column_name_index_map);
         println(stderr, "\ntest_table: {}\n", test_table);
+        auto search_result = string_match(test_table, "Filename", "Iceland.png");
+        CHECK_TRUE(!search_result.empty());
+        search_result = string_match(test_table, "Filename", "Finland.png");
+        CHECK_TRUE(search_result.empty());
+        search_result = string_match(test_table, "Type", "jpeg");
+        CHECK_TRUE(!search_result.empty());
+        CHECK_TRUE(search_result.size() == 2);
+        println(stderr, "\nsearch for \"Type\" == \"jpeg\": {}\n", search_result);
     }
 }
