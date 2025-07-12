@@ -29,25 +29,45 @@ Some things should be moved over to the parser. They do not belong here.
 
 ## Overhaul Parser
 
-Need a parser class.
+Need a parser class. DONE.
 
-Need supporting classes:
+Need supporting classes: DONE.
 
 (In cell_type?) The data_value_type variant, and the optional of that.
 
 * header_field
   * name
+  * e_cell_data_type (defaults to unknown).
 
 * data_field
   * text
-  * optional
+  * cell
 
 ## Overhaul Cells
+
+Changed the class name to `data_cell`.
 
 Do we really need to know the position of the cell?
 
 We could determine the data type to associate with the column after all the data rows
 have been read in. Then go row by row through the data until all the data types have been
-deduced, or we run out of rows.
+deduced, or we run out of rows. DONE.
 
-Have a new class - parsed_data_field. This holds the text and the guessed data type.
+Have a new class - parsed_data_field. This holds the text and the guessed data type. DONE.
+
+## Convert `header_and_data` to Table
+
+That is basically done.
+
+## parser::header_field and parser::data_field are the same!
+
+Don't worry about it for now.
+
+## NEXT STEP
+
+Query stuff.
+do a text field query first.
+
+Given a field name, look up what type of values it holds.
+Parse the query value argument accordingly.
+Do we need a map that is the inverse of type_to_column_name_map? I think we will. DONE.
