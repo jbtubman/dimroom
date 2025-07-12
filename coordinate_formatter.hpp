@@ -1,10 +1,11 @@
+#if !defined(COORDINATE_INCLUDE_FORMATTER)
+#error "coordinate_formatter.hpp should not be included directly"
+#else
 #pragma once
 
 #include <format>
 #include <iomanip>
 #include <sstream>
-
-#include "coordinates.hpp"
 
 // Formatter implementation based on the example found at:
 // https://www.en.cppreference.com/w/cpp/utility/format/formatter.html
@@ -71,4 +72,5 @@ inline std::ostream& operator<<(std::ostream& os, const jt::coordinate& c) {
     os << std::format("{}", c);
     return os;
 }
-}
+}  // namespace std
+#endif

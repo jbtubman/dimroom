@@ -350,3 +350,9 @@ class data_cell {
 
 using data_cells = vector<data_cell>;
 }  // namespace jt
+
+#define CELL_INCLUDE_FORMATTER
+
+#include "cell_formatter.hpp"
+
+#undef CELL_INCLUDE_FORMATTER

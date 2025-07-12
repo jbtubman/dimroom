@@ -1,3 +1,6 @@
+#if !defined(PARSER_INCLUDE_FORMATTER)
+#error "parser_formatter.hpp should not be included directly."
+#else
 #pragma once
 
 #include <format>
@@ -5,7 +8,6 @@
 #include <sstream>
 
 #include "cell_types.hpp"
-#include "parser.hpp"
 
 // Formatter implementation based on the example found at:
 // https://www.en.cppreference.com/w/cpp/utility/format/formatter.html
@@ -161,3 +163,5 @@ inline std::ostream& operator<<(std::ostream& os,
     return os;
 }
 }  // namespace std
+
+#endif

@@ -283,3 +283,9 @@ inline coordinate make_coordinate(const string& s) {
 }
 
 };  // namespace jt
+
+#define COORDINATE_INCLUDE_FORMATTER
+
+#include "coordinate_formatter.hpp"
+
+#undef COORDINATE_INCLUDE_FORMATTER

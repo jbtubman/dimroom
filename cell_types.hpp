@@ -4,8 +4,10 @@
 #include <print>
 #endif
 #include <compare>
+#include <format>
 #include <optional>
 #include <regex>
+#include <sstream>
 #include <string>
 #include <tuple>
 #include <variant>
@@ -290,10 +292,10 @@ using tag_sequence = type_sequence<undetermined_tag, invalid_tag, floating_tag,
 template <class T>
 using tag_cell_value_type_t = T::value_type;
 
-/// @param e_cell_data_type v
+/// @param e_cell_data_type ecdt
 /// @return string
-inline constexpr string str(e_cell_data_type v) {
-    switch (v) {
+inline constexpr string str(e_cell_data_type ecdt) {
+    switch (ecdt) {
         case e_cell_data_type::undetermined:
             return "undetermined";
 
@@ -473,3 +475,9 @@ const static auto ecdt_it_end =
 consteval e_cell_data_type_iterator ecdt_end() { return ecdt_it_end; }
 
 }  // namespace jt
+
+#define CELL_TYPES_INCLUDE_FORMATTER
+
+#include "cell_types_formatter.hpp"
+
+#undef CELL_TYPES_INCLUDE_FORMATTER

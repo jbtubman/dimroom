@@ -1,3 +1,6 @@
+#if !defined(CELL_INCLUDE_FORMATTER)
+#error "cell_formatter.hpp should not be included directly"
+#else
 #pragma once
 
 #include <algorithm>
@@ -7,9 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "cell.hpp"
 #include "cell_types.hpp"
-#include "coordinate_formatter.hpp"
 #include "coordinates.hpp"
 
 // Formatter implementation based on the example found at:
@@ -44,11 +45,11 @@ struct std::formatter<jt::data_cell, char> {
                 out << std::get<float>(variant_value);
             } else if (holds_alternative<std::string>(variant_value)) {
                 out << "\"" << std::get<std::string>(variant_value) << "\"";
-            } else if (holds_alternative<std::vector<std::string>>(
+            } else if (holds_alternative<std::vector<std::string> >(
                            variant_value)) {
                 // tags
                 const auto the_tags =
-                    std::get<std::vector<std::string>>(variant_value);
+                    std::get<std::vector<std::string> >(variant_value);
                 bool first_tag = true;
                 out << R"(""")";
                 std::ranges::for_each(the_tags, [&first_tag, &out](string tag) {
@@ -61,7 +62,7 @@ struct std::formatter<jt::data_cell, char> {
                 out << R"(""")";
             } else if (holds_alternative<jt::coordinate>(variant_value)) {
                 jt::coordinate coord{std::get<jt::coordinate>(variant_value)};
-                //const auto coord = std::get<jt::coordinate>(variant_value);
+                // const auto coord = std::get<jt::coordinate>(variant_value);
                 out << coord;
             } else {
                 out << jt::str(dc.data_type);
@@ -77,7 +78,8 @@ struct std::formatter<jt::data_cell, char> {
 
 namespace std {
 inline std::ostream& operator<<(std::ostream& os, const jt::data_cell& c) {
-  os << std::format("{}", c);
-  return os;
+    os << std::format("{}", c);
+    return os;
 }
-}
+}  // namespace std
+#endif

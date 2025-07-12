@@ -326,3 +326,9 @@ static parser::header_and_data parse_lines(VectorString&& input_lines) {
 }
 
 }  // namespace jt
+
+#define PARSER_INCLUDE_FORMATTER
+
+#include "parser_formatter.hpp"
+
+#undef PARSER_INCLUDE_FORMATTER
