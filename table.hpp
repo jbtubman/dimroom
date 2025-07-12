@@ -65,11 +65,12 @@ struct table {
                 geo_coordinate_fields, tags_fields};
     }
 
-    using type_column_name_map_t = map<e_cell_data_type, type_column_name_set>;
+    using column_name_to_type_map_t =
+        map<type_column_name_set, e_cell_data_type>;
 
-    /// @brief Associates a e_cell_data_type value with its corresponding
-    /// type_column_name_set.
-    type_column_name_map_t type_to_column_name_map{};
+    /// @brief Associates a column name with its corresponding
+    /// e_cell_data_type.
+    column_name_to_type_map_t column_name_to_type_map{};
 
     /// @brief Creates a map of column names to header index values.
     /// @param hfs
@@ -90,30 +91,29 @@ struct table {
           cell_rows_{dcs},
           column_name_index_map{
               headers_to_column_name_index_map(header_fields_)} {
-        type_to_column_name_map =
-            ranges::zip_view(all_e_cell_data_types(),
-                             all_type_column_name_sets()) |
-            ranges::to<type_column_name_map_t>();
+        column_name_to_type_map = ranges::zip_view(all_type_column_name_sets(),
+                                                   all_e_cell_data_types()) |
+                                  ranges::to<column_name_to_type_map_t>();
     }
 
     table(const table& other)
         : header_fields_{other.header_fields_},
           cell_rows_{other.cell_rows_},
           column_name_index_map{other.column_name_index_map},
-          type_to_column_name_map{other.type_to_column_name_map} {}
+          column_name_to_type_map{other.column_name_to_type_map} {}
 
     table(table&& other)
         : header_fields_{std::move(other.header_fields_)},
           cell_rows_{std::move(other.cell_rows_)},
           column_name_index_map{std::move(other.column_name_index_map)},
-          type_to_column_name_map{std::move(other.type_to_column_name_map)} {}
+          column_name_to_type_map{std::move(other.column_name_to_type_map)} {}
 
     void swap(table& other) {
         using std::swap;
         swap(header_fields_, other.header_fields_);
         swap(cell_rows_, other.cell_rows_);
         swap(column_name_index_map, other.column_name_index_map);
-        swap(type_to_column_name_map, other.type_to_column_name_map);
+        swap(column_name_to_type_map, other.column_name_to_type_map);
     }
 
     table& operator=(const table& other) {
