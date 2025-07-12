@@ -40,30 +40,43 @@ struct std::formatter<jt::e_cell_data_type, char> {
         switch (ecdt) {
             case jt::e_cell_data_type::undetermined:
                 out << "undetermined"s;
+                break;
 
             case jt::e_cell_data_type::invalid:
                 out << "invalid"s;
+                break;
 
             case jt::e_cell_data_type::floating:
                 out << "floating"s;
+                break;
 
             case jt::e_cell_data_type::boolean:
                 out << "boolean"s;
+                break;
 
             case jt::e_cell_data_type::integer:
                 out << "integer"s;
+                break;
 
             case jt::e_cell_data_type::text:
                 out << "text"s;
+                break;
 
             case jt::e_cell_data_type::geo_coordinate:
                 out << "geo_coordinate"s;
+                break;
 
             case jt::e_cell_data_type::tags:
                 out << "tags"s;
+                break;
 
             case jt::e_cell_data_type::SENTINEL:
                 out << "SENTINEL"s;
+                break;
+
+            default:
+                // This should not happen but it keeps the compiler happy.
+                out << "**UNKNOWNN**"s;
         }
 
         return std::ranges::copy(std::move(out).str(), ctx.out()).out;
