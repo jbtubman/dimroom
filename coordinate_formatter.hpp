@@ -34,13 +34,17 @@ struct std::formatter<jt::coordinate, char> {
     template <class FmtContext>
     FmtContext::iterator format(jt::coordinate coord, FmtContext& ctx) const {
         std::ostringstream out;
-        if (long_format) {
-            out << "jt::coordinate";
-        }
+        out << "{ ";
+        const string prefix =
+            long_format
+                ? ((coord.coordinate_format == jt::coordinate::format::decimal)
+                       ? "\"jt::coordinate<decimal>\""
+                       : "\"jt::coordinate<dm>\"")
+                : "\"coordinate\"";
+
+        out << prefix << " : { \"value\" : ";
+
         if (coord.coordinate_format == jt::coordinate::format::decimal) {
-            if (long_format) {
-                out << "<decimal>{ ";
-            }
             out << "\"";
             const bool lat_negative = coord.latitude < 0;
             out << std::setprecision(5);
@@ -52,9 +56,6 @@ struct std::formatter<jt::coordinate, char> {
             out << "\"";
         } else if (coord.coordinate_format ==
                    jt::coordinate::format::degrees_minutes) {
-            if (long_format) {
-                out << "<dm>{ ";
-            }
             out << "\"";
             const float lat_f = coord.latitude;
             const std::string direction = lat_f >= 0 ? "N" : "S";
@@ -78,11 +79,17 @@ struct std::formatter<jt::coordinate, char> {
             out << fraction_long_f << "' " << long_direction;
             out << "\"";
         } else {
-            out << "INVALID_COORDINATE";
+            out << "\"INVALID_COORDINATE\"";
         }
-        if (long_format) {
-            out << " }";
-        }
+        out << ", ";
+
+        const string coord_format =
+            (coord.coordinate_format == jt::coordinate::format::decimal)
+                ? "\"decimal\""
+                : "\"dm\"";
+        out << "\"format\" : " << coord_format;
+
+        out << " } }";
 
         return std::ranges::copy(std::move(out).str(), ctx.out()).out;
     }

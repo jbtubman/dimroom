@@ -78,15 +78,15 @@ struct std::formatter<jt::data_cell, char> {
                 const auto the_tags =
                     std::get<std::vector<std::string> >(variant_value);
                 bool first_tag = true;
-                out << R"("\"\"\")";
-                std::ranges::for_each(the_tags, [&first_tag, &out](string tag) {
+                out << "[ ";
+                ranges::for_each(the_tags, [&first_tag, &out](string tag) {
                     if (!first_tag) {
                         out << ", ";
                     }
-                    out << tag;
                     first_tag = false;
+                    out << "\"" << tag << "\"";
                 });
-                out << R"(\"\"\"")";
+                out << " ]";
             } else if (holds_alternative<jt::coordinate>(variant_value)) {
                 jt::coordinate coord{std::get<jt::coordinate>(variant_value)};
                 out << coord;

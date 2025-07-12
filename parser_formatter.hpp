@@ -17,6 +17,7 @@ using std::operator""s;
 using std::operator""sv;
 }  // namespace
 
+#pragma region header_field
 // Formatter implementation based on the example found at:
 // https://www.en.cppreference.com/w/cpp/utility/format/formatter.html
 template <>
@@ -46,17 +47,17 @@ struct std::formatter<jt::parser::header_field, char> {
     FmtContext::iterator format(jt::parser::header_field hf,
                                 FmtContext& ctx) const {
         std::ostringstream out;
-
-        if (long_format) out << "jt::parser::";
-        out << "header_field{ ";
-        out << "name: \"" << hf.name << "\", ";
-        out << "data_type: ";
+        out << "{ ";
+        const string prefix = long_format ? "jt::parser::" : "";
+        out << "\"header_field\" : { ";
+        out << "\"name\" : \"" << hf.name << "\", ";
+        out << "\"data_type\" : ";
         if (long_format) {
             out << std::vformat("{#}"sv, std::make_format_args(hf.data_type));
         } else {
             out << hf.data_type;
         }
-        out << " }";
+        out << " } }";
 
         return std::ranges::copy(std::move(out).str(), ctx.out()).out;
     }
@@ -69,6 +70,10 @@ inline std::ostream& operator<<(std::ostream& os,
     return os;
 }
 }  // namespace std
+
+#pragma endregion
+
+#pragma region header_fields
 
 template <>
 struct std::formatter<jt::parser::header_fields, char> {
@@ -98,9 +103,9 @@ struct std::formatter<jt::parser::header_fields, char> {
                                 FmtContext& ctx) const {
         std::ostringstream out;
         const bool lfmt = long_format;
-
-        if (long_format) out << "jt::parser::";
-        out << "header_fields{ ";
+        out << "{ ";
+        const string prefix = long_format ? "jt::parser::" : "";
+        out << "\"" << prefix << "header_fields\" : [ ";
         bool first_header = true;
         ranges::for_each(
             hfs, [&out, &first_header, &lfmt](jt::parser::header_field hf) {
@@ -114,7 +119,7 @@ struct std::formatter<jt::parser::header_fields, char> {
                     out << hf;
                 }
             });
-        out << " }";
+        out << " ] }";
 
         return std::ranges::copy(std::move(out).str(), ctx.out()).out;
     }
@@ -127,6 +132,10 @@ inline std::ostream& operator<<(std::ostream& os,
     return os;
 }
 }  // namespace std
+
+#pragma endregion
+
+#pragma region data_field
 
 template <>
 struct std::formatter<jt::parser::data_field, char> {
@@ -155,11 +164,11 @@ struct std::formatter<jt::parser::data_field, char> {
     FmtContext::iterator format(jt::parser::data_field df,
                                 FmtContext& ctx) const {
         std::ostringstream out;
-
-        if (long_format) out << "jt::parser::";
-        out << "data_field{ ";
-        out << "text: \"" << df.text << "\", ";
-        out << "data_type: ";
+        out << "{ ";
+        const string prefix = long_format ? "jt::parser::" : "";
+        out << "\"" << prefix << "data_field\" : { ";
+        out << "\"text\" : \"" << df.text << "\", ";
+        out << "\"data_type\" : ";
         if (long_format) {
             out << std::vformat("{#}"sv, std::make_format_args(df.data_type));
         } else {
@@ -178,6 +187,10 @@ inline std::ostream& operator<<(std::ostream& os,
     return os;
 }
 }  // namespace std
+
+#pragma endregion
+
+#pragma region data_fields
 
 template <>
 struct std::formatter<jt::parser::data_fields, char> {
@@ -206,9 +219,9 @@ struct std::formatter<jt::parser::data_fields, char> {
     FmtContext::iterator format(jt::parser::data_fields dfs,
                                 FmtContext& ctx) const {
         std::ostringstream out;
-
-        if (long_format) out << "jt::parser::";
-        out << "data_fields{ ";
+        out << "{ ";
+        const string prefix = long_format ? "jt::parser::" : "";
+        out << "\"" << prefix << "\"data_fields\" : ";
         bool first_data = true;
         const bool lfmt = long_format;
         ranges::for_each(
@@ -236,5 +249,7 @@ inline std::ostream& operator<<(std::ostream& os,
     return os;
 }
 }  // namespace std
+
+#pragma endregion
 
 #endif
