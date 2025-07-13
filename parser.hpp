@@ -1,11 +1,13 @@
 #pragma once
 
 #include <fstream>
+#include <iostream>
 #include <print>
 #include <ranges>
 #include <regex>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <vector>
 
 #include "cell_types.hpp"
@@ -15,6 +17,7 @@
 #include "utility.hpp"
 
 namespace jt {
+using std::print;
 using std::println;
 using std::regex;
 using std::string;
@@ -291,17 +294,18 @@ static inline parser::header_and_data parse_lines(std::ifstream& instream) {
 
     string header_line;
     std::getline(instream, header_line);
-    //instream >> header_line;
+    trim(header_line);
+
     parser::header_and_data result(parser::parse_header(header_line));
 
-    // if (!instream) {
-    //     println(stderr, "No data rows in file");
-    // }
+    if (!instream) {
+        println(stderr, "No data rows in file");
+    }
 
     string data_line;
     while (std::getline(instream, data_line)) {
-        //std::getline(instream, data_line);
-        // instream >> data_line;
+        trim(data_line);
+
         parser::data_fields dfs = parser::parse_data_row(data_line);
         result.data_fields_vec_.push_back(dfs);
     }
