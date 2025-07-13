@@ -1,7 +1,9 @@
 #pragma once
 
 #include <algorithm>
+#include <cctype>
 #include <concepts>
+#include <expected>
 #include <iterator>
 #include <ranges>
 #include <type_traits>
@@ -11,6 +13,15 @@
 #include "jt_concepts.hpp"
 
 namespace jt {
+
+enum class convert_error {
+    boolean_convert_error,
+    integer_convert_error,
+    float_convert_error,
+    text_convert_error,
+    geo_coordinate_convert_error,
+    tags_convert_error
+};
 
 using std::pair;
 using std::vector;
@@ -152,6 +163,20 @@ auto shove_back(Container&& acc, T&& v) {
     auto result = std::forward<Container>(acc);
     result.push_back(std::forward<T>(v));
     return result;
+}
+
+inline string& trim(string& line) {
+    line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
+    line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+    return line;
+}
+
+inline std::expected<bool, convert_error> s_to_boolean(const string& s) {
+    string ss{s};
+    std::transform(ss.begin(), ss.end(), ss.begin(), ::tolower);
+    if (ss == "yes" || ss == "true") return true;
+    if (ss == "no" || ss == "false") return false;
+    return std::unexpected(convert_error::boolean_convert_error);
 }
 
 // /**
