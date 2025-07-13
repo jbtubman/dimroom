@@ -24,6 +24,8 @@ namespace jt {
 #if DEBUG
 using std::println;
 #endif
+using std::get;
+using std::holds_alternative;
 using std::regex;
 using std::string;
 using std::strong_ordering;
@@ -236,59 +238,6 @@ using tag_sequence = type_sequence<undetermined_tag, invalid_tag, floating_tag,
                                    boolean_tag, integer_tag, text_tag,
                                    geo_coordinate_tag, tags_tag, sentinel_tag>;
 
-// template <e_cell_data_type E>
-// auto make_tag(E e) {
-//     return e_cell_data_tag_type<E>();
-// }
-
-// template<>
-// auto make_tag<e_cell_data_type::undetermined>(e_cell_data_type::undetermined)
-// {
-//     return undetermined_tag{};
-// }
-
-// template<>
-// auto make_tag<e_cell_data_type::invalid>(e_cell_data_type::invalid) {
-//     return invalid_tag{};
-// }
-
-// template<>
-// auto make_tag<e_cell_data_type::floating>(e_cell_data_type::floating e) {
-//     return floating_tag{};
-// }
-
-// template<>
-// auto make_tag<e_cell_data_type::boolean>(e_cell_data_type::boolean e) {
-//     return boolean_tag{};
-// }
-
-// template<>
-// auto make_tag<e_cell_data_type::integer>(e_cell_data_type::integer e) {
-//     return integer_tag{};
-// }
-
-// template<>
-// auto make_tag<e_cell_data_type::text>(e_cell_data_type::text e) {
-//     return text_tag{};
-// }
-
-// template<>
-// auto
-// make_tag<e_cell_data_type::geo_coordinate>(e_cell_data_type::geo_coordinate
-// e) {
-//     return geo_coordinate_tag{};
-// }
-
-// template<>
-// auto make_tag<e_cell_data_type::tags_tag>(e_cell_data_type::tags_tag e) {
-//     return tags_tag_tag{};
-// }
-
-// template<>
-// auto make_tag<e_cell_data_type::SENTINEL>(e_cell_data_type::SENTINEL e) {
-//     return sentinel_tag{};
-// }
-
 template <class T>
 using tag_cell_value_type_t = T::value_type;
 
@@ -296,6 +245,36 @@ using tag_cell_value_type_t = T::value_type;
 using cell_value_types =
     std::variant<std::monostate, std::monostate, float, bool, int, std::string,
                  coordinate, vector<string>>;
+
+inline string cell_value_types_value_as_string(const cell_value_types& cvt) {
+    std::ostringstream sout{};
+    if (std::holds_alternative<int>(cvt)) {
+        sout << get<int>(cvt);
+    } else if (holds_alternative<float>(cvt)) {
+        sout << get<float>(cvt);
+    } else if (holds_alternative<bool>(cvt)) {
+        sout << get<bool>(cvt);
+    } else if (holds_alternative<string>(cvt)) {
+        return get<string>(cvt);
+    } else if (holds_alternative<coordinate>(cvt)) {
+        sout << get<coordinate>(cvt);
+    } else if (holds_alternative<vector<string>>(cvt)) {
+        sout << R"(""")";
+        const auto vs = get<vector<string>>(cvt);
+        bool first_string = true;
+        ranges::for_each(vs, [&sout, &first_string](const string& s) {
+            if (!first_string) {
+                sout << ", ";
+            }
+            first_string = false;
+            sout << s;
+        });
+        sout << R"(""")";
+    } else {
+        return "";
+    }
+    return sout.str();
+}
 
 // If we know enough about a data_cell's contents to determine its type,
 // or to know that its contents do not match a valid type,
