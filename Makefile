@@ -1,13 +1,13 @@
 # Copyright 2025, James B. Tubman
 CPP = /usr/bin/c++
 
-CFLAGS = -std=c++23
+CFLAGS = -std=c++23 -I../rapidjson/include
 
 # TEST_INCLUDE_DIR = -I../CppUnitTestFramework
 
 .SUFFIXES : .o .cpp
 
-OBJS = main.o parser.o
+OBJS = main.o parser.o command_interpreter.o query.o
 
 # TEST_OBJS = test/*.o
 
@@ -18,7 +18,8 @@ geologic: $(OBJS)
 	$(CPP) -std=c++23 -o $@ $(OBJS)
 
 .PHONY: test/test
-test/test: test/main.cpp parser.o parser.hpp parser.cpp cell_types.hpp column.hpp jt_concepts.hpp parse_utils.hpp utility.hpp
+test/test: test/main.cpp parser.o parser.hpp parser.cpp cell_types.hpp \
+	column.hpp jt_concepts.hpp parse_utils.hpp utility.hpp query.o command_handler.o
 	cd test ; make test
 #	$(CPP) -std=c++23 -I../CppUnitTestFramework $(?) -o test/test
 
@@ -32,7 +33,15 @@ cell_types.hpp: coordinates.hpp type_utility.hpp utility.hpp
 
 column.hpp: cell_types.hpp
 
+command_handler.o: command_handler.cpp
+
+command_handler.cpp: command_handler.hpp
+
 command_handler.hpp: coordinates.hpp query.hpp table.hpp
+
+command_interpreter.o: command_handler.cpp
+
+command_interpreter.cpp: command_interpreter.hpp
 
 command_interpreter.hpp: command_handler.hpp query.hpp table.hpp
 
@@ -56,8 +65,11 @@ parser.cpp: parser.hpp
 
 parser.hpp: cell_types.hpp column.hpp jt_concepts.hpp parse_utils.hpp utility.hpp
 
-# no in-project dependencies
-query.hpp:
+query.hpp: table.hpp
+
+query.cpp: query.hpp
+
+query.o: query.cpp
 
 row.hpp: cell.hpp cell_types.hpp parse_utils.hpp parser.hpp vectorize.hpp
 
