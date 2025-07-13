@@ -70,7 +70,15 @@ auto vw_boolean_match(table& t, const string& col_name, bool query_value,
 auto vw_floating_match(table& t, const string& col_name, float query_value,
                        ranges::ref_view<table::cell_rows> targets) {
     const auto col_idx = t.index_for_column_name(col_name);
-    // resume here
+
+    auto result =
+        targets | views::filter([query_value, col_idx](const data_cells& dcs) {
+            const cell_value_type cvt = dcs[col_idx].value;
+            if (!cvt) return false;
+            const float f = std::get<float>(*cvt);
+            return close(f, query_value);
+        });
+    return result;
 }
 
 table::cell_rows string_match(table& t, const string& col_name,
@@ -151,5 +159,17 @@ table::cell_rows boolean_match(table& t, const string& col_name,
     }
 
     return boolean_match(t, col_name, *e_bool_value, targets);
+}
+
+table::cell_rows floating_match(table& t, const string& col_name,
+                                float query_value,
+                                table::opt_cell_rows rows_to_query) {
+    table::cell_rows targets = rows_to_query ? *rows_to_query : t.cell_rows_;
+    auto targets_vw = views::all(targets);
+
+    auto floating_match_view =
+        vw_floating_match(t, col_name, query_value, targets_vw);
+    auto result = ranges::to<table::cell_rows>(floating_match_view);
+    return result;
 }
 }  // namespace jt
