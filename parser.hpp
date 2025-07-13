@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <print>
 #include <ranges>
 #include <regex>
@@ -280,6 +281,46 @@ template <typename VectorString>
 static parser::header_and_data parse_lines(VectorString&& input_lines) {
     const VectorString in_lines{std::forward<VectorString>(input_lines)};
     return __parse_lines(in_lines);
+}
+
+static inline parser::header_and_data parse_lines(std::ifstream& instream) {
+    if (!instream) {
+        println(stderr, "empty file");
+        return parser::header_and_data();
+    }
+
+    string header_line;
+    std::getline(instream, header_line);
+    //instream >> header_line;
+    parser::header_and_data result(parser::parse_header(header_line));
+
+    // if (!instream) {
+    //     println(stderr, "No data rows in file");
+    // }
+
+    string data_line;
+    while (std::getline(instream, data_line)) {
+        //std::getline(instream, data_line);
+        // instream >> data_line;
+        parser::data_fields dfs = parser::parse_data_row(data_line);
+        result.data_fields_vec_.push_back(dfs);
+    }
+
+    const vector<e_cell_data_type> cell_data_types_vec =
+        parser::get_data_types_for_all_columns(result.data_fields_vec_);
+
+    // Add the cell data info to the headers.
+    parser::header_fields& hfs = result.header_fields_;
+    parser::header_fields hfs_result{};
+
+    auto zipped = ranges::zip_view(hfs, cell_data_types_vec);
+
+    for (std::pair<parser::header_field, e_cell_data_type> hf_cdt : zipped) {
+        hfs_result.emplace_back(hf_cdt.first.name, hf_cdt.second);
+    }
+    result.header_fields_ = hfs_result;
+
+    return result;
 }
 
 }  // namespace jt

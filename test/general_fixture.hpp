@@ -85,6 +85,7 @@ struct general_fixture {
         R"(Japan.jpeg,jpeg,26.4,600,800,600,"36° 00' N, 138° 00' E",,Asia,,,,"""Mt Fuji, Fog""")",
         R"(Calgary.tif,tiff,30.6,600,800,1200,"51.05011, -114.08529",Yes,,32,Y,Flames,"""Urban, Dusk""")",
         R"(Edmonton.jpg,jpeg,5.6,900,400,72,"53.55014, -113.46871",,,,,Oilers,)"};
+    const string csv_input_file{"test/data/sample.csv"};
 };
 
 // Utilities to check floating point numbers for closeness.

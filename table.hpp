@@ -3,6 +3,7 @@
 // holds the column and row information.
 
 #include <algorithm>
+#include <fstream>
 #include <map>
 #include <optional>
 #include <ranges>
@@ -96,6 +97,18 @@ struct table {
 
     table() {};
 
+    // class parser::data_field {
+    //       string text{""};
+    //       e_cell_data_type data_type{e_cell_data_type::undetermined};
+    // using parser::data_fields = vector<data_field>;
+    // using parser all_data_fields = vector<data_fields>;
+    // class data_cell {
+    //       e_cell_data_type data_type{e_cell_data_type::undetermined};
+    //       cell_value_type value{};
+    // }
+    // using table::data_cells = vector<data_cell>
+    // using table::cell_rows = vector<data_cells>;
+
     table(const parser::header_fields& hfs, const cell_rows& dcs)
         : header_fields_{hfs},
           cell_rows_{dcs},
@@ -105,6 +118,41 @@ struct table {
                                                    all_e_cell_data_types()) |
                                   ranges::to<column_name_to_type_map_t>();
     }
+
+    table(const parser::header_and_data& h_and_d)
+        : table(h_and_d.header_fields_,
+                data_cell::make_all_data_cells(h_and_d.get_data_fields())) {}
+
+    table(std::ifstream& instream) : table(parse_lines(instream)) {
+        // auto header_and_data = parse_lines(instream);
+        // header_fields_ = header_and_data.header_fields_;
+        // using zz = decltype(cell_rows_);
+        // // parser::data_field dc;
+        // auto fields = header_and_data.data_fields_vec_;
+        // const auto all_data_cells =
+        //     data_cell::make_all_data_cells(header_and_data.get_data_fields());
+        // // cell_rows cr{fields};
+        // cell_rows_ = all_data_cells;
+    }
+
+    // table(std::ifstream&& instream) : table(std::move(instream)) {}
+    static auto make_ifstream(const string& filename) {
+        std::filesystem::path fsp{filename};
+        return std::ifstream(fsp);
+    }
+
+    static table make_table_from_file(const string& filename) {
+        std::filesystem::path fp{filename};
+        auto afp = std::filesystem::absolute(fp);
+        std::ifstream ifs{afp};
+        return table(ifs);
+    }
+
+    // table(const string& filename) {
+    //     std::ifstream ifs{filename};
+    //     table other{ifs};
+    //     swap(other);
+    // }
 
     table(const table& other)
         : header_fields_{other.header_fields_},

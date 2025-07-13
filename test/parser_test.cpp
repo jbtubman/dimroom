@@ -1,6 +1,8 @@
 #include "../parser.hpp"
 
 #include <algorithm>
+#include <filesystem>
+#include <fstream>
 #include <print>
 #include <ranges>
 #include <sstream>
@@ -158,6 +160,22 @@ TEST_CASE(MyFixture, ParseFile) {
         parser::header_and_data result = parse_lines(input);
         CHECK_TRUE(!result.header_fields_.empty());
         CHECK_TRUE(result.data_fields_vec_.size() == input.size() - 1);
+    }
+
+    SECTION("parse_lines from ifstream") {
+        const string filename = MyFixture::csv_input_file;
+        // const string filename{"/Users/jbtubman/src/c++20/geologic/test/data/sample.csv"};
+        CHECK_TRUE(std::filesystem::exists(filename));
+        auto fp = std::filesystem::relative(filename);
+        auto cp = std::filesystem::current_path();
+        auto rel_fp = std::filesystem::relative(fp, cp);
+        println(stderr, "rel_fp: \"{}\"", rel_fp.c_str());
+        std::ifstream ifs(fp);
+        CHECK_TRUE(ifs.good());
+        std::filesystem::path dotp(".");
+        auto thing = fp.relative_path().c_str();
+        println(stderr, "\nrelative_path: \"{}\"\n", thing);
+        println(stderr, "\ncurrent_path: \"{}\n", cp.c_str());
     }
 }
 
