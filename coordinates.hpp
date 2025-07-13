@@ -21,16 +21,16 @@ using std::regex;
 using std::string;
 using std::string_view;
 
-const string deg_min_lat_s{R"(((\d{1,2})° (\d{2})' ([NS])))"};
+const string deg_min_lat_s{R"(((\d{1,2})°\s+(\d{1,2})'\s+([NS])))"};
 const regex deg_min_lat_rx{deg_min_lat_s};
 
-const string deg_min_lat_starts_s{R"(("(\d{1,2})° (\d{2})' ([NS])))"};
+const string deg_min_lat_starts_s{R"(("(\d{1,2})° (\d{1,2})' ([NS])))"};
 const regex deg_min_lat_starts_rx{deg_min_lat_starts_s};
 
-const string deg_min_long_s(R"(((\d{1,3})° (\d{2})' ([EW])))");
+const string deg_min_long_s(R"(((\d{1,3})° (\d{1,2})' ([EW])))");
 const regex deg_min_long_rx{deg_min_long_s};
 
-const string deg_min_long_end_s(R"(\s\d{1,3}° \d{2}' [EW]")");
+const string deg_min_long_end_s(R"(\s\d{1,3}° \d{1,2}' [EW]")");
 const regex deg_min_long_end_rx{deg_min_long_end_s};
 
 // A complete coordinate has double quote marks around it.
