@@ -40,26 +40,27 @@ const bool has_enumerate_view =
     false;
 #endif
 
-struct table {
-    // RESUME HERE: table.
+class table {
+   public:
+    using cell_rows = vector<data_cells>;
+    using opt_cell_rows = std::optional<cell_rows>;
+    using cell_column = vector<data_cell>;
+    using column_name_index_map_t = map<string, size_t>;
+    using type_column_name_set = set<string>;
+    using column_name_to_type_map_t =
+        map<type_column_name_set, e_cell_data_type>;
 
     /// @brief The names of the header fields and their e_cell_data_type values.
     parser::header_fields header_fields_{};
 
-    using cell_rows = vector<data_cells>;
-    using opt_cell_rows = std::optional<cell_rows>;
-
-    using cell_column = vector<data_cell>;
-
     /// @brief vector of rows of cells.
     cell_rows cell_rows_{};
 
-    using column_name_index_map_t = map<string, size_t>;
+    string name{"unnamed"};
 
+   private:
     /// @brief Maps a column name to its index in the vector of headers.
     column_name_index_map_t column_name_index_map{};
-
-    using type_column_name_set = set<string>;
 
     type_column_name_set undetermined_fields{};
     type_column_name_set invalid_fields{};
@@ -75,9 +76,6 @@ struct table {
                 boolean_fields,        integer_fields, text_fields,
                 geo_coordinate_fields, tags_fields};
     }
-
-    using column_name_to_type_map_t =
-        map<type_column_name_set, e_cell_data_type>;
 
     /// @brief Associates a column name with its corresponding
     /// e_cell_data_type.
@@ -95,23 +93,14 @@ struct table {
                ranges::to<column_name_index_map_t>();
     }
 
+   public:
     table() {};
 
-    // class parser::data_field {
-    //       string text{""};
-    //       e_cell_data_type data_type{e_cell_data_type::undetermined};
-    // using parser::data_fields = vector<data_field>;
-    // using parser all_data_fields = vector<data_fields>;
-    // class data_cell {
-    //       e_cell_data_type data_type{e_cell_data_type::undetermined};
-    //       cell_value_type value{};
-    // }
-    // using table::data_cells = vector<data_cell>
-    // using table::cell_rows = vector<data_cells>;
-
-    table(const parser::header_fields& hfs, const cell_rows& dcs)
+    table(const parser::header_fields& hfs, const cell_rows& dcs,
+          string name = "unnamed"s)
         : header_fields_{hfs},
           cell_rows_{dcs},
+          name{name},
           column_name_index_map{
               headers_to_column_name_index_map(header_fields_)} {
         column_name_to_type_map = ranges::zip_view(all_type_column_name_sets(),
@@ -123,46 +112,36 @@ struct table {
         : table(h_and_d.header_fields_,
                 data_cell::make_all_data_cells(h_and_d.get_data_fields())) {}
 
-    table(std::ifstream& instream) : table(parse_lines(instream)) {
-        // auto header_and_data = parse_lines(instream);
-        // header_fields_ = header_and_data.header_fields_;
-        // using zz = decltype(cell_rows_);
-        // // parser::data_field dc;
-        // auto fields = header_and_data.data_fields_vec_;
-        // const auto all_data_cells =
-        //     data_cell::make_all_data_cells(header_and_data.get_data_fields());
-        // // cell_rows cr{fields};
-        // cell_rows_ = all_data_cells;
-    }
+    table(std::ifstream& instream) : table(parse_lines(instream)) {}
 
-    // table(std::ifstream&& instream) : table(std::move(instream)) {}
+   private:
     static auto make_ifstream(const string& filename) {
         std::filesystem::path fsp{filename};
         return std::ifstream(fsp);
     }
 
+   public:
     static table make_table_from_file(const string& filename) {
         std::filesystem::path fp{filename};
         auto afp = std::filesystem::absolute(fp);
         std::ifstream ifs{afp};
-        return table(ifs);
+        table result(ifs);
+        const string table_name = afp.filename();
+        result.name = table_name;
+        return result;
     }
-
-    // table(const string& filename) {
-    //     std::ifstream ifs{filename};
-    //     table other{ifs};
-    //     swap(other);
-    // }
 
     table(const table& other)
         : header_fields_{other.header_fields_},
           cell_rows_{other.cell_rows_},
+          name{other.name},
           column_name_index_map{other.column_name_index_map},
           column_name_to_type_map{other.column_name_to_type_map} {}
 
     table(table&& other)
         : header_fields_{std::move(other.header_fields_)},
           cell_rows_{std::move(other.cell_rows_)},
+          name{std::move(other.name)},
           column_name_index_map{std::move(other.column_name_index_map)},
           column_name_to_type_map{std::move(other.column_name_to_type_map)} {}
 
@@ -170,6 +149,7 @@ struct table {
         using std::swap;
         swap(header_fields_, other.header_fields_);
         swap(cell_rows_, other.cell_rows_);
+        swap(name, other.name);
         swap(column_name_index_map, other.column_name_index_map);
         swap(column_name_to_type_map, other.column_name_to_type_map);
     }
@@ -195,7 +175,24 @@ struct table {
     }
 
     const auto index_for_column_name(const std::string& col_name) const {
-        return column_name_index_map.at(col_name);
+        using map_t = column_name_index_map_t;
+        using value_t = column_name_index_map_t::value_type;
+        auto res = std::find_if(
+            column_name_index_map.begin(), column_name_index_map.end(),
+            [&col_name](const value_t& v) { return v.first == col_name; });
+        if (res == column_name_index_map.end()) {
+            println(stderr, "Can't find index for field \"{}\"!", col_name);
+            println(stderr, "There are {} entries in column_name_index_map",
+                    column_name_index_map.size());
+            std::cerr << std::flush;
+            println(stderr, "entries:");
+            ranges::for_each(column_name_index_map, [](const value_t& v) {
+                println(stderr, "key: \"{}\", value: {}", v.first, v.second);
+            });
+        }
+        auto result = res->second;
+        return result;
+        // return column_name_index_map[col_name];
     }
 
     constexpr bool is_undetermined(const std::string& col_name) const {
@@ -254,6 +251,14 @@ struct table {
             });
     }
 
+    e_cell_data_type get_column_data_type(size_t column_idx) {
+        return header_at_index(column_idx).data_type;
+    }
+
+    e_cell_data_type get_column_data_type(const string& column_name) {
+        return get_column_data_type(index_for_column_name(column_name));
+    }
+
     cell_rows string_match(const string& col_name, const string& query_value,
                            opt_cell_rows query_targets = opt_cell_rows{}) {
         cell_rows targets = query_targets ? *query_targets : cell_rows_;
@@ -266,7 +271,7 @@ static inline table::cell_column get_data_column(table& t, size_t column_idx) {
     return t.get_data_column(column_idx);
 }
 
-static inline table::cell_rows string_match(
+static inline table::cell_rows string_matchx(
     table& t, const string& col_name, const string& query_value,
     table::opt_cell_rows rows_to_query = table::opt_cell_rows{}) {
     table::cell_rows targets = rows_to_query ? *rows_to_query : t.cell_rows_;
@@ -283,6 +288,37 @@ static inline table::cell_rows string_match(
             }
             return acc;
         });
+    return result;
+}
+
+// TODO: Not used any more
+static inline auto t_vw_string_match(
+    table& t, const string& col_name, const string& query_value,
+    ranges::ref_view<table::cell_rows> targets) {
+    const auto col_idx = t.index_for_column_name(col_name);
+
+    auto result = targets | views::filter([&query_value, &col_idx](auto dcs) {
+                      const cell_value_type cvt = dcs[col_idx].value;
+                      if (!cvt) return false;
+                      const string s = std::get<string>(*cvt);
+                      return (s == query_value);
+                  });
+
+    return result;
+}
+
+// TODO: Not used any more
+static inline table::cell_rows t_string_match(
+    table& t, const string& col_name, const string& query_value,
+    table::opt_cell_rows rows_to_query = table::opt_cell_rows{}) {
+    table::cell_rows targets = rows_to_query ? *rows_to_query : t.cell_rows_;
+    const auto col_idx = t.index_for_column_name(col_name);
+    auto targets_vw = views::all(targets);
+    using tvw_t = decltype(targets_vw);
+    static_assert(std::is_same_v<tvw_t, ranges::ref_view<table::cell_rows>>);
+
+    auto res = t_vw_string_match(t, col_name, query_value, targets_vw);
+    auto result = ranges::to<table::cell_rows>(res);
     return result;
 }
 
