@@ -32,6 +32,41 @@ inline static auto infinite_ints_vw() {
     std::size_t zero{0};
     return views::iota(zero);
 }
+template <std::floating_point T>
+consteval T epsilon();
+
+template <>
+consteval float epsilon<float>() {
+    return (0.00002f - 0.00001f);
+}
+
+template <>
+consteval double epsilon<double>() {
+    return (0.00002 - 0.00001);
+}
+
+template <>
+consteval long double epsilon<long double>() {
+    return (0.00002l - 0.00001l);
+}
+
+/// @brief Returns true if the difference between two floating point numbers is
+/// less than 0.00001.
+/// @tparam CommonT
+/// @tparam T1
+/// @tparam T2
+/// @param lhs
+/// @param rhs
+/// @return bool
+template <std::floating_point T1, std::floating_point T2,
+          typename CommonT = std::common_type_t<T1, T2>>
+constexpr bool close(T1 lhs, T2 rhs) {
+    const CommonT clhs{lhs};
+    const CommonT crhs{rhs};
+    const CommonT cepsilon{epsilon<CommonT>()};
+
+    return (std::abs(clhs - crhs) < cepsilon);
+}
 
 template <typename T1, typename T2 = T1>
 using cross_product_pair_t = std::pair<T1, T2>;
@@ -177,6 +212,26 @@ inline std::expected<bool, convert_error> s_to_boolean(const string& s) {
     if (ss == "yes" || ss == "true") return true;
     if (ss == "no" || ss == "false") return false;
     return std::unexpected(convert_error::boolean_convert_error);
+}
+
+inline std::expected<float, convert_error> s_to_floating(const string& s) {
+    float f;
+    try {
+        f = std::stof(s);
+    } catch (const std::exception& e) {
+        return std::unexpected(convert_error::float_convert_error);
+    }
+    return f;
+}
+
+inline std::expected<int, convert_error> s_to_integer(const string& s) {
+    int i;
+    try {
+        i = std::stoi(s);
+    } catch (const std::exception& e) {
+        return std::unexpected(convert_error::integer_convert_error);
+    }
+    return i;
 }
 
 // /**

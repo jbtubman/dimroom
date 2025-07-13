@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+#include "../utility.hpp"
+
 namespace {
 using std::string;
 using std::vector;
@@ -90,39 +92,5 @@ struct general_fixture {
 
 // Utilities to check floating point numbers for closeness.
 namespace jt {
-template <std::floating_point T>
-consteval T epsilon();
 
-template <>
-consteval float epsilon<float>() {
-    return (0.00002f - 0.00001f);
-}
-
-template <>
-consteval double epsilon<double>() {
-    return (0.00002 - 0.00001);
-}
-
-template <>
-consteval long double epsilon<long double>() {
-    return (0.00002l - 0.00001l);
-}
-
-/// @brief Returns true if the difference between two floating point numbers is
-/// less than 0.00001.
-/// @tparam CommonT
-/// @tparam T1
-/// @tparam T2
-/// @param lhs
-/// @param rhs
-/// @return bool
-template <std::floating_point T1, std::floating_point T2,
-          typename CommonT = std::common_type_t<T1, T2>>
-constexpr bool close(T1 lhs, T2 rhs) {
-    const CommonT clhs{lhs};
-    const CommonT crhs{rhs};
-    const CommonT cepsilon{epsilon<CommonT>()};
-
-    return (std::abs(clhs - crhs) < cepsilon);
-}
 }  // namespace jt
