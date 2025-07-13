@@ -47,6 +47,63 @@ string row_to_string(const data_cells& row_dcs) {
 void command_line::do_query(table& t, const string& query_line) {
     println("do the query: \"{}\"", query_line);
 
+    // Most of this stuff should be refactored elsewhere.
+    const string query_prefix_s{R"-(^\s*query\s*)-"};
+
+    // m[1] is the column name.
+    // m[2] is the query value string.
+    regex text_query_rx{R"-(^\s*query\s*\("([^"]+)"\s+"([^"]+)"\s*\)\s*$)-",
+                        regex::icase};
+
+    // m[1] is column name.
+    // m[2] is integer value string.
+    regex integer_query_rx{
+        R"-(/^\s*query\s*\(\s*"([^"]+)"\s+(-?\d+)\s*\)\s*$/mug)-"};
+
+    // m[1] is column name.
+    // m[2] is float value string.
+    regex floating_query_rx{
+        R"-(^\s*query\s*\(\s*"([^"]+)"\s+(-?\d+\.\d+)\s*\)\s*$)-",
+        regex::icase};
+
+    // m[2] - lat degrees
+    // m[3] - lat minutes
+    // m[4] - lat direction [NS]
+    // m[6] - long degrees
+    // m[7] - long minutes
+    // m[8] - long direction [EW]
+    const string dms_coord_s{
+        R"-("((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,\s*((\d{1,3})°\s+(\d{1,2})'\s+([EW]))")-"};
+
+    // m[1] - column name.
+    // m[3] - lat degrees.
+    // m[4] - lat minutes
+    // m[5] - lat direction NS
+    // m[7] - long degrees
+    // m[8] - long minutes
+    // m[9] - long direction EW
+    regex coord_dms_query_rx{
+        R"-(^\s*query\s*\(\s*"([^"]+)"\s+"((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,\s*((\d{1,3})°\s+(\d{1,2})'\s+([EW])"\s*\))\s*$)-",
+        regex::icase};
+
+    regex coord_decimal_query_rx{
+        R"-(^\s*query\s*\(\s*"([^"]+)"\s+"(-?\d{1,2}(\.\d{1,5})?),\s+(-?\d{1,3}(\.\d{1,5})?)"\s*\)\s*$)-",
+        regex::icase};
+
+    const string coord_decimal_s{
+        R"-("(-?\d{1,2}(\.\d{1,5})?),\s*(-?\d{1,3}(\.\d{1,5})?)")-"};
+    const string coord_dms_s{
+        R"-("((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,\s*((\d{1,3})°\s+(\d{1,2})'\s+([EW]))")-"};
+
+    const string coord_both_s{"(" + coord_decimal_s + "|" + coord_dms_s + ")"};
+
+    const string coord_polygon_s =
+        std::format(R"-(\[({}(\s{})*)\])-", coord_both_s, coord_both_s);
+
+    // regex coord_dms_polygon_rx{
+    //     R"-(\[("((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,\s*((\d{1,3})°\s+(\d{1,2})'\s+([EW]))")(\s+("((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,\s*((\d{1,3})°\s+(\d{1,2})'\s+([EW]))"))*\])-",
+    //     regex::icase};
+
     // Used regex101.com to work this out.
     // https://regex101.com/r/5AgL7v/1
     // This one matches queries like:
@@ -91,6 +148,11 @@ void command_line::do_query(table& t, const string& query_line) {
             results = boolean_match(t, column_name, query_b);
         }
     } else if (t.is_floating(column_name)) {
+        const auto query_value = s_to_floating(query_value_s);
+        if (query_value) {
+          const float query_f = *query_value;
+          results = floating_match(t, column_name, query_f);
+        }
     } else if (t.is_geo_coordinate(column_name)) {
     } else if (t.is_integer(column_name)) {
         const auto query_value = std::stoi(query_value_s);
