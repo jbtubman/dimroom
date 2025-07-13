@@ -103,7 +103,6 @@ struct std::formatter<jt::parser::header_fields, char> {
                                 FmtContext& ctx) const {
         std::ostringstream out;
         const bool lfmt = long_format;
-        out << "{ ";
         const string prefix = long_format ? "jt::parser::" : "";
         out << "\"" << prefix << "header_fields\" : [ ";
         bool first_header = true;
@@ -119,7 +118,7 @@ struct std::formatter<jt::parser::header_fields, char> {
                     out << hf;
                 }
             });
-        out << " ] }";
+        out << " ]";
 
         return std::ranges::copy(std::move(out).str(), ctx.out()).out;
     }

@@ -62,6 +62,7 @@ struct std::formatter<jt::table::cell_rows> {
             } else {
                 out << dc;
             }
+            out.flush();
         });
 
         out << " ]";
@@ -70,6 +71,13 @@ struct std::formatter<jt::table::cell_rows> {
         return ranges::copy(std::move(out).str(), ctx.out()).out;
     }
 };
+
+namespace std {
+inline std::ostream& operator<<(std::ostream& os, const jt::table::cell_rows& crs) {
+    os << std::format("{}", crs);
+    return os;
+}
+}
 
 #pragma endregion
 
@@ -102,8 +110,8 @@ struct std::formatter<jt::table> {
         std::ostringstream out;
         out << "{ ";
         const string prefix = long_format ? "jt::" : "";
-        out << "\"" << prefix << "table\" : ";
-        // out << "\"header_fields\" : ";
+        out << "\"" << prefix << "table\" : { ";
+        out << "\"" << prefix << "name\" : \"" << t.name << "\", ";
         if (long_format) {
             out << std::vformat("{#}"sv,
                                 std::make_format_args(t.header_fields_));
@@ -125,12 +133,20 @@ struct std::formatter<jt::table> {
                 } else {
                     out << dcs;
                 }
+                out.flush();
             });
 
-        out << " ] }";
+        out << " ] } }";
         return ranges::copy(std::move(out).str(), ctx.out()).out;
     }
 };
+
+namespace std {
+inline std::ostream& operator<<(std::ostream& os, const jt::table& t) {
+    os << std::format("{}", t);
+    return os;
+}
+}
 
 #pragma endregion
 
