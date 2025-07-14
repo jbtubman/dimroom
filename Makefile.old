@@ -5,13 +5,24 @@ CFLAGS = -std=c++23
 
 .SUFFIXES : .o .cpp
 
-OBJS = main.o command_interpreter.o query.o
+TARGET = dimroom
 
-.cpp.o :
-	$(CPP) $(CFLAGS) -c $<
+SRCS = main.cpp command_interpreter.cpp query.cpp
 
-dimroom: $(OBJS)
-	$(CPP) -std=c++23 -o $@ $(OBJS)
+OBJS = $(SRCS:.cpp=.o)
+
+# .cpp.o :
+# 	$(CPP) $(CFLAGS) -c $<
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CPP) $(CFLAGS) -o $(TARGET) $(OBJS)
+
+%.o: %.cpp
+	$(CPP) $(CFLAGS) -c $< -o $@
+
+%.cpp: %.hpp
 
 .PHONY: test/test
 test/test: test/main.cpp parser.hpp cell_types.hpp \
@@ -67,5 +78,5 @@ utility.hpp: jt_concepts.hpp
 main.cpp: cell_types.hpp command_interpreter.hpp contains.hpp coordinates_formatter.hpp coordinates.hpp table.hpp
 
 clean:
-	/bin/rm -f ./geologic $(OBJS)
+	/bin/rm -f $(TARGET) $(OBJS)
 	cd test ; make clean
