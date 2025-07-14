@@ -290,37 +290,6 @@ static inline table::cell_rows string_matchx(
     return result;
 }
 
-// TODO: Not used any more
-static inline auto t_vw_string_match(
-    table& t, const string& col_name, const string& query_value,
-    ranges::ref_view<table::cell_rows> targets) {
-    const auto col_idx = t.index_for_column_name(col_name);
-
-    auto result = targets | views::filter([&query_value, &col_idx](auto dcs) {
-                      const cell_value_type cvt = dcs[col_idx].value;
-                      if (!cvt) return false;
-                      const string s = std::get<string>(*cvt);
-                      return (s == query_value);
-                  });
-
-    return result;
-}
-
-// TODO: Not used any more
-static inline table::cell_rows t_string_match(
-    table& t, const string& col_name, const string& query_value,
-    table::opt_cell_rows rows_to_query = table::opt_cell_rows{}) {
-    table::cell_rows targets = rows_to_query ? *rows_to_query : t.cell_rows_;
-    const auto col_idx = t.index_for_column_name(col_name);
-    auto targets_vw = views::all(targets);
-    using tvw_t = decltype(targets_vw);
-    static_assert(std::is_same_v<tvw_t, ranges::ref_view<table::cell_rows>>);
-
-    auto res = t_vw_string_match(t, col_name, query_value, targets_vw);
-    auto result = ranges::to<table::cell_rows>(res);
-    return result;
-}
-
 }  // namespace jt
 
 #define TABLE_INCLUDE_FORMATTER
