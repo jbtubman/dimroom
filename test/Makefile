@@ -6,7 +6,7 @@ UPPER_DIR = ..
 
 .SUFFIXES : .o .cpp .hpp
 
-OBJS = main.o cell_test.o cell_types_test.o column_test.o command_interpreter_test.o coordinates_test.o \
+OBJS = test_dimroom.o cell_test.o cell_types_test.o column_test.o command_interpreter_test.o coordinates_test.o \
 	parse_utils_test.o parser_test.o row_test.o table_test.o utility_test.o query_test.o
 
 SRCS := $(patsubst %.o,%.cpp,$(OBJS))
@@ -20,9 +20,9 @@ test: $(OBJS) ../query.o ../command_interpreter.o $(TEST_INCS)
 
 *_test.cpp : $(TEST_INCS)
 
-main.cpp:
+test_dimroom.cpp:
 
-main.o: main.cpp
+test_dimroom.o: test_dimroom.cpp
 	$(CPP) $(CFLAGS) -c $<
 
 query_test.cpp: ../query.hpp ../query.hpp
