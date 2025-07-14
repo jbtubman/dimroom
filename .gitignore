@@ -49,6 +49,7 @@ build/
 out/
 bin/
 obj/
+xcode/
 
 # Ignore Makefiles and Autotools-generated files
 # Makefile
@@ -71,7 +72,7 @@ Makefile.in
 *.exe
 *.out
 ./geologic
-./dimroom
+dimroom
 test/test
 
 # ==================================================
