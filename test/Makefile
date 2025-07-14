@@ -15,9 +15,9 @@ UPPER_INCLUDES = $(wildcard ../*.hpp)
 
 TEST_INCS := $(patsubst %_test.cpp,../%.hpp,$(wildcard *_test.cpp))
 
-test: $(OBJS) ../parser.o ../query.o ../command_interpreter.o $(TEST_INCS)
+test: $(OBJS) ../query.o ../command_interpreter.o $(TEST_INCS)
 	printf "TEST_INCS: \"%s\"" "$(TEST_INCS)"
-	$(CPP) $(CFLAGS) -o $@ $(OBJS) ../parser.o ../query.o ../command_interpreter.o
+	$(CPP) $(CFLAGS) -o $@ $(OBJS) ../query.o ../command_interpreter.o
 
 *_test.cpp : $(TEST_INCS)
 
@@ -41,17 +41,13 @@ cell_test.cpp: ../cell.hpp ../parser.hpp
 cell_test.o: cell_test.cpp ../cell.hpp ../parser.hpp
 	$(CPP) $(CFLAGS) -c $<
 
-parser_test.cpp: ../parser.hpp ../parser.cpp
+parser_test.cpp: ../parser.hpp
 
 parser_test.o: parser_test.cpp
 	$(CPP) $(CFLAGS) -c $<
 
 .cpp.o :
 	$(CPP) $(CFLAGS) -c $<
-
-.PHONY: ../parser.o
-../parser.o : ../parser.cpp ../parser.hpp ../cell_types.hpp ../column.hpp ../jt_concepts.hpp ../parse_utils.hpp ../utility.hpp
-	cd .. ; make parser.o ; cd test
 
 .PHONY: ../query.o
 ../query.o : ../query.cpp ../query.hpp ../table.hpp

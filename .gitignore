@@ -71,6 +71,7 @@ Makefile.in
 *.exe
 *.out
 ./geologic
+./dimroom
 test/test
 
 # ==================================================
