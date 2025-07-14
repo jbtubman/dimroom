@@ -27,7 +27,8 @@ const regex deg_min_lat_rx{deg_min_lat_s};
 const string deg_min_lat_starts_s{R"(("(\d{1,2})° (\d{1,2})' ([NS])))"};
 const regex deg_min_lat_starts_rx{deg_min_lat_starts_s};
 
-const string deg_min_long_s(R"(((\d{1,3})°s+(\d{1,2})'\s+([EW])))");
+// const string deg_min_long_s(R"(((\d{1,3})°s+(\d{1,2})'\s+([EW])))");
+const string deg_min_long_s(R"(((\d{1,3})° (\d{1,2})' ([EW])))");
 const regex deg_min_long_rx{deg_min_long_s};
 
 const string deg_min_long_end_s(R"(\s\d{1,3}° \d{1,2}' [EW]")");
