@@ -126,19 +126,4 @@ TEST_CASE(MyFixture, IntegerTest) {
         CHECK_TRUE(!q_result.empty());
         CHECK_TRUE(q_result.size() == 4);
   }
-
-  SECTION("integer search 4z") {
-        const parser::header_and_data input =
-            parse_lines(MyFixture::sample_csv_rows);
-        const auto all_data_cells =
-            data_cell::make_all_data_cells(input.get_data_fields());
-        table test_table(input.header_fields_, all_data_cells);
-
-        const string column_name = "Image X";
-        const auto column_idx = test_table.index_for_column_name(column_name);
-        const auto column_value = 600;
-        auto q_result = zinteger_match(test_table, column_name, column_value);
-        CHECK_TRUE(!q_result.empty());
-        CHECK_TRUE(q_result.size() == 4);
-  }
 }

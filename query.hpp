@@ -55,10 +55,6 @@ table::cell_rows integer_match(
     table& t, const string& col_name, int query_value,
     table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
 
-table::cell_rows zinteger_match(
-    table& t, const string& col_name, int query_value,
-    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
-
 auto vw_boolean_match(table& t, const string& col_name, bool query_value,
                       ranges::ref_view<table::cell_rows> targets);
 

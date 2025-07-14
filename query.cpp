@@ -107,25 +107,6 @@ table::cell_rows integer_match(table& t, const string& col_name,
     return result;
 }
 
-table::cell_rows zinteger_match(table& t, const string& col_name,
-                                int query_value,
-                                table::opt_cell_rows rows_to_query) {
-    table::cell_rows targets = rows_to_query ? *rows_to_query : t.cell_rows_;
-    const auto col_idx = t.index_for_column_name(col_name);
-    table::cell_rows result{};
-    for (const data_cells& cell_row_ : targets) {
-        auto c = cell_row_[col_idx];
-        auto val = c.value;
-        if (val) {
-            const int i = std::get<int>(*val);
-            if (i == query_value) {
-                result.push_back(cell_row_);
-            }
-        }
-    }
-    return result;
-}
-
 table::cell_rows integer_match(table& t, const string& col_name,
                                const string& query_value,
                                table::opt_cell_rows rows_to_query) {

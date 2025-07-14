@@ -12,7 +12,6 @@
 
 #include "cell_types.hpp"
 #include "column.hpp"
-#include "jt_concepts.hpp"
 #include "parse_utils.hpp"
 #include "utility.hpp"
 

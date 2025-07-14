@@ -75,8 +75,8 @@ class data_cell {
         return *this;
     }
 
-    template <e_cell_data_type E>
-    using Construct = std::integral_constant<e_cell_data_type, E>;
+    // template <e_cell_data_type E>
+    // using Construct = std::integral_constant<e_cell_data_type, E>;
 
     constexpr explicit operator bool() const noexcept {
         return value.has_value();
@@ -94,98 +94,8 @@ class data_cell {
 
     vector<string> get_tags() const { return get<vector<string>>(*value); }
 
-#pragma region _getvalue
-    template <e_cell_data_type E>
-    static auto _get_value(const data_cell& dc, Construct<E>);
-
-    static auto _get_value(const data_cell& dc,
-                           Construct<e_cell_data_type::boolean>) -> bool {
-        return std::get<bool>(*(dc.value));
-    }
-
-    static auto _get_value(const data_cell& dc,
-                           Construct<e_cell_data_type::floating>) -> float {
-        return std::get<float>(*(dc.value));
-    }
-
-    static auto _get_value(const data_cell& dc,
-                           Construct<e_cell_data_type::geo_coordinate>)
-        -> coordinate {
-        return std::get<coordinate>(*(dc.value));
-    }
-
-    static auto _get_value(const data_cell& dc,
-                           Construct<e_cell_data_type::integer>) -> int {
-        return std::get<int>(*(dc.value));
-    }
-
-    static auto _get_value(const data_cell& dc,
-                           Construct<e_cell_data_type::tags>)
-        -> vector<string> {
-        return std::get<vector<string>>(*(dc.value));
-    }
-
-    static auto _get_value(const data_cell& dc,
-                           Construct<e_cell_data_type::text>) -> string {
-        return std::get<string>(*(dc.value));
-    }
-
-    static auto _get_value(const data_cell& dc,
-                           Construct<e_cell_data_type::undetermined>) -> void {
-        // nothing.
-    }
-#pragma endregion _get_value
-
-    constexpr bool has_value() const noexcept { return value.has_value(); }
-
-    template <typename ECellDataTagType>
-    auto get_value(ECellDataTagType tag) {};
-
-    template <>
-    auto get_value<undetermined_tag>(undetermined_tag) {
-        return std::nullopt;
-    }
-
-    template <>
-    auto get_value<invalid_tag>(invalid_tag) {
-        return std::nullopt;
-    }
-
-    template <>
-    auto get_value<floating_tag>(floating_tag) {
-        return std::get<float>(*(this->value));
-    }
-
-    template <>
-    auto get_value<boolean_tag>(boolean_tag) {
-        return std::get<bool>(*(this->value));
-    }
-
-    template <>
-    auto get_value<integer_tag>(integer_tag) {
-        return std::get<int>(*(this->value));
-    }
-
-    template <>
-    auto get_value<text_tag>(text_tag) {
-        return std::get<string>(*(this->value));
-    }
-
-    template <>
-    auto get_value<geo_coordinate_tag>(geo_coordinate_tag) {
-        return std::get<coordinate>(*(this->value));
-    }
-
-    template <>
-    auto get_value<tags_tag>(tags_tag) {
-        return std::get<vector<string>>(*(this->value));
-    }
-
-    template <>
-    auto get_value<sentinel_tag>(sentinel_tag) {
-        return std::nullopt;
-    }
-
+    // Do we need make_data_cells? Yes, it used by make_all_data_cells,
+    // which does get used.
     static cell_value_type make_cell_value_type(
         const string& s, /* std::size_t pos, */
         e_cell_data_type v) {

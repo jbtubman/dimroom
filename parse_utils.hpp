@@ -10,7 +10,6 @@
 
 #include "cell_types.hpp"
 #include "coordinates.hpp"
-#include "jt_concepts.hpp"
 #include "utility.hpp"
 
 // turn on cassert.

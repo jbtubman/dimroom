@@ -32,9 +32,8 @@ struct MyFixture : general_fixture {
 
 TEST_CASE(MyFixture, Column) {
     SECTION("creation") {
-        using cv_type = cpp_cell_data_type_t<e_cell_data_type::integer>;
         string nm{"Filename"};
-        cv_type test_int{0};
+        int test_int{0};
         std::size_t pos{0};
         cell_value_type ct{test_int};
         column col{nm, pos, ct};
@@ -44,7 +43,7 @@ TEST_CASE(MyFixture, Column) {
         CHECK_TRUE(col.value);
         auto col_t_t = *(col.value);
         // see if the optional value is the right thing.
-        auto col_v = std::get<cv_type>(col_t_t);
+        auto col_v = std::get<int>(col_t_t);
         CHECK_TRUE(col_v == test_int);
     }
 }
