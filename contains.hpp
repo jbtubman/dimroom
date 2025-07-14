@@ -106,12 +106,6 @@ inline bool point_in_poly(std::vector<coordinate> vertexes, coordinate test) {
     return inside;
 }
 
-// inline bool flip_inside_state(const coordinate &v1, const coordinate &v2,
-//                               const coordinate &test) {
-//     return (((v1.y > test.y) != (v2.y > test.y)) &&
-//             (test.x < (v2.x - v1.x) * (test.y - v1.y) / (v2.y - v1.y) + v1.x));
-// }
-
 using zip_coordinates = std::tuple<coordinate, coordinate>;
 
 inline bool flip_inside_state(const coordinate &test,
