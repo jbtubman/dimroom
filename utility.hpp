@@ -23,6 +23,11 @@ enum class convert_error {
     tags_convert_error
 };
 
+enum class runtime_error {
+    file_not_found,
+    column_name_not_found
+};
+
 using std::pair;
 using std::vector;
 namespace ranges = std::ranges;

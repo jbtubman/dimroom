@@ -173,66 +173,68 @@ class table {
         return header_fields_[idx].name;
     }
 
-    const auto index_for_column_name(const std::string& col_name) const {
+    const std::expected<size_t, jt::runtime_error> index_for_column_name(
+        const string& col_name) const {
         using map_t = column_name_index_map_t;
         using value_t = column_name_index_map_t::value_type;
         auto res = std::find_if(
             column_name_index_map.begin(), column_name_index_map.end(),
             [&col_name](const value_t& v) { return v.first == col_name; });
         if (res == column_name_index_map.end()) {
-            println(stderr, "Can't find index for field \"{}\"!", col_name);
-            println(stderr, "There are {} entries in column_name_index_map",
-                    column_name_index_map.size());
-            std::cerr << std::flush;
-            println(stderr, "entries:");
-            ranges::for_each(column_name_index_map, [](const value_t& v) {
-                println(stderr, "key: \"{}\", value: {}", v.first, v.second);
-            });
+            return std::unexpected(runtime_error::column_name_not_found);
         }
         auto result = res->second;
         return result;
-        // return column_name_index_map[col_name];
     }
 
     constexpr bool is_undetermined(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
-        return header_at_index(idx).data_type == e_cell_data_type::undetermined;
+        if (!idx) return false;
+        return header_at_index(*idx).data_type ==
+               e_cell_data_type::undetermined;
     }
 
     constexpr bool is_invalid(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
-        return header_at_index(idx).data_type == e_cell_data_type::invalid;
+        if (!idx) return false;
+        return header_at_index(*idx).data_type == e_cell_data_type::invalid;
     }
 
     constexpr bool is_boolean(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
-        return header_at_index(idx).data_type == e_cell_data_type::boolean;
+        if (!idx) return false;
+        return header_at_index(*idx).data_type == e_cell_data_type::boolean;
     }
 
     constexpr bool is_floating(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
-        return header_at_index(idx).data_type == e_cell_data_type::floating;
+        if (!idx) return false;
+        return header_at_index(*idx).data_type == e_cell_data_type::floating;
     }
 
     constexpr bool is_integer(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
-        return header_at_index(idx).data_type == e_cell_data_type::integer;
+        if (!idx) return false;
+        return header_at_index(*idx).data_type == e_cell_data_type::integer;
     }
 
     constexpr bool is_text(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
-        return header_at_index(idx).data_type == e_cell_data_type::text;
+        if (!idx) return false;
+        return header_at_index(*idx).data_type == e_cell_data_type::text;
     }
 
     constexpr bool is_geo_coordinate(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
-        return header_at_index(idx).data_type ==
+        if (!idx) return false;
+        return header_at_index(*idx).data_type ==
                e_cell_data_type::geo_coordinate;
     }
 
     constexpr bool is_tags(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
-        return header_at_index(idx).data_type == e_cell_data_type::tags;
+        if (!idx) return false;
+        return header_at_index(*idx).data_type == e_cell_data_type::tags;
     }
 
     const data_cells& get_data_row(size_t row_idx) const {
@@ -255,7 +257,9 @@ class table {
     }
 
     e_cell_data_type get_column_data_type(const string& column_name) {
-        return get_column_data_type(index_for_column_name(column_name));
+        auto expected_idx = index_for_column_name(column_name);
+        if (!expected_idx) return e_cell_data_type::undetermined;
+        return get_column_data_type(*expected_idx);
     }
 
     cell_rows string_match(const string& col_name, const string& query_value,
@@ -274,7 +278,9 @@ static inline table::cell_rows string_matchx(
     table& t, const string& col_name, const string& query_value,
     table::opt_cell_rows rows_to_query = table::opt_cell_rows{}) {
     table::cell_rows targets = rows_to_query ? *rows_to_query : t.cell_rows_;
-    const auto col_idx = t.index_for_column_name(col_name);
+    const auto ex_col_idx = t.index_for_column_name(col_name);
+    if (!ex_col_idx) return table::cell_rows{};
+    auto col_idx = *ex_col_idx;
     auto result = ranges::fold_left(
         targets, table::cell_rows{},
         [&query_value, &col_idx](table::cell_rows acc, data_cells dcs) {

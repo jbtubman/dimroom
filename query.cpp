@@ -23,7 +23,8 @@ auto vw_string_match(table& t, const string& col_name,
     const auto col_idx = t.index_for_column_name(col_name);
 
     auto result = targets | views::filter([&query_value, col_idx](auto dcs) {
-                      const cell_value_type cvt = dcs[col_idx].value;
+                      if (!col_idx) return false;
+                      const cell_value_type cvt = dcs[*col_idx].value;
                       if (!cvt) return false;
                       const string s = std::get<string>(*cvt);
                       return (s == query_value);
@@ -38,7 +39,8 @@ auto vw_integer_match(table& t, const string& col_name, int query_value,
 
     auto result =
         targets | views::filter([query_value, col_idx](const data_cells& dcs) {
-            const cell_value_type& cvt = dcs[col_idx].value;
+            if (!col_idx) return false;
+            const cell_value_type& cvt = dcs[*col_idx].value;
             if (!cvt) {
                 return false;
             }
@@ -54,7 +56,8 @@ auto vw_boolean_match(table& t, const string& col_name, bool query_value,
 
     auto result =
         targets | views::filter([query_value, col_idx](const data_cells& dcs) {
-            const cell_value_type cvt = dcs[col_idx].value;
+            if (!col_idx) return false;
+            const cell_value_type cvt = dcs[*col_idx].value;
             if (!cvt) return false;
             const int i = std::get<bool>(*cvt);
             return (i == query_value);
@@ -68,7 +71,8 @@ auto vw_floating_match(table& t, const string& col_name, float query_value,
 
     auto result =
         targets | views::filter([query_value, col_idx](const data_cells& dcs) {
-            const cell_value_type cvt = dcs[col_idx].value;
+            if (!col_idx) return false;
+            const cell_value_type cvt = dcs[*col_idx].value;
             if (!cvt) return false;
             const float f = std::get<float>(*cvt);
             return close(f, query_value);

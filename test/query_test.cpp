@@ -39,7 +39,7 @@ TEST_CASE(MyFixture, TextTest) {
         auto q_result = string_match(test_table, column_name, column_value);
         CHECK_TRUE(!q_result.empty());
         CHECK_TRUE(q_result.size() == 1);
-        const auto s_result = q_result[0][column_idx].get_string();
+        const auto s_result = q_result[0][*column_idx].get_string();
         CHECK_TRUE(s_result == column_value);
     }
 
@@ -57,9 +57,9 @@ TEST_CASE(MyFixture, TextTest) {
         auto q_result = string_match(test_table, column_name, column_value);
         CHECK_TRUE(!q_result.empty());
         CHECK_TRUE(q_result.size() == 2);
-        auto s_result = q_result[0][column_idx].get_string();
+        auto s_result = q_result[0][*column_idx].get_string();
         CHECK_TRUE(s_result == column_value);
-        s_result = q_result[1][column_idx].get_string();
+        s_result = q_result[1][*column_idx].get_string();
         CHECK_TRUE(s_result == column_value);
     }
 

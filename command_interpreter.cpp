@@ -142,8 +142,8 @@ void command_line::do_query(table& t, const string& query_line) {
     } else if (t.is_floating(column_name)) {
         const auto query_value = s_to_floating(query_value_s);
         if (query_value) {
-          const float query_f = *query_value;
-          results = floating_match(t, column_name, query_f);
+            const float query_f = *query_value;
+            results = floating_match(t, column_name, query_f);
         }
     } else if (t.is_geo_coordinate(column_name)) {
     } else if (t.is_integer(column_name)) {
@@ -151,7 +151,13 @@ void command_line::do_query(table& t, const string& query_line) {
         results = integer_match(t, column_name, query_value);
     } else if (t.is_tags(column_name)) {
     } else {
-        // Invalid?
+        auto expected_idx = t.index_for_column_name(column_name);
+        if (!expected_idx) {
+            println(stderr, "Column \"{}\" is not in this file.", column_name);
+            println(stderr,
+                    "Use the \"describe\" command to see the column names and "
+                    "types.");
+        }
     }
 
     // Print out the column names.
