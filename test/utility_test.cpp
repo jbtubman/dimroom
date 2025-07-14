@@ -1,7 +1,6 @@
 #include "../utility.hpp"
 
 #include <algorithm>
-#include <print>
 #include <ranges>
 #include <sstream>
 #include <string>
@@ -16,7 +15,6 @@
 
 namespace {
 using std::pair;
-using std::println;
 using std::string;
 using std::vector;
 using namespace jt;
@@ -45,7 +43,6 @@ using std::string;
 using std::vector;
 using std::pair;
 
-using std::println;
 using namespace jt;
 namespace ranges = std::ranges;
 namespace views = std::views;

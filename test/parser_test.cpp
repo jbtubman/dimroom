@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
-#include <print>
 #include <ranges>
 #include <sstream>
 #include <string>
@@ -19,7 +18,6 @@
 #include "general_fixture.hpp"
 
 namespace {
-using std::println;
 using std::string;
 using std::vector;
 using namespace jt;
@@ -77,7 +75,6 @@ struct MyFixture : general_fixture {
 using std::string;
 using std::vector;
 
-using std::println;
 using namespace jt;
 namespace ranges = std::ranges;
 namespace views = std::views;
@@ -90,11 +87,6 @@ TEST_CASE(MyFixture, ParseHeader) {
         const parser::header_fields result = parser::parse_header(input);
 
         CHECK_TRUE(result.size() == expected.size());
-        if (result.size() != expected.size()) {
-            println(stderr, "result.size() {} != expected.size() {}",
-                    result.size(), expected.size());
-            println(stderr, "result: {}", result);
-        }
 
         CHECK_TRUE(ranges::all_of(
             ranges::zip_view(result, expected), [](auto r_e_pair) {
@@ -105,16 +97,6 @@ TEST_CASE(MyFixture, ParseHeader) {
             return h.data_type == e_cell_data_type::undetermined;
         }));
     }
-
-    // SECTION("parse sample header as columns") {
-    //     using std::operator""sv;
-
-    //     auto parsed_columns = parse_header(MyFixture::sample_header);
-
-    //     CHECK_TRUE(parsed_columns.mostly_equal(MyFixture::sample_columns));
-    // }
-
-    SECTION("find triple-quoted fields") {}
 }
 
 TEST_CASE(MyFixture, ParseRow) {
@@ -134,22 +116,9 @@ TEST_CASE(MyFixture, ParseRow) {
         size_t index = 0;
         while (r_it != result.end() && e_it != expected.end()) {
             CHECK_TRUE(*r_it == *e_it);
-            if (*r_it != *e_it) {
-                println(stderr, "\nparse_data_row");
-                println(stderr, "result[{}]:   {}", index, *r_it);
-                println(stderr, "expected[{}]: {}\n", index, *e_it);
-            }
             ++r_it;
             ++e_it;
             ++index;
-        }
-    }
-    SECTION("row value types") {
-        auto parsed_strings = fix_quoted_fields(MyFixture::sample_row_3);
-        auto val_types = parser::row_value_types(parsed_strings);
-        int i = 0;
-        for (auto v : val_types) {
-            println(stderr, "row value types - val_types[{}]: {}", i++, v);
         }
     }
 }
@@ -164,18 +133,14 @@ TEST_CASE(MyFixture, ParseFile) {
 
     SECTION("parse_lines from ifstream") {
         const string filename = MyFixture::csv_input_file;
-        // const string filename{"/Users/jbtubman/src/c++20/geologic/test/data/sample.csv"};
+        // const string
+        // filename{"/Users/jbtubman/src/c++20/geologic/test/data/sample.csv"};
         CHECK_TRUE(std::filesystem::exists(filename));
         auto fp = std::filesystem::relative(filename);
         auto cp = std::filesystem::current_path();
-        auto rel_fp = std::filesystem::relative(fp, cp);
-        println(stderr, "rel_fp: \"{}\"", rel_fp.c_str());
         std::ifstream ifs(fp);
         CHECK_TRUE(ifs.good());
         std::filesystem::path dotp(".");
-        auto thing = fp.relative_path().c_str();
-        println(stderr, "\nrelative_path: \"{}\"\n", thing);
-        println(stderr, "\ncurrent_path: \"{}\n", cp.c_str());
     }
 }
 
@@ -184,43 +149,35 @@ TEST_CASE(MyFixture, GetDataTypeForAllColumns) {
         using ecdt = e_cell_data_type;
         const vector<string> input = MyFixture::sample_csv_rows;
         const parser::header_and_data hd = parse_lines(input);
-        println(stderr, "\nhd.size() = {}\n", hd.data_fields_vec_.size());
         const parser::all_data_fields adf = hd.get_data_fields();
-        println(stderr, "\nadf.size() = {}\n", adf.size());
-        println(stderr, "\nnumber of columns: {}", adf[0].size());
         const auto result = parser::get_data_types_for_all_columns(adf);
-        const vector<e_cell_data_type> expected = {
-            // Filename
-            ecdt::text,
-            // Type
-            ecdt::text,
-            // Image Size (MB)
-            ecdt::floating,
-            // Image X,
-            ecdt::integer,
-            // Image Y,
-            ecdt::integer,
-            // DPI,
-            ecdt::integer,
-            // (Center) Coordinate,
-            ecdt::geo_coordinate,
-            // Favorite,
-            ecdt::boolean,
-            // Continent,
-            ecdt::text,
-            // Bit color,
-            ecdt::integer,
-            // Alpha,
-            ecdt::text,
-            // Hockey Team,
-            ecdt::text,
-            // User Tags
-            ecdt::tags
-        };
+        const vector<e_cell_data_type> expected = {// Filename
+                                                   ecdt::text,
+                                                   // Type
+                                                   ecdt::text,
+                                                   // Image Size (MB)
+                                                   ecdt::floating,
+                                                   // Image X,
+                                                   ecdt::integer,
+                                                   // Image Y,
+                                                   ecdt::integer,
+                                                   // DPI,
+                                                   ecdt::integer,
+                                                   // (Center) Coordinate,
+                                                   ecdt::geo_coordinate,
+                                                   // Favorite,
+                                                   ecdt::boolean,
+                                                   // Continent,
+                                                   ecdt::text,
+                                                   // Bit color,
+                                                   ecdt::integer,
+                                                   // Alpha,
+                                                   ecdt::text,
+                                                   // Hockey Team,
+                                                   ecdt::text,
+                                                   // User Tags
+                                                   ecdt::tags};
         CHECK_TRUE(result.size() == expected.size());
-        if (result.size() != expected.size()) {
-            println(stderr, "\nresult.size() = {}; expected.size() = {}\n", result.size(), expected.size());
-        }
         for (size_t i = 0; i < result.size(); i++) {
             CHECK_TRUE(result[i] == expected[i]);
         }

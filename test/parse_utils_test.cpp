@@ -1,6 +1,6 @@
 #include "../parse_utils.hpp"
 
-#include <print>
+// #include <print>
 #include <ranges>
 #include <regex>
 #include <string>
@@ -60,7 +60,6 @@ struct MyFixture : general_fixture {
 using std::string;
 using std::vector;
 
-using std::println;
 using std::regex;
 using std::sregex_iterator;
 using namespace jt;
@@ -74,12 +73,6 @@ TEST_CASE(MyFixture, ParseUtils) {
         const vector<string> expected({});
         const vector<string> result = split_row(input);
         CHECK_TRUE(result == expected);
-        if (result != expected) {
-            println(stderr, "\nsplit row 0");
-            println(stderr, "input:    \"{}\"", input);
-            println(stderr, "result:   \"{}\"", result);
-            println(stderr, "expected: \"{}\"\n", expected);
-        }
     }
 
     SECTION("split row 1") {
@@ -87,12 +80,6 @@ TEST_CASE(MyFixture, ParseUtils) {
         const vector<string> expected({"1200"s});
         const vector<string> result = split_row(input);
         CHECK_TRUE(result == expected);
-        if (result != expected) {
-            println(stderr, "\nsplit row 1");
-            println(stderr, "input:    \"{}\"", input);
-            println(stderr, "result:   \"{}\"", result);
-            println(stderr, "expected: \"{}\"\n", expected);
-        }
     }
 
     SECTION("split row 2") {
@@ -100,12 +87,6 @@ TEST_CASE(MyFixture, ParseUtils) {
         const vector<string> expected({"1200"s, "Yes"s});
         const vector<string> result = split_row(input);
         CHECK_TRUE(result == expected);
-        if (result != expected) {
-            println(stderr, "\nsplit row 2");
-            println(stderr, "input:    \"{}\"", input);
-            println(stderr, "result:   \"{}\"", result);
-            println(stderr, "expected: \"{}\"\n", expected);
-        }
     }
 
     SECTION("split row 3") {
@@ -116,12 +97,6 @@ TEST_CASE(MyFixture, ParseUtils) {
              ""s, R"("""Mt Fuji)", R"( Fog""")"});
         const vector<string> result = split_row(input);
         CHECK_TRUE(result == expected);
-        if (result != expected) {
-            println(stderr, "\nsplit row 3");
-            println(stderr, "input:    \"{}\"", input);
-            println(stderr, "result:   \"{}\"", result);
-            println(stderr, "expected: \"{}\"\n", expected);
-        }
     }
 
     SECTION("combine decimal coordinate fields") {
@@ -132,12 +107,6 @@ TEST_CASE(MyFixture, ParseUtils) {
                               ","s + "Yes"s};
         auto result = combine_coordinate_fields(input);
         CHECK_TRUE(result == expected);
-        if (result != expected) {
-            println(stderr, "\ninput_s:  \"{}\"", input_s);
-            println(stderr, "input:    {}", input);
-            println(stderr, "result:   \"{}\"", result);
-            println(stderr, "expected: \"{}\"\n", expected);
-        }
     }
 
     SECTION("combine dms coordinate fields") {
@@ -148,12 +117,6 @@ TEST_CASE(MyFixture, ParseUtils) {
                                 ","s + ""s + ","s + "Asia"s;
         const string result = combine_coordinate_fields(input);
         CHECK_TRUE(result == expected);
-        if (result != expected) {
-            println(stderr, "\ninput_s:  \"{}\"", input_s);
-            println(stderr, "input:    {}", input);
-            println(stderr, "result:   \"{}\"", result);
-            println(stderr, "expected: \"{}\"\n", expected);
-        }
     }
 
     SECTION("combine tag fields 0") {
@@ -162,12 +125,6 @@ TEST_CASE(MyFixture, ParseUtils) {
         const string expected{R"("""""")"};
         const string result = combine_tag_fields(input);
         CHECK_TRUE(result == expected);
-        if (result != expected) {
-            println(stderr, "\ncombine tag fields");
-            println(stderr, "input:    \"{}\"", input);
-            println(stderr, "result:   \"{}\"", result);
-            println(stderr, "expected: \"{}\"\n", expected);
-        }
     }
 
     SECTION("combine tag fields 1") {
@@ -176,12 +133,6 @@ TEST_CASE(MyFixture, ParseUtils) {
         const string expected{R"("""OneTag""")"};
         const string result = combine_tag_fields(input);
         CHECK_TRUE(result == expected);
-        if (result != expected) {
-            println(stderr, "\ncombine tag fields");
-            println(stderr, "input:    \"{}\"", input);
-            println(stderr, "result:   \"{}\"", result);
-            println(stderr, "expected: \"{}\"\n", expected);
-        }
     }
 
     SECTION("combine tag fields 3") {
@@ -193,12 +144,6 @@ TEST_CASE(MyFixture, ParseUtils) {
                                 comma_substitute + R"( Dusk""")";
         const string result = combine_tag_fields(input);
         CHECK_TRUE(result == expected);
-        if (result != expected) {
-            println(stderr, "\ncombine tag fields");
-            println(stderr, "input:    \"{}\"", input);
-            println(stderr, "result:   \"{}\"", result);
-            println(stderr, "expected: \"{}\"\n", expected);
-        }
     }
 
     SECTION("fix quoted fields") {
@@ -206,10 +151,6 @@ TEST_CASE(MyFixture, ParseUtils) {
         auto result = fix_quoted_fields(row_s);
         int i = 0;
         CHECK_TRUE(valid_decimal_coord == result[6]);
-        if (valid_decimal_coord != result[6]) {
-            println(stderr, "valid_decimal_coord: \"{}\"", valid_decimal_coord);
-            println(stderr, "result[6]:           \"{}\"", result[6]);
-        }
         CHECK_TRUE(valid_tag_sample_row_3 == result[12]);
     }
 
@@ -221,12 +162,6 @@ TEST_CASE(MyFixture, ParseUtils) {
             const e_cell_data_type result =
                 determine_data_field_e_cell_data_type(input);
             CHECK_TRUE(result == expected);
-            if (result != expected) {
-                println(stderr, "\ntest determine_data_field_e_cell_data_type");
-                println(stderr, "input:    \"{}\"", input);
-                println(stderr, "result:   {}", result);
-                println(stderr, "expected: {}\n", expected);
-            }
         }
     }
 }

@@ -3,13 +3,9 @@ CPP = /usr/bin/c++
 
 CFLAGS = -std=c++23
 
-# TEST_INCLUDE_DIR = -I../CppUnitTestFramework
-
 .SUFFIXES : .o .cpp
 
 OBJS = main.o command_interpreter.o query.o
-
-# TEST_OBJS = test/*.o
 
 .cpp.o :
 	$(CPP) $(CFLAGS) -c $<
@@ -21,7 +17,6 @@ dimroom: $(OBJS)
 test/test: test/main.cpp parser.hpp cell_types.hpp \
 	column.hpp jt_concepts.hpp parse_utils.hpp utility.hpp query.o command_handler.o
 	cd test ; make test
-#	$(CPP) -std=c++23 -I../CppUnitTestFramework $(?) -o test/test
 
 .PHONY: do_test
 do_test: test/test

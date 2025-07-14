@@ -242,22 +242,16 @@ static inline parser::header_and_data __parse_lines(
 
     auto second = ++first;
     if (second == last) {
-        println(stderr, "No data rows");
         return parser::header_and_data(parser::parse_header(in_lines[0]));
-    } else {
-        println(stderr, "{} data rows", last - second);
     }
 
     parser::header_and_data result(parser::parse_header(in_lines[0]));
     auto data_range = ranges::subrange(second, last);
 
     for (auto current = second; current != last; ++current) {
-        println(stderr, "data row: \"{}\"", *current);
         const string& s = *current;
         parser::data_fields dfs = parser::parse_data_row(s);
         result.data_fields_vec_.push_back(dfs);
-        println(stderr, "result.data_fields_vec_.size(): {}",
-                result.data_fields_vec_.size());
     }
 
     const vector<e_cell_data_type> cell_data_types_vec =
@@ -287,7 +281,6 @@ static parser::header_and_data parse_lines(VectorString&& input_lines) {
 
 static inline parser::header_and_data parse_lines(std::ifstream& instream) {
     if (!instream) {
-        println(stderr, "empty file");
         return parser::header_and_data();
     }
 

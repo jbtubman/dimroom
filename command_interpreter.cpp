@@ -45,8 +45,6 @@ string row_to_string(const data_cells& row_dcs) {
 }
 
 void command_line::do_query(table& t, const string& query_line) {
-    println("do the query: \"{}\"", query_line);
-
     // Most of this stuff should be refactored elsewhere.
     const string query_prefix_s{R"-(^\s*query\s*)-"};
 
@@ -125,12 +123,6 @@ void command_line::do_query(table& t, const string& query_line) {
         println(stderr, "could not parse query \"{}\"", query_line);
         return;
         // Will need to change this when handling more complex queries.
-    }
-
-    int match_count = 0;
-    for (auto it = m.begin(); it != m.end(); ++it) {
-        const auto val = *it;
-        cerr << "m[" << match_count++ << "] = \"" << val << "\"" << endl;
     }
 
     const string column_name = m[1].str();

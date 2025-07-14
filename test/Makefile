@@ -16,7 +16,6 @@ UPPER_INCLUDES = $(wildcard ../*.hpp)
 TEST_INCS := $(patsubst %_test.cpp,../%.hpp,$(wildcard *_test.cpp))
 
 test: $(OBJS) ../query.o ../command_interpreter.o $(TEST_INCS)
-	printf "TEST_INCS: \"%s\"" "$(TEST_INCS)"
 	$(CPP) $(CFLAGS) -o $@ $(OBJS) ../query.o ../command_interpreter.o
 
 *_test.cpp : $(TEST_INCS)

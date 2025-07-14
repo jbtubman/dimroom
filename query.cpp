@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <expected>
 #include <optional>
-#include <print>
 #include <ranges>
 #include <string>
 #include <variant>
@@ -16,7 +15,6 @@ namespace jt {
 namespace ranges = std::ranges;
 namespace views = std::ranges::views;
 
-using std::println;
 using std::string;
 
 auto vw_string_match(table& t, const string& col_name,
@@ -37,17 +35,14 @@ auto vw_string_match(table& t, const string& col_name,
 auto vw_integer_match(table& t, const string& col_name, int query_value,
                       ranges::ref_view<table::cell_rows> targets) {
     const auto col_idx = t.index_for_column_name(col_name);
-    println(stderr, "\ncol_idx: {}\n", col_idx);
 
     auto result =
         targets | views::filter([query_value, col_idx](const data_cells& dcs) {
             const cell_value_type& cvt = dcs[col_idx].value;
             if (!cvt) {
-                println(stderr, "\ncell value not found\n");
                 return false;
             }
             const int i = std::get<int>(*cvt);
-            println(stderr, "\ni = {}\n", i);
             return (i == query_value);
         });
     return result;
@@ -102,8 +97,6 @@ table::cell_rows integer_match(table& t, const string& col_name,
     auto integer_match_view =
         vw_integer_match(t, col_name, query_value, targets_vw);
     auto result = ranges::to<table::cell_rows>(integer_match_view);
-    println(stderr, "\n{} elements for query_value {}\n", result.size(),
-            query_value);
     return result;
 }
 
@@ -135,7 +128,6 @@ table::cell_rows boolean_match(table& t, const string& col_name,
 
     const auto e_bool_value = s_to_boolean(query_value);
     if (!e_bool_value) {
-        println(stderr, "could not parse as boolean input \"{}\"", query_value);
         return table::cell_rows{};
     }
 

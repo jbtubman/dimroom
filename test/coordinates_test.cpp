@@ -1,14 +1,14 @@
+#include "../coordinates.hpp"
+
 #include <cmath>
 #include <concepts>
 #include <string>
 #include <type_traits>
 
 #include "CppUnitTestFramework.hpp"
-#include "../coordinates.hpp"
 #include "general_fixture.hpp"
 
 namespace {
-using std::println;
 using std::string;
 using namespace jt;
 struct MyFixture : general_fixture {

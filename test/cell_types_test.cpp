@@ -21,18 +21,6 @@ namespace ranges = std::ranges;
 namespace views = std::views;
 
 struct MyFixture : general_fixture {
-    /*
-    enum class e_cell_data_type {
-      undetermined,
-      invalid,
-      floating,
-      boolean,
-      integer,
-      text,
-      geo_coordinate,
-      tags
-  };
-    */
     const vector<e_cell_data_type> ecdt_vec_1 = {
         e_cell_data_type::undetermined,   e_cell_data_type::invalid,
         e_cell_data_type::floating,       e_cell_data_type::boolean,
@@ -42,15 +30,6 @@ struct MyFixture : general_fixture {
 
     using ecdt_pair_t =
         cross_product_pair_t<e_cell_data_type, e_cell_data_type>;
-    // using ecdt_x_ecdt_t = vector<ecdt_pair_t>;
-
-    // using outer_acc_t = ecdt_x_ecdt_t;
-    // using inner_acc_t = std::pair<e_cell_data_type, ecdt_x_ecdt_t>;
-
-    // inner_acc_t inner_fn(inner_acc_t& inner_acc, e_cell_data_type dt2) {
-    //     inner_acc.second.emplace_back(ecdt_pair_t(inner_acc.first, dt2));
-    //     return inner_acc;
-    // }
 
     static consteval cross_product_output_t<e_cell_data_type> all_cdt_combos() {
         auto v1 = all_e_cell_data_types();

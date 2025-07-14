@@ -11,10 +11,8 @@
 #include "general_fixture.hpp"
 
 namespace {
-using std::println;
 using std::string;
 using namespace jt;
-using std::println;
 namespace filesystem = std::filesystem;
 using namespace std::string_literals;
 using std::operator""s;
@@ -82,7 +80,7 @@ TEST_CASE(MyFixture, TextTest) {
 }
 
 TEST_CASE(MyFixture, IntegerTest) {
-  SECTION("integer search 0") {
+    SECTION("integer search 0") {
         const parser::header_and_data input =
             parse_lines(MyFixture::sample_csv_rows);
         const auto all_data_cells =
@@ -95,9 +93,9 @@ TEST_CASE(MyFixture, IntegerTest) {
         auto q_result = integer_match(test_table, column_name, column_value);
         CHECK_TRUE(q_result.empty());
         CHECK_TRUE(q_result.size() == 0);
-  }
+    }
 
-  SECTION("integer search 1") {
+    SECTION("integer search 1") {
         const parser::header_and_data input =
             parse_lines(MyFixture::sample_csv_rows);
         const auto all_data_cells =
@@ -110,9 +108,9 @@ TEST_CASE(MyFixture, IntegerTest) {
         auto q_result = integer_match(test_table, column_name, column_value);
         CHECK_TRUE(!q_result.empty());
         CHECK_TRUE(q_result.size() == 1);
-  }
+    }
 
-  SECTION("integer search 4") {
+    SECTION("integer search 4") {
         const parser::header_and_data input =
             parse_lines(MyFixture::sample_csv_rows);
         const auto all_data_cells =
@@ -125,5 +123,5 @@ TEST_CASE(MyFixture, IntegerTest) {
         auto q_result = integer_match(test_table, column_name, column_value);
         CHECK_TRUE(!q_result.empty());
         CHECK_TRUE(q_result.size() == 4);
-  }
+    }
 }

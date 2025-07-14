@@ -1,7 +1,6 @@
 #include "../cell.hpp"
 
 #include <algorithm>
-#include <print>
 #include <ranges>
 #include <regex>
 #include <string>
@@ -17,7 +16,6 @@ namespace {
 using std::string;
 using std::vector;
 using namespace jt;
-using std::println;
 
 struct MyFixture : general_fixture {
     // ...
@@ -49,7 +47,6 @@ struct MyFixture : general_fixture {
 };
 }  // namespace
 
-using std::println;
 using std::regex;
 using std::string;
 using std::string_view;
@@ -131,10 +128,6 @@ TEST_CASE(MyFixture, Cell) {
 
         auto raw_field_strings = fields_view | ranges::to<vector>();
 
-        for (auto s : raw_field_strings) {
-            println(stderr, "\"{}\", ", s);
-        }
-
         // Glue together the tags fields.
         regex start_tag_rx{R"(^""".*)"};
         auto start_tag_fn = [start_tag_rx](const string& s) {
@@ -160,7 +153,6 @@ TEST_CASE(MyFixture, Cell) {
                 auto the_end = ending_tags;
                 ++the_end;
                 vector<string> tag_vec(beginning_tags, the_end);
-                println(stderr, "tag_vec: {}", tag_vec);
 
                 string initial{""};
                 auto res = ranges::fold_left(tag_vec, initial,
@@ -171,14 +163,15 @@ TEST_CASE(MyFixture, Cell) {
                                                      return acc + "," + s;
                                                  }
                                              });
-                println(stderr, "res: {}", res);
             }
         }
     }
 
     SECTION("converting 1") {
-        const parser::header_and_data input = parse_lines(MyFixture::sample_csv_rows);
-        const auto all_data_cells = data_cell::make_all_data_cells(input.get_data_fields());
+        const parser::header_and_data input =
+            parse_lines(MyFixture::sample_csv_rows);
+        const auto all_data_cells =
+            data_cell::make_all_data_cells(input.get_data_fields());
         const auto first_row_data_cells =
             data_cell::make_data_cells(input.get_data_fields()[0]);
         const auto first_result = first_row_data_cells[0];
@@ -189,17 +182,19 @@ TEST_CASE(MyFixture, Cell) {
     }
 
     SECTION("converting Japan") {
-        const parser::header_and_data input = parse_lines(MyFixture::sample_csv_rows);
-        const auto all_data_cells = data_cell::make_all_data_cells(input.get_data_fields());
+        const parser::header_and_data input =
+            parse_lines(MyFixture::sample_csv_rows);
+        const auto all_data_cells =
+            data_cell::make_all_data_cells(input.get_data_fields());
         // Japan is the third row.
         const auto cells = all_data_cells[2];
-        // R"(Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags)"
-        // R"(Japan.jpeg,jpeg,26.4,600,800,600,"36° 00' N, 138° 00' E",,Asia,,,,"""Mt Fuji, Fog""")",
+        // R"(Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center)
+        // Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags)"
+        // R"(Japan.jpeg,jpeg,26.4,600,800,600,"36° 00' N, 138° 00'
+        // E",,Asia,,,,"""Mt Fuji, Fog""")",
         const auto filename = cells[0];
         CHECK_TRUE(filename);
         CHECK_TRUE(true);
         CHECK_TRUE(filename.get_string() == "Japan.jpeg");
-        println(stderr, "\nfilename cell: {}", filename);
-        println(stderr, "cells: {}\n", cells);
     }
 }
