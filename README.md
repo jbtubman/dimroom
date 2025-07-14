@@ -1,11 +1,15 @@
 # DIMROOM
 
-A read-only command-line version of Lightroom.
+Jim Tubman
+June/July 2025
+
+_A read-only command-line version of Lightroom._
 
 ## Installation
 
-Dimroom was built and tested on a Mac Studio, using the Clang C++ compiler and
-VSCode.
+Dimroom was built and tested on a Mac Studio (MacOS 15.5), using the Clang 17.0.0 C++ compiler
+and VSCode. It does compile without error in that environment. The unit tests (such as they
+are) all pass.
 
 The source code is available on GitHub. Clone `git@github.com:jbtubman/geologic.git`
 into a directory.

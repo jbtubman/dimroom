@@ -36,6 +36,9 @@ with that process.
 If I were to do it again, I would come up with a more consistent naming convention
 for data types and classes.
 
+The makefiles are rather clunky. If I had had the time, I would have learned
+how to use CMake for this project.
+
 I missed having feedback from my peers through pull requests. (That is obviously
 impossible when doing an assessment during the hiring process.)
 
