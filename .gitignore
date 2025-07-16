@@ -42,6 +42,7 @@ CMakeFiles/
 cmake_install.cmake
 CTestTestfile.cmake
 Makefile
+include/dimroomConfig.h
 
 # ==================================================
 # 🔹 Ignore build directories (CLion, VS Code, or general)
@@ -107,3 +108,8 @@ Thumbs.db
 # 🔹 Documentation files
 # ==================================================
 doc/
+
+# ==================================================
+# 🔹 Backup files
+# ==================================================
+*.old
