@@ -5,46 +5,17 @@ June/July 2025
 
 _A read-only command-line version of Lightroom._
 
-## Installation
+## Installation (Now Uses CMAKE)
 
-Dimroom was built and tested on a Mac Studio (MacOS 15.5), using the Clang 17.0.0 C++ compiler
-and VSCode. It does compile without error in that environment. The unit tests (such as they
-are) all pass.
-
-The source code is available on GitHub. Clone `git@github.com:jbtubman/geologic.git`
-into a directory.
-
-The _CppUnitTestFramework_ was used for unit testing.
-
-The two packages need to be installed at the same level, e.g.:
-
-    src/geologic
-    src/CppUnitTestFramework
-
-In the `geologic` directory, create a `build` directory and go into it:
-
-    $ mkdir build
-    $ cd build
-
-Create the `Makefile` by running cmake thusly:
-
-    $ cmake ..
-
-This will create the file `build\Makefile`. Then type
-
-    $ make
-
-This will build the execuable file `dimroom` in the `build` directory.
-
-To run the tests, in the `geologic` directory, enter the command
-
-    make do_test
+Installation instructions are available in the file [INSTALL.md](./INSTALL.md).
 
 ## Running Dimroom
 
-To run Dimroom from a terminal window, type the command name and the path to a CSV file, e.g.:
+To run Dimroom from a terminal window, make sure that you are in the
+`geologic/build` directory, then type the command name and the path
+to a CSV file, e.g.:
 
-    $ ./dimroom test/data/sample.csv
+    $ ./dimroom ../test/data/sample.csv
 
 The filename is required. Unfortunately, Dimroom is not very robust if a
 non-CSV file is used.
@@ -53,7 +24,7 @@ A greeting and the command prompt will appear.
 
     Welcome to DimRoom
     Enter the command "help" for help.
-    command>
+    dimroom-2.1>
 
 ### Getting Help
 
