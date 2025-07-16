@@ -1,12 +1,12 @@
-#include "../table.hpp"
+#include "table.hpp"
 
 #include <algorithm>
 #include <filesystem>
 #include <string>
 #include <vector>
 
-#include "../parser.hpp"
-#include "../query.hpp"
+#include "parser.hpp"
+#include "query.hpp"
 #include "CppUnitTestFramework.hpp"
 #include "general_fixture.hpp"
 

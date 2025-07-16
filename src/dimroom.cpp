@@ -34,7 +34,9 @@ int main(int argc, char** argv) {
             return EXIT_FAILURE;
         }
     } else {
-        println(stderr, "{}: please specify a filename", argv_sv[0]);
+        println(stderr,
+                "{}: please specify a CSV filename (like ../test/data/sample.csv)",
+                argv_sv[0]);
         return EXIT_FAILURE;
     }
 }

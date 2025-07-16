@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "command_handler.hpp"
+#include "dimroomConfig.h"
 #include "query.hpp"
 #include "table.hpp"
 #include "utility.hpp"
@@ -55,7 +56,6 @@ class command_line {
         "\"describe\" - describe the table",
         "\"query (\"column name\" = value)\" - do a query",
         "\"exit\" - end program", "\"quit\" - end program",
-
         "\"help\" - print help message"};
 
     const regex quit_cmd_rx{R"(^\s*(quit|exit)\b.*)", regex::icase};
@@ -84,12 +84,12 @@ class command_line {
 
     void do_query(table& t, const string& query_line);
 
-    const string prompt{"command> "};
-
     int read_eval_print(table& table_to_use) {
         println(stderr, "Welcome to DimRoom");
         println(stderr, "Enter the command \"help\" for help.");
-        cout << prompt;
+        const string prompt_str = std::format(
+            "dimroom-{}.{}> ", dimroom_VERSION_MAJOR, dimroom_VERSION_MINOR);
+        cout << prompt_str;
         string input_line;
         while (getline(cin, input_line)) {
             trim(input_line);
@@ -111,7 +111,7 @@ class command_line {
                      << endl;
             }
 
-            cout << prompt;
+            cout << prompt_str;
         }
 
         println("Goodbye.");

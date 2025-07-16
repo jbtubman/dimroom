@@ -1,4 +1,4 @@
-#include "../command_interpreter.hpp"
+#include "command_interpreter.hpp"
 
 #include <algorithm>
 #include <array>

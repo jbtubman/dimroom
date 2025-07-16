@@ -21,9 +21,20 @@ The two packages need to be installed at the same level, e.g.:
     src/geologic
     src/CppUnitTestFramework
 
-In the `geologic` directory, build the program with
+In the `geologic` directory, create a `build` directory and go into it:
 
-    make -B all
+    $ mkdir build
+    $ cd build
+
+Create the `Makefile` by running cmake thusly:
+
+    $ cmake ..
+
+This will create the file `build\Makefile`. Then type
+
+    $ make
+
+This will build the execuable file `dimroom` in the `build` directory.
 
 To run the tests, in the `geologic` directory, enter the command
 

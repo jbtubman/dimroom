@@ -1,4 +1,4 @@
-#include "../coordinates.hpp"
+#include "coordinates.hpp"
 
 #include <cmath>
 #include <concepts>

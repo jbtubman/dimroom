@@ -1,4 +1,4 @@
-#include "../parser.hpp"
+#include "parser.hpp"
 
 #include <algorithm>
 #include <filesystem>
@@ -11,9 +11,9 @@
 #include <type_traits>
 #include <vector>
 
-#include "../cell_types.hpp"
-#include "../parse_utils.hpp"
-#include "../parser_formatter.hpp"
+#include "cell_types.hpp"
+#include "parse_utils.hpp"
+#include "parser_formatter.hpp"
 #include "CppUnitTestFramework.hpp"
 #include "general_fixture.hpp"
 

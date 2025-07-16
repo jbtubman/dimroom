@@ -1,4 +1,5 @@
-#include "../cell.hpp"
+// #include "../cell.hpp"
+#include "cell.hpp"
 
 #include <algorithm>
 #include <ranges>
@@ -7,8 +8,8 @@
 #include <string_view>
 #include <vector>
 
-#include "../cell_types.hpp"
-#include "../parser.hpp"
+#include "cell_types.hpp"
+#include "parser.hpp"
 #include "CppUnitTestFramework.hpp"
 #include "general_fixture.hpp"
 

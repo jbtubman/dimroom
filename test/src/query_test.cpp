@@ -1,12 +1,12 @@
-#include "../query.hpp"
+#include "query.hpp"
 
 #include <cmath>
 #include <concepts>
 #include <string>
 #include <type_traits>
 
-#include "../coordinates.hpp"
-#include "../table.hpp"
+#include "coordinates.hpp"
+#include "table.hpp"
 #include "CppUnitTestFramework.hpp"
 #include "general_fixture.hpp"
 

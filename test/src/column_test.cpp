@@ -1,8 +1,8 @@
-#include "../column.hpp"
+#include "column.hpp"
 
 #include <string>
 
-#include "../cell_types.hpp"
+#include "cell_types.hpp"
 #include "CppUnitTestFramework.hpp"
 #include "general_fixture.hpp"
 

@@ -1,4 +1,4 @@
-#include "../cell_types.hpp"
+#include "cell_types.hpp"
 
 #include <algorithm>
 #include <concepts>
@@ -8,8 +8,8 @@
 #include <type_traits>
 #include <vector>
 
-#include "../jt_concepts.hpp"
-#include "../utility.hpp"
+#include "jt_concepts.hpp"
+#include "utility.hpp"
 #include "CppUnitTestFramework.hpp"
 #include "general_fixture.hpp"
 

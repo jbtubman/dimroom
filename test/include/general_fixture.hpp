@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "../utility.hpp"
+#include "utility.hpp"
 
 namespace {
 using std::string;
