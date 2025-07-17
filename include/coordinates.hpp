@@ -7,6 +7,8 @@
 #include <string_view>
 #include <type_traits>
 
+#include "utility.hpp"
+
 // Geographical coordinates.
 // May be represented in the CSV file in two ways:
 // 36° 00' N, 138° 00' E
@@ -36,7 +38,6 @@ const string deg_min_lat_starts_s{R"-(("(\d{1,2})°\s*(\d{1,2})'\s*([NS])))-"};
 const regex deg_min_lat_starts_rx{deg_min_lat_starts_s};
 
 const string deg_min_long_s(R"-(((\d{1,3})°\s*(\d{1,2})'\s*([EW])))-");
-// const string deg_min_long_s(R"(((\d{1,3})° (\d{1,2})' ([EW])))");
 const regex deg_min_long_rx{deg_min_long_s};
 
 const string deg_min_long_end_s(R"-(\s\d{1,3}° \d{1,2}' [EW]")-");
@@ -61,7 +62,6 @@ const int long_dir{8};
 
 // decimal coordinates regexps.
 
-// const string decimal_lat_s{R"((-?\d{1,2}\.\d{5}))"};
 const string decimal_lat_s{R"-((-?\d{1,2}(\.\d{1,5})?)\s*,)-"};
 const regex decimal_lat_rx{decimal_lat_s};
 
@@ -71,13 +71,14 @@ const regex decimal_lat_starts_rx{decimal_lat_starts_s};
 const string decimal_long_s{R"-((-?\d{1,3}(\.\d{1,5})?))-"};
 const regex decimal_long_rx{decimal_long_s};
 
-const string decimal_long_end_s{R"((\s-?\d{1,3}\.\d{5}"))"};
+const string decimal_long_end_s{R"((\s-?\d{1,3}(\.\d{1,5})?"))"};
 const regex decimal_long_end_rx{decimal_long_end_s};
 
 const string decimal_coordinate_s("(\"" + decimal_lat_s + R"-(\s*)-" +
                                   decimal_long_s + "\")");
 const regex decimal_coordinate_rx{decimal_coordinate_s};
 
+// Both types of coordinates.
 const string coordinate_s("^" + deg_min_cooordinate_s + "|" +
                           decimal_coordinate_s + "$");
 const regex coordinate_rx{coordinate_s};
@@ -150,7 +151,7 @@ class coordinate {
         return *this;
     }
 
-    // Should these be free functions?
+    // Should this be a free function?
     constexpr static bool is_valid(float lat_f, float long_f) {
         if (lat_f > 90.0 || lat_f < -90.0) return false;
         if (long_f > 180.0 || long_f < -180.0) return false;
@@ -159,6 +160,11 @@ class coordinate {
 
     constexpr bool is_valid() const {
         return coordinate::is_valid(latitude, longitude);
+    }
+
+    // Should this be a free function?
+    constexpr static bool is_valid(const coordinate& coord) {
+        return coord.is_valid();
     }
 };
 
@@ -263,6 +269,22 @@ inline coordinate make_coordinate(const string& s) {
 
     // default-constructed coordinate is invalid.
     return coordinate();
+}
+
+inline std::expected<coordinate, convert_error> s_to_geo_coordinate(
+    const string& s) {
+    coordinate result = make_coordinate(s);
+    if (result.coordinate_format != coordinate::format::invalid) {
+        return result;
+    }
+
+    // try putting quotes around it.
+    const string s2 = "\"" + s + "\"";
+    result = make_coordinate(s2);
+    if (result.coordinate_format != coordinate::format::invalid) {
+        return result;
+    }
+    return std::unexpected(convert_error::geo_coordinate_convert_error);
 }
 
 };  // namespace jt

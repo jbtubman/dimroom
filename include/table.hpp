@@ -237,6 +237,36 @@ class table {
         return header_at_index(*idx).data_type == e_cell_data_type::tags;
     }
 
+    constexpr e_cell_data_type column_type(const std::string& col_name) const {
+        using ecdt = e_cell_data_type;
+
+        if (is_undetermined(col_name)) {
+            return ecdt::undetermined;
+        }
+        if (is_invalid(col_name)) {
+            return ecdt::invalid;
+        }
+        if (is_boolean(col_name)) {
+            return ecdt::boolean;
+        }
+        if (is_floating(col_name)) {
+            return ecdt::floating;
+        }
+        if (is_integer(col_name)) {
+            return ecdt::integer;
+        }
+        if (is_text(col_name)) {
+            return ecdt::text;
+        }
+        if (is_geo_coordinate(col_name)) {
+            return ecdt::geo_coordinate;
+        }
+        if (is_tags(col_name)) {
+            return ecdt::tags;
+        }
+        return ecdt::undetermined;
+    }
+
     const data_cells& get_data_row(size_t row_idx) const {
         return cell_rows_[row_idx];
     }

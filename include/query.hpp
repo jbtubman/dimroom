@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "command_handler.hpp"
+#include "coordinates.hpp"
 #include "table.hpp"
 #include "utility.hpp"
 
@@ -58,24 +59,39 @@ table::cell_rows integer_match(
 auto vw_boolean_match(table& t, const string& col_name, bool query_value,
                       ranges::ref_view<table::cell_rows> targets);
 
-table::cell_rows boolean_match(table& t, const string& col_name,
-                               bool query_value,
-                               table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+table::cell_rows boolean_match(
+    table& t, const string& col_name, bool query_value,
+    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
 
-table::cell_rows boolean_match(table& t, const string& col_name,
-                               const string& query_value,
-                               table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+table::cell_rows boolean_match(
+    table& t, const string& col_name, const string& query_value,
+    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
 
 auto vw_floating_match(table& t, const string& col_name, float query_value,
                        ranges::ref_view<table::cell_rows> targets);
 
-table::cell_rows floating_match(table& t, const string& col_name,
-                                float query_value,
-                                table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+table::cell_rows floating_match(
+    table& t, const string& col_name, float query_value,
+    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
 
-table::cell_rows floating_match(table& t, const string& col_name,
-                                const string& query_value,
-                                table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+table::cell_rows floating_match(
+    table& t, const string& col_name, const string& query_value,
+    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+
+auto vw_geo_query_match(table& t, const string& col_name,
+                        const coordinate& coord,
+                        ranges::ref_view<table::cell_rows> targets);
+
+table::cell_rows geo_query_match(
+    table& t, const string& col_name, const coordinate& coord,
+    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+
+table::cell_rows geo_query_match(
+    table& t, const string& col_name, const string& coord,
+    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+
+
+
 struct query {
     table& table_ref;
     string column_name{};

@@ -80,6 +80,23 @@ auto vw_floating_match(table& t, const string& col_name, float query_value,
     return result;
 }
 
+auto vw_geo_query_match(table& t, const string& col_name,
+                        const coordinate& coord,
+                        ranges::ref_view<table::cell_rows> targets) {
+    const auto col_idx = t.index_for_column_name(col_name);
+
+    auto result =
+        targets | views::filter([&coord, col_idx](const data_cells& dcs) {
+            if (!col_idx) return false;
+            const cell_value_type cvt = dcs[*col_idx].value;
+            if (!cvt) return false;
+            const coordinate cr = std::get<coordinate>(*cvt);
+            return (close(cr.latitude, coord.latitude) &&
+                    close(cr.longitude, coord.longitude));
+        });
+    return result;
+}
+
 table::cell_rows string_match(table& t, const string& col_name,
                               const string& query_value,
                               table::opt_cell_rows rows_to_query) {
@@ -149,4 +166,42 @@ table::cell_rows floating_match(table& t, const string& col_name,
     auto result = ranges::to<table::cell_rows>(floating_match_view);
     return result;
 }
+
+table::cell_rows floating_match(table& t, const string& col_name,
+                                const string& query_value,
+                                table::opt_cell_rows rows_to_query) {
+    table::cell_rows targets = rows_to_query ? *rows_to_query : t.cell_rows_;
+    const float qf = std::stof(query_value);
+    return floating_match(t, col_name, qf, rows_to_query);
+}
+
+table::cell_rows geo_query_match(table& t, const string& col_name,
+                                 const coordinate& coord,
+                                 table::opt_cell_rows rows_to_query) {
+    table::cell_rows targets = rows_to_query ? *rows_to_query : t.cell_rows_;
+    auto targets_vw = views::all(targets);
+    println(stderr, "geo_query_match: coord = {}", coord);
+
+    auto geo_coordinate_match_view =
+        vw_geo_query_match(t, col_name, coord, targets);
+    auto result = ranges::to<table::cell_rows>(geo_coordinate_match_view);
+    return result;
+}
+
+table::cell_rows geo_query_match(table& t, const string& col_name,
+                                 const string& query_value,
+                                 table::opt_cell_rows rows_to_query) {
+    println(stderr, "geo_query_match: query_value = {}", query_value);
+    table::cell_rows targets = rows_to_query ? *rows_to_query : t.cell_rows_;
+    // auto targets_vw = views::all(targets);
+    const coordinate coord = make_coordinate(query_value);
+    return geo_query_match(t, col_name, coord, targets);
+
+    // auto geo_coordinate_match_view =
+    //     vw_geo_query_match(t, col_name, coord, targets);
+    // auto result = ranges::to<table::cell_rows>(geo_coordinate_match_view);
+    // return result;
+}
+
+// vw_geo_query_match
 }  // namespace jt
