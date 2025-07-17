@@ -42,7 +42,7 @@ CMakeFiles/
 cmake_install.cmake
 CTestTestfile.cmake
 Makefile
-include/dimroomConfig.h
+# include/dimroomConfig.h
 
 # ==================================================
 # 🔹 Ignore build directories (CLion, VS Code, or general)
