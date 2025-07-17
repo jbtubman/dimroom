@@ -1,6 +1,7 @@
 #pragma once
 
 #include <expected>
+#include <iostream>
 #include <regex>
 #include <string>
 #include <string_view>
@@ -17,11 +18,18 @@
 namespace jt {
 // degrees/minutes regexps.
 
+using std::cerr;
+using std::endl;
+using std::flush;
+using std::pair;
 using std::regex;
+using std::regex_match;
+using std::smatch;
+using std::stof;
 using std::string;
 using std::string_view;
 
-const string deg_min_lat_s{R"-(((\d{1,2})°\s+(\d{1,2})'\s+([NS])))-"};
+const string deg_min_lat_s{R"-(((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,)-"};
 const regex deg_min_lat_rx{deg_min_lat_s};
 
 const string deg_min_lat_starts_s{R"-(("(\d{1,2})°\s*(\d{1,2})'\s*([NS])))-"};
@@ -35,7 +43,7 @@ const string deg_min_long_end_s(R"-(\s\d{1,3}° \d{1,2}' [EW]")-");
 const regex deg_min_long_end_rx{deg_min_long_end_s};
 
 // A complete coordinate has double quote marks around it.
-const string deg_min_cooordinate_s("(\"" + deg_min_lat_s + ", " +
+const string deg_min_cooordinate_s("(\"" + deg_min_lat_s + R"-(\s*)-" +
                                    deg_min_long_s + "\")");
 const regex deg_min_cooordinate_rx{deg_min_cooordinate_s};
 
@@ -171,11 +179,11 @@ parse_decimal_coordinate(const string& coord) {
     const bool parsed_successfully =
         std::regex_match(coord, m, jt::decimal_coordinate_rx);
     if (parsed_successfully) {
-        string latitude_s = m[2];
-        string longitude_s = m[4];
+        const string latitude_s = m[2];
+        const string longitude_s = m[4];
         try {
-            float latitude = std::stof(latitude_s);
-            float longitude = std::stof(longitude_s);
+            const float latitude = std::stof(latitude_s);
+            const float longitude = std::stof(longitude_s);
             return std::pair{latitude, longitude};
         } catch (const std::exception& e) {
             return std::unexpected(coordinate::format::invalid);
@@ -188,41 +196,31 @@ std::expected<
     std::pair<float, float>,
     coordinate::format> inline parse_deg_min_coordinate(const string&
                                                             deg_min_coord) {
-    // create a vector of regex token iterators that point to the
-    // subexpressions found in the pattern matching.
-    std::vector<std::sregex_token_iterator> rti_vec;
-    const auto subexpression_count = deg_min_cooordinate_rx.mark_count();
-    if (subexpression_count > 0) {
-        for (int subexpression_index = 1;
-             subexpression_index <= deg_min_cooordinate_rx.mark_count();
-             subexpression_index++) {
-            auto dec_end = std::sregex_token_iterator();
-            auto it = std::sregex_token_iterator(
-                deg_min_coord.begin(), deg_min_coord.end(),
-                deg_min_cooordinate_rx, subexpression_index);
-            if (it != dec_end) {
-                rti_vec.push_back(it);
-            }
+    smatch m;
+    const bool parsed_successfully =
+        regex_match(deg_min_coord, m, deg_min_cooordinate_rx);
+
+    if (parsed_successfully) {
+        const string latitude_deg_s = m[3];
+        const string latitude_min_s = m[4];
+        const float latitude_sign = (m[5] == "N") ? 1.0 : -1.0;
+        const string longitude_deg_s = m[7];
+        const string longitude_min_s = m[8];
+        const float longitude_sign = (m[9] == "E") ? 1.0 : -1.0;
+        try {
+            const float latitude =
+                (stof(latitude_deg_s) + (stof(latitude_min_s) / 60.0f)) *
+                latitude_sign;
+            const float longitude =
+                (stof(longitude_deg_s) + (stof(longitude_min_s) / 60.0f)) *
+                longitude_sign;
+
+            return pair{latitude, longitude};
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << '\n';
         }
     }
-
-    if (rti_vec.empty()) {
-        return std::unexpected(coordinate::format::invalid);
-    }
-
-    const float lat_direction = rti_vec[lat_dir]->str() == "N" ? 1.0 : -1.0;
-    const string lat_min_s = rti_vec[lat_min]->str();
-    const float lat_min_f = std::stof(lat_min_s) / 60.0;
-    const string lat_deg_s = rti_vec[lat_deg]->str();
-    const float lat_f = (std::stof(lat_deg_s) + lat_min_f) * lat_direction;
-
-    const float long_direction = rti_vec[long_dir]->str() == "E" ? 1.0 : -1.0;
-    const string long_min_s = rti_vec[long_min]->str();
-    const float long_min_f = std::stof(long_min_s) / 60.0;
-    const string long_deg_s = rti_vec[long_deg]->str();
-    const float long_f = (std::stof(long_deg_s) + long_min_f) * long_direction;
-
-    return std::pair{lat_f, long_f};
+    return std::unexpected(coordinate::format::invalid);
 }
 
 inline std::expected<std::pair<float, float>, coordinate::format>

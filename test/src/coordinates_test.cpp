@@ -102,7 +102,7 @@ TEST_CASE(MyFixture, ParseLatitude) {
     }
 
     SECTION("north dms") {
-        string lat{"36° 00' N"};
+        string lat{"36° 00' N,"};
 
         auto match_begin =
             std::sregex_iterator(lat.begin(), lat.end(), jt::deg_min_lat_rx);
@@ -113,7 +113,7 @@ TEST_CASE(MyFixture, ParseLatitude) {
     }
 
     SECTION("south dms") {
-        string lat{"3° 18' S"};
+        string lat{"3° 18' S ,"};
 
         auto match_begin =
             std::sregex_iterator(lat.begin(), lat.end(), jt::deg_min_lat_rx);
@@ -233,6 +233,8 @@ TEST_CASE(MyFixture, Coordinate) {
     }
 
     SECTION("parse deg min coordinates") {
+        cerr << flush << endl << "!!!!!!jt::deg_min_cooordinate_s:"
+        << endl << jt::deg_min_cooordinate_s << endl << endl << flush;
         auto result = parse_deg_min_coordinate(MyFixture::valid_deg_min_coord);
         CHECK_TRUE(result);
 
