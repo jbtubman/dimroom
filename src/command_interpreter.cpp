@@ -23,6 +23,7 @@ using std::regex_search;
 using std::smatch;
 using std::string;
 using std::unexpected;
+using ecdt = e_cell_data_type;
 
 enum class query_error { bad_format };
 
@@ -64,44 +65,6 @@ void command_line::do_query(table& t, const string& query_line) {
         R"-(^\s*query\s*\(\s*"([^"]+)"\s+(-?\d+\.\d+)\s*\)\s*$)-",
         regex::icase};
 
-    // m[2] - lat degrees
-    // m[3] - lat minutes
-    // m[4] - lat direction [NS]
-    // m[6] - long degrees
-    // m[7] - long minutes
-    // m[8] - long direction [EW]
-    const string dms_coord_s{
-        R"-("((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,\s*((\d{1,3})°\s+(\d{1,2})'\s+([EW]))")-"};
-
-    // m[1] - column name.
-    // m[3] - lat degrees.
-    // m[4] - lat minutes
-    // m[5] - lat direction NS
-    // m[7] - long degrees
-    // m[8] - long minutes
-    // m[9] - long direction EW
-    regex coord_dms_query_rx{
-        R"-(^\s*query\s*\(\s*"([^"]+)"\s+"((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,\s*((\d{1,3})°\s+(\d{1,2})'\s+([EW])"\s*\))\s*$)-",
-        regex::icase};
-
-    regex coord_decimal_query_rx{
-        R"-(^\s*query\s*\(\s*"([^"]+)"\s+"(-?\d{1,2}(\.\d{1,5})?),\s+(-?\d{1,3}(\.\d{1,5})?)"\s*\)\s*$)-",
-        regex::icase};
-
-    const string coord_decimal_s{
-        R"-("(-?\d{1,2}(\.\d{1,5})?),\s*(-?\d{1,3}(\.\d{1,5})?)")-"};
-    const string coord_dms_s{
-        R"-("((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,\s*((\d{1,3})°\s+(\d{1,2})'\s+([EW]))")-"};
-
-    const string coord_both_s{"(" + coord_decimal_s + "|" + coord_dms_s + ")"};
-
-    const string coord_polygon_s =
-        std::format(R"-(\[({}(\s{})*)\])-", coord_both_s, coord_both_s);
-
-    // regex coord_dms_polygon_rx{
-    //     R"-(\[("((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,\s*((\d{1,3})°\s+(\d{1,2})'\s+([EW]))")(\s+("((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,\s*((\d{1,3})°\s+(\d{1,2})'\s+([EW]))"))*\])-",
-    //     regex::icase};
-
     // Used regex101.com to work this out.
     // https://regex101.com/r/5AgL7v/1
     // This one matches queries like:
@@ -129,27 +92,34 @@ void command_line::do_query(table& t, const string& query_line) {
     // m[4] for string values; m[5] for integers.
     const string query_value_s = m[4].str().empty() ? m[5].str() : m[4].str();
     table::cell_rows results;
-    // Need to determine the column's value type and dispatch the query
+    // Determine the column's value type and dispatch the query
     // appropriately.
-    if (t.is_text(column_name)) {
+    ecdt col_type = t.column_type(column_name);
+    if (col_type == ecdt::text) {
         results = string_match(t, column_name, query_value_s);
-    } else if (t.is_boolean(column_name)) {
+    } else if (col_type == ecdt::boolean) {
         const auto query_value = s_to_boolean(query_value_s);
         if (query_value) {
             const bool query_b = *query_value;
             results = boolean_match(t, column_name, query_b);
         }
-    } else if (t.is_floating(column_name)) {
+    } else if (col_type == ecdt::floating) {
         const auto query_value = s_to_floating(query_value_s);
         if (query_value) {
             const float query_f = *query_value;
             results = floating_match(t, column_name, query_f);
         }
-    } else if (t.is_geo_coordinate(column_name)) {
-    } else if (t.is_integer(column_name)) {
+    } else if (col_type == ecdt::geo_coordinate) {
+        const auto query_value = s_to_geo_coordinate(query_value_s);
+        if (query_value) {
+            const coordinate coord = *query_value;
+            results = geo_query_match(t, column_name, coord);
+        }
+    } else if (col_type == ecdt::integer) {
         const auto query_value = std::stoi(query_value_s);
         results = integer_match(t, column_name, query_value);
-    } else if (t.is_tags(column_name)) {
+    } else if (col_type == ecdt::tags) {
+        // TODO
     } else {
         auto expected_idx = t.index_for_column_name(column_name);
         if (!expected_idx) {
