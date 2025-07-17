@@ -21,17 +21,17 @@ using std::regex;
 using std::string;
 using std::string_view;
 
-const string deg_min_lat_s{R"(((\d{1,2})°\s+(\d{1,2})'\s+([NS])))"};
+const string deg_min_lat_s{R"-(((\d{1,2})°\s+(\d{1,2})'\s+([NS])))-"};
 const regex deg_min_lat_rx{deg_min_lat_s};
 
-const string deg_min_lat_starts_s{R"(("(\d{1,2})° (\d{1,2})' ([NS])))"};
+const string deg_min_lat_starts_s{R"-(("(\d{1,2})°\s*(\d{1,2})'\s*([NS])))-"};
 const regex deg_min_lat_starts_rx{deg_min_lat_starts_s};
 
-// const string deg_min_long_s(R"(((\d{1,3})°s+(\d{1,2})'\s+([EW])))");
-const string deg_min_long_s(R"(((\d{1,3})° (\d{1,2})' ([EW])))");
+const string deg_min_long_s(R"-(((\d{1,3})°\s*(\d{1,2})'\s*([EW])))-");
+// const string deg_min_long_s(R"(((\d{1,3})° (\d{1,2})' ([EW])))");
 const regex deg_min_long_rx{deg_min_long_s};
 
-const string deg_min_long_end_s(R"(\s\d{1,3}° \d{1,2}' [EW]")");
+const string deg_min_long_end_s(R"-(\s\d{1,3}° \d{1,2}' [EW]")-");
 const regex deg_min_long_end_rx{deg_min_long_end_s};
 
 // A complete coordinate has double quote marks around it.
@@ -53,19 +53,20 @@ const int long_dir{8};
 
 // decimal coordinates regexps.
 
-const string decimal_lat_s{R"((-?\d{1,2}\.\d{5}))"};
+// const string decimal_lat_s{R"((-?\d{1,2}\.\d{5}))"};
+const string decimal_lat_s{R"-((-?\d{1,2}(\.\d{1,5})?)\s*,)-"};
 const regex decimal_lat_rx{decimal_lat_s};
 
-const string decimal_lat_starts_s{R"(("-?\d{1,2}\.\d{5}))"};
+const string decimal_lat_starts_s{R"-(("-?\d{1,2}(\.\d{1,5})?)\b)-"};
 const regex decimal_lat_starts_rx{decimal_lat_starts_s};
 
-const string decimal_long_s{R"((-?\d{1,3}\.\d{5}))"};
+const string decimal_long_s{R"-((-?\d{1,3}(\.\d{1,5})?))-"};
 const regex decimal_long_rx{decimal_long_s};
 
 const string decimal_long_end_s{R"((\s-?\d{1,3}\.\d{5}"))"};
 const regex decimal_long_end_rx{decimal_long_end_s};
 
-const string decimal_coordinate_s("(\"" + decimal_lat_s + ", " +
+const string decimal_coordinate_s("(\"" + decimal_lat_s + R"-(\s*)-" +
                                   decimal_long_s + "\")");
 const regex decimal_coordinate_rx{decimal_coordinate_s};
 
@@ -166,37 +167,20 @@ inline coordinate::format coordinate_format(const string& s) noexcept {
 
 inline std::expected<std::pair<float, float>, coordinate::format>
 parse_decimal_coordinate(const string& coord) {
-    const auto subexpression_count = jt::decimal_coordinate_rx.mark_count();
-    std::vector<std::sregex_token_iterator> rti_vec;
-    auto dec_end = std::sregex_token_iterator();
-    if (subexpression_count > 0) {
-        for (int subexpression_index = 1;
-             subexpression_index <= subexpression_count;
-             subexpression_index++) {
-            auto it = std::sregex_token_iterator(coord.begin(), coord.end(),
-                                                 jt::decimal_coordinate_rx,
-                                                 subexpression_index);
-            if (it != dec_end) {
-                rti_vec.push_back(it);
-            }
+    std::smatch m;
+    const bool parsed_successfully =
+        std::regex_match(coord, m, jt::decimal_coordinate_rx);
+    if (parsed_successfully) {
+        string latitude_s = m[2];
+        string longitude_s = m[4];
+        try {
+            float latitude = std::stof(latitude_s);
+            float longitude = std::stof(longitude_s);
+            return std::pair{latitude, longitude};
+        } catch (const std::exception& e) {
+            return std::unexpected(coordinate::format::invalid);
         }
     }
-
-    if (rti_vec.empty()) {
-        return std::unexpected(coordinate::format::invalid);
-    }
-
-    auto lat_begin = rti_vec[lat_decimal];
-    auto long_begin = rti_vec[long_decimal];
-
-    if ((lat_begin != dec_end) && long_begin != dec_end) {
-        float lat_f = std::stof(lat_begin->str());
-        float long_f = std::stof(long_begin->str());
-        if (coordinate::is_valid(lat_f, long_f)) {
-            return std::pair{lat_f, long_f};
-        }
-    }
-
     return std::unexpected(coordinate::format::invalid);
 }
 

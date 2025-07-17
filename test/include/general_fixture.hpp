@@ -55,8 +55,8 @@ struct general_fixture {
     const float valid_decimal_lat{51.05011};
     const float valid_decimal_long{-114.08529};
     const string valid_decimal_coord{R"("51.05011, -114.08529")"};
-    const string valid_pos_decimal_lat_s{R"(51.05011)"};
-    const string valid_neg_decimal_lat_s{R"(-51.05011)"};
+    const string valid_pos_decimal_lat_s{R"(51.05011,)"};
+    const string valid_neg_decimal_lat_s{R"(-51.05011,)"};
 
     const float valid_deg_min_lat{6.0};
     const float valid_deg_min_long{-138.0};
