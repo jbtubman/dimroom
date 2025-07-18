@@ -1,6 +1,6 @@
 # Status and observations
 
-This summarizes the state of things before the code is submitted.
+This summarizes the state of things as of Version 2.4.
 
 Some work still remains.
 
@@ -17,10 +17,12 @@ As of July 18, 2025:
 * Integer queries work.
 * Floating point queries work.
 * Boolean queries work.
+* Renamed some classes and aliases to better match their real meaning.
 
 ## Things Remaining
 
 * Rename some of the classes and data types to be less confusing.
+  * Partly done.
 * Implement tag queries.
 * Implement "within polygon" queries. (The code for determining that is
   present, but not hooked up to the user interface.)

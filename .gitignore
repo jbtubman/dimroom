@@ -52,6 +52,7 @@ out/
 bin/
 obj/
 xcode/
+_deps/
 
 # Ignore Makefiles and Autotools-generated files
 # Makefile
