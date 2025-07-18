@@ -15,7 +15,6 @@
 
 #include "cell.hpp"
 #include "parser.hpp"
-#include "row.hpp"
 #include "utility.hpp"
 
 namespace jt {
