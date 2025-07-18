@@ -197,7 +197,7 @@ inline vector<string_cvt_pos_tuple> parse_row(const string& row_s) {
     std::size_t starting_value{0};
     auto infinite_ints_vw = views::iota(starting_value);
     auto split_fields = fix_quoted_fields(row_s);
-    // row result;
+    // deprecated_row result;
     vector<e_cell_data_type> cell_types_vec =
         split_fields | views::transform([](string s) {
             return determine_data_field_e_cell_data_type(s);

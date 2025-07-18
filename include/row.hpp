@@ -18,7 +18,7 @@ using std::vector;
 namespace ranges = std::ranges;
 namespace views = std::ranges::views;
 
-class row {
+class deprecated_row {
    private:
     vector<data_cell> container;
 

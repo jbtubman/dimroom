@@ -25,6 +25,6 @@ query command_handler::create_geo_query(coordinate location,
     return query(table_to_search);
 }
 
-vector<row> run_query(query q, table table_to_search) { return vector<row>(); }
+// vector<deprecated_row> run_query(query q, table table_to_search) { return vector<deprecated_row>(); }
 
 }  // namespace jt

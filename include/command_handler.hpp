@@ -66,7 +66,7 @@ class command_handler {
     query create_geo_query(coordinate location, polygon bounding_polygon,
                            table table_to_search);
 
-    vector<row> run_query(query q, table table_to_search);
+    // vector<deprecated_row> run_query(query q, table table_to_search);
 
     void exit_app() {};
 };
