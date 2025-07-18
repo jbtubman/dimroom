@@ -30,6 +30,7 @@ using std::smatch;
 using std::stof;
 using std::string;
 using std::string_view;
+using std::operator""s;
 
 const string deg_min_lat_s{R"-(((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,)-"};
 const regex deg_min_lat_rx{deg_min_lat_s};
@@ -62,11 +63,26 @@ const int long_dir{8};
 
 // decimal coordinates regexps.
 
+// TODO: Clean up the string and regex declarations.
+const string v2_decimal_coord_s{
+    R"-(((-?\d{1,2})(\.\d{1,5})?)\b(?![\d°'])\s*,\s*((-?\d{1,3})(\.\d{1,5})?))-"};
+const regex v2_decimal_coord_rx{v2_decimal_coord_s};
+
+const string v2_quoted_decimal_coord_s = "\""s + v2_decimal_coord_s + "\""s;
+const regex v2_quoted_decimal_coord_rx{v2_quoted_decimal_coord_s};
+
+const string v2_quoted_decimal_lat_start_s{
+    R"-(("(-?\d{1,2})(\.\d{1,5})?)\b(?![\d°'])\s*)-"}; // THIS WORKS.
+const regex v2_quoted_decimal_lat_start_rx{v2_quoted_decimal_lat_start_s};
+
+///////////////////////////////////
 const string decimal_lat_s{R"-((-?\d{1,2}(\.\d{1,5})?)\s*,)-"};
 const regex decimal_lat_rx{decimal_lat_s};
 
-const string decimal_lat_starts_s{R"-(("-?\d{1,2}(\.\d{1,5})?)\b)-"};
-const regex decimal_lat_starts_rx{decimal_lat_starts_s};
+// // deprecated
+// const string decimal_lat_starts_s{R"-(("-?\d{1,2}(\.\d{1,5})?)\b)-"};
+// // deprecated
+// const regex decimal_lat_starts_rx{decimal_lat_starts_s};
 
 const string decimal_long_s{R"-((-?\d{1,3}(\.\d{1,5})?))-"};
 const regex decimal_long_rx{decimal_long_s};
@@ -99,7 +115,8 @@ inline bool is_decimal_coordinate(const string& s) {
 }
 
 inline bool starts_with_coordinate(const string& s) {
-    return regex_match(s, decimal_lat_starts_rx) ||
+    return // regex_match(s, decimal_lat_starts_rx) ||
+           regex_match(s, v2_quoted_decimal_lat_start_rx) ||
            regex_match(s, deg_min_lat_starts_rx);
 }
 
