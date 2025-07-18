@@ -1,4 +1,4 @@
-#include "row.hpp"
+#include "deprecated_row.hpp"
 
 #include <string>
 #include <vector>
@@ -16,6 +16,6 @@ using namespace jt;
 
 // TODO: proper tests for row_test.cpp.
 
-TEST_CASE(MyFixture, Row) {
-  // TODO: TEST_CASE Row.
+TEST_CASE(MyFixture, DeprecatedRow) {
+  // TODO: TEST_CASE DeprecatedRow.
 }
