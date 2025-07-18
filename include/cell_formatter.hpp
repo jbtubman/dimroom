@@ -114,7 +114,7 @@ inline std::ostream& operator<<(std::ostream& os, const jt::data_cell& c) {
 #pragma region data_cells
 
 template <>
-struct std::formatter<jt::data_cells, char> {
+struct std::formatter<jt::row, char> {
     bool long_format = false;
 
     template <class ParseContext>
@@ -125,25 +125,24 @@ struct std::formatter<jt::data_cells, char> {
             long_format = true;
             ++it;
             if (it == ctx.end()) {
-                throw std::format_error(
-                    "Unfinished format args for data_cells.");
+                throw std::format_error("Unfinished format args for row.");
             }
         }
         if (it != ctx.end() && *it != '}')
-            throw std::format_error("Invalid format args for data_cells.");
+            throw std::format_error("Invalid format args for row.");
 
         return it;
     }
 
     template <class FmtContext>
-    FmtContext::iterator format(jt::data_cells dcs, FmtContext& ctx) const {
+    FmtContext::iterator format(jt::row rw, FmtContext& ctx) const {
         std::ostringstream out;
         const string prefix = long_format ? "jt::" : "";
         out << "{ \"" << prefix;
-        out << "data_cells\" : [ ";
+        out << "row\" : [ ";
         const bool lfmt = long_format;
         bool first_row = true;
-        ranges::for_each(dcs, [&out, &first_row, &lfmt](jt::data_cell dc) {
+        ranges::for_each(rw, [&out, &first_row, &lfmt](jt::data_cell dc) {
             if (!first_row) {
                 out << ", ";
             }
@@ -161,7 +160,7 @@ struct std::formatter<jt::data_cells, char> {
 };
 
 namespace std {
-inline std::ostream& operator<<(std::ostream& os, const jt::data_cells& c) {
+inline std::ostream& operator<<(std::ostream& os, const jt::row& c) {
     os << std::format("{}", c);
     return os;
 }

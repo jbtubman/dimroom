@@ -38,57 +38,57 @@ namespace views = std::ranges::views;
 
 auto vw_string_match(table& t, const string& col_name,
                      const string& query_value,
-                     ranges::ref_view<table::cell_rows> targets);
+                     ranges::ref_view<table::rows> targets);
 
-table::cell_rows string_match(
+table::rows string_match(
     table& t, const string& col_name, const string& query_value,
-    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+    table::opt_rows rows_to_query = table::opt_rows{});
 
 auto vw_integer_match(table& t, const string& col_name,
                       const string& query_value,
-                      ranges::ref_view<table::cell_rows> targets);
+                      ranges::ref_view<table::rows> targets);
 
-table::cell_rows integer_match(
+table::rows integer_match(
     table& t, const string& col_name, const string& query_value,
-    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+    table::opt_rows rows_to_query = table::opt_rows{});
 
-table::cell_rows integer_match(
+table::rows integer_match(
     table& t, const string& col_name, int query_value,
-    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+    table::opt_rows rows_to_query = table::opt_rows{});
 
 auto vw_boolean_match(table& t, const string& col_name, bool query_value,
-                      ranges::ref_view<table::cell_rows> targets);
+                      ranges::ref_view<table::rows> targets);
 
-table::cell_rows boolean_match(
+table::rows boolean_match(
     table& t, const string& col_name, bool query_value,
-    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+    table::opt_rows rows_to_query = table::opt_rows{});
 
-table::cell_rows boolean_match(
+table::rows boolean_match(
     table& t, const string& col_name, const string& query_value,
-    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+    table::opt_rows rows_to_query = table::opt_rows{});
 
 auto vw_floating_match(table& t, const string& col_name, float query_value,
-                       ranges::ref_view<table::cell_rows> targets);
+                       ranges::ref_view<table::rows> targets);
 
-table::cell_rows floating_match(
+table::rows floating_match(
     table& t, const string& col_name, float query_value,
-    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+    table::opt_rows rows_to_query = table::opt_rows{});
 
-table::cell_rows floating_match(
+table::rows floating_match(
     table& t, const string& col_name, const string& query_value,
-    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+    table::opt_rows rows_to_query = table::opt_rows{});
 
 auto vw_geo_query_match(table& t, const string& col_name,
                         const coordinate& coord,
-                        ranges::ref_view<table::cell_rows> targets);
+                        ranges::ref_view<table::rows> targets);
 
-table::cell_rows geo_query_match(
+table::rows geo_query_match(
     table& t, const string& col_name, const coordinate& coord,
-    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+    table::opt_rows rows_to_query = table::opt_rows{});
 
-table::cell_rows geo_query_match(
+table::rows geo_query_match(
     table& t, const string& col_name, const string& coord,
-    table::opt_cell_rows rows_to_query = table::opt_cell_rows{});
+    table::opt_rows rows_to_query = table::opt_rows{});
 
 
 

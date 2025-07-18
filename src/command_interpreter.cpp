@@ -27,10 +27,10 @@ using ecdt = e_cell_data_type;
 
 enum class query_error { bad_format };
 
-string row_to_string(const data_cells& row_dcs) {
+string row_to_string(const row& rw) {
     std::ostringstream sout{};
     bool first_column = true;
-    ranges::for_each(row_dcs, [&first_column, &sout](const data_cell& dc) {
+    ranges::for_each(rw, [&first_column, &sout](const data_cell& dc) {
         if (!first_column) {
             sout << ",";
         }
@@ -91,7 +91,7 @@ void command_line::do_query(table& t, const string& query_line) {
     const string column_name = m[1].str();
     // m[4] for string values; m[5] for integers.
     const string query_value_s = m[4].str().empty() ? m[5].str() : m[4].str();
-    table::cell_rows results;
+    table::rows results;
     // Determine the column's value type and dispatch the query
     // appropriately.
     ecdt col_type = t.column_type(column_name);
@@ -147,8 +147,8 @@ void command_line::do_query(table& t, const string& query_line) {
 
     using zzz = decltype(results[0]);
     bool first_row = true;
-    ranges::for_each(results, [](const data_cells& row_dcs) {
-        string row_str = row_to_string(row_dcs);
+    ranges::for_each(results, [](const row& rw) {
+        string row_str = row_to_string(rw);
         println("{}", row_str);
     });
     println("{} rows found", results.size());

@@ -40,8 +40,9 @@ const bool has_enumerate_view =
 
 class table {
    public:
-    using cell_rows = vector<data_cells>;
-    using opt_cell_rows = std::optional<cell_rows>;
+    using rows = vector<row>;
+    using opt_rows = std::optional<rows>;
+    // TODO: We have another class for representing columns. Use it instead?
     using cell_column = vector<data_cell>;
     using column_name_index_map_t = map<string, size_t>;
     using type_column_name_set = set<string>;
@@ -52,7 +53,7 @@ class table {
     parser::header_fields header_fields_{};
 
     /// @brief vector of rows of cells.
-    cell_rows cell_rows_{};
+    rows rows_{};
 
     string name{"unnamed"};
 
@@ -94,10 +95,10 @@ class table {
    public:
     table() {};
 
-    table(const parser::header_fields& hfs, const cell_rows& dcs,
+    table(const parser::header_fields& hfs, const rows& rws,
           string name = "unnamed"s)
         : header_fields_{hfs},
-          cell_rows_{dcs},
+          rows_{rws},
           name{name},
           column_name_index_map{
               headers_to_column_name_index_map(header_fields_)} {
@@ -131,14 +132,14 @@ class table {
 
     table(const table& other)
         : header_fields_{other.header_fields_},
-          cell_rows_{other.cell_rows_},
+          rows_{other.rows_},
           name{other.name},
           column_name_index_map{other.column_name_index_map},
           column_name_to_type_map{other.column_name_to_type_map} {}
 
     table(table&& other)
         : header_fields_{std::move(other.header_fields_)},
-          cell_rows_{std::move(other.cell_rows_)},
+          rows_{std::move(other.rows_)},
           name{std::move(other.name)},
           column_name_index_map{std::move(other.column_name_index_map)},
           column_name_to_type_map{std::move(other.column_name_to_type_map)} {}
@@ -146,7 +147,7 @@ class table {
     void swap(table& other) {
         using std::swap;
         swap(header_fields_, other.header_fields_);
-        swap(cell_rows_, other.cell_rows_);
+        swap(rows_, other.rows_);
         swap(name, other.name);
         swap(column_name_index_map, other.column_name_index_map);
         swap(column_name_to_type_map, other.column_name_to_type_map);
@@ -266,19 +267,16 @@ class table {
         return ecdt::undetermined;
     }
 
-    const data_cells& get_data_row(size_t row_idx) const {
-        return cell_rows_[row_idx];
-    }
+    const row& get_data_row(size_t row_idx) const { return rows_[row_idx]; }
 
-    data_cells& get_data_row(size_t row_idx) { return cell_rows_[row_idx]; }
+    row& get_data_row(size_t row_idx) { return rows_[row_idx]; }
 
     cell_column get_data_column(size_t column_idx) {
-        return ranges::fold_left(
-            cell_rows_, cell_column{},
-            [&column_idx](cell_column acc, data_cells& dcs) {
-                acc.push_back(dcs[column_idx]);
-                return acc;
-            });
+        return ranges::fold_left(rows_, cell_column{},
+                                 [&column_idx](cell_column acc, row& rw) {
+                                     acc.push_back(rw[column_idx]);
+                                     return acc;
+                                 });
     }
 
     e_cell_data_type get_column_data_type(size_t column_idx) {
@@ -291,9 +289,9 @@ class table {
         return get_column_data_type(*expected_idx);
     }
 
-    cell_rows string_match(const string& col_name, const string& query_value,
-                           opt_cell_rows query_targets = opt_cell_rows{}) {
-        cell_rows targets = query_targets ? *query_targets : cell_rows_;
+    rows string_match(const string& col_name, const string& query_value,
+                      opt_rows query_targets = opt_rows{}) {
+        rows targets = query_targets ? *query_targets : rows_;
 
         return targets;
     }
@@ -303,25 +301,26 @@ static inline table::cell_column get_data_column(table& t, size_t column_idx) {
     return t.get_data_column(column_idx);
 }
 
-static inline table::cell_rows string_matchx(
+// TODO: This appears to be only used in tests. Remove?
+static inline table::rows string_matchx(
     table& t, const string& col_name, const string& query_value,
-    table::opt_cell_rows rows_to_query = table::opt_cell_rows{}) {
-    table::cell_rows targets = rows_to_query ? *rows_to_query : t.cell_rows_;
+    table::opt_rows rows_to_query = table::opt_rows{}) {
+    table::rows targets = rows_to_query ? *rows_to_query : t.rows_;
     const auto ex_col_idx = t.index_for_column_name(col_name);
-    if (!ex_col_idx) return table::cell_rows{};
+    if (!ex_col_idx) return table::rows{};
     auto col_idx = *ex_col_idx;
-    auto result = ranges::fold_left(
-        targets, table::cell_rows{},
-        [&query_value, &col_idx](table::cell_rows acc, data_cells dcs) {
-            const cell_value_type cvt = dcs[col_idx].value;
-            if (cvt) {
-                const string s = std::get<string>(*cvt);
-                if (s == query_value) {
-                    acc.push_back(dcs);
-                }
-            }
-            return acc;
-        });
+    auto result =
+        ranges::fold_left(targets, table::rows{},
+                          [&query_value, &col_idx](table::rows acc, row rw) {
+                              const cell_value_type cvt = rw[col_idx].value;
+                              if (cvt) {
+                                  const string s = std::get<string>(*cvt);
+                                  if (s == query_value) {
+                                      acc.push_back(rw);
+                                  }
+                              }
+                              return acc;
+                          });
     return result;
 }
 

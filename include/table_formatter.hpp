@@ -21,7 +21,7 @@ using std::operator""sv;
 #pragma region cell_rows
 
 template <>
-struct std::formatter<jt::table::cell_rows> {
+struct std::formatter<jt::table::rows> {
     bool long_format = false;
 
     template <class ParseContext>
@@ -33,34 +33,34 @@ struct std::formatter<jt::table::cell_rows> {
             ++it;
             if (it == ctx.end()) {
                 throw std::format_error(
-                    "Unfinished format args for jt::table::cell_rows.");
+                    "Unfinished format args for jt::table::rows.");
             }
         }
         if (it != ctx.end() && *it != '}')
             throw std::format_error(
-                "Invalid format args for jt::table::cell_rows.");
+                "Invalid format args for jt::table::rows.");
 
         return it;
     }
 
     template <class FmtContext>
-    FmtContext::iterator format(jt::table::cell_rows cr,
+    FmtContext::iterator format(jt::table::rows cr,
                                 FmtContext& ctx) const {
         std::ostringstream out;
         out << "{ ";
         const string prefix = long_format ? "jt::table::" : "";
-        out << "\"" << prefix << "cell_rows\" : [ ";
+        out << "\"" << prefix << "rows\" : [ ";
         const bool lfmt = long_format;
         bool first_cell = true;
-        ranges::for_each(cr, [&out, &first_cell, &lfmt](jt::data_cells dc) {
+        ranges::for_each(cr, [&out, &first_cell, &lfmt](jt::row rw) {
             if (!first_cell) {
                 out << ", ";
             }
             first_cell = false;
             if (lfmt) {
-                out << std::vformat("{#}"sv, std::make_format_args(dc));
+                out << std::vformat("{#}"sv, std::make_format_args(rw));
             } else {
-                out << dc;
+                out << rw;
             }
             out.flush();
         });
@@ -73,11 +73,12 @@ struct std::formatter<jt::table::cell_rows> {
 };
 
 namespace std {
-inline std::ostream& operator<<(std::ostream& os, const jt::table::cell_rows& crs) {
+inline std::ostream& operator<<(std::ostream& os,
+                                const jt::table::rows& crs) {
     os << std::format("{}", crs);
     return os;
 }
-}
+}  // namespace std
 
 #pragma endregion
 
@@ -119,22 +120,21 @@ struct std::formatter<jt::table> {
             out << t.header_fields_;
         }
         out << ", ";
-        out << "\"cell_rows\" : [ ";
+        out << "\"rows\" : [ ";
         bool first_row = true;
         const bool lfmt = long_format;
-        ranges::for_each(
-            t.cell_rows_, [&out, &first_row, &lfmt](jt::data_cells dcs) {
-                if (!first_row) {
-                    out << ", ";
-                }
-                first_row = false;
-                if (lfmt) {
-                    out << std::vformat("{#}"sv, std::make_format_args(dcs));
-                } else {
-                    out << dcs;
-                }
-                out.flush();
-            });
+        ranges::for_each(t.rows_, [&out, &first_row, &lfmt](jt::row dcs) {
+            if (!first_row) {
+                out << ", ";
+            }
+            first_row = false;
+            if (lfmt) {
+                out << std::vformat("{#}"sv, std::make_format_args(dcs));
+            } else {
+                out << dcs;
+            }
+            out.flush();
+        });
 
         out << " ] } }";
         return ranges::copy(std::move(out).str(), ctx.out()).out;
@@ -146,7 +146,7 @@ inline std::ostream& operator<<(std::ostream& os, const jt::table& t) {
     os << std::format("{}", t);
     return os;
 }
-}
+}  // namespace std
 
 #pragma endregion
 

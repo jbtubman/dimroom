@@ -258,7 +258,8 @@ class data_cell {
     // Deliberately excluding e_cell_value_type::invalid;
 };
 
-using data_cells = vector<data_cell>;
+/// @brief A row of data cell objects, as a vector.
+using row = vector<data_cell>;
 }  // namespace jt
 
 #define CELL_INCLUDE_FORMATTER
