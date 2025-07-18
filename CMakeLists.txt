@@ -5,6 +5,9 @@ project(dimroom VERSION 2.1)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+set(dimroom_VERSION_MAJOR 2)
+set(dimroom_VERSION_MINOR 3)
+
 configure_file(${PROJECT_SOURCE_DIR}/include/dimroomConfig.h.in ${PROJECT_SOURCE_DIR}/include/dimroomConfig.h)
 
 add_executable(dimroom
