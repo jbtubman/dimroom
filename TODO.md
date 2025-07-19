@@ -1,6 +1,6 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.4.
+This summarizes the state of things as of Version 2.5.
 
 Some work still remains.
 
