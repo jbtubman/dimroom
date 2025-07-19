@@ -18,6 +18,7 @@ namespace ranges = std::ranges;
 
 struct MyFixture : general_fixture {
     // ...
+    // TODO: This does not appear to be used anywhere but the first test case.
     const string coords_foo =
         R"-(^\s*query\s*\()\s*"([^"]+)"\s+"("(-?\d{1,2}(\.\d{1,5})?),\s*(-?\d{1,3}(\.\d{1,5})?)"|"((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,\s*((\d{1,3})°\s+(\d{1,2})'\s+([EW]))")"\s*$)-";
 };
@@ -48,7 +49,7 @@ TEST_CASE(MyFixture, StartEndCoordinates) {
     }
 
     SECTION("ends with") {
-        CHECK_TRUE(ends_with_coordinate(" -114.08529\""));
+        CHECK_TRUE(ends_with_coordinate(" -114.08529)"));
         CHECK_TRUE(ends_with_coordinate(MyFixture::dec_cord_end));
         CHECK_TRUE(ends_with_coordinate(MyFixture::dms_cord_end));
         CHECK_TRUE(!ends_with_coordinate("banana"));
@@ -61,15 +62,6 @@ TEST_CASE(MyFixture, ParseLatitude) {
         const bool should_be_true =
             regex_match(valid_neg_decimal_lat_s, m, jt::decimal_lat_rx);
         CHECK_TRUE(should_be_true);
-
-        // auto match_begin =
-        // std::sregex_iterator(valid_neg_decimal_lat_s.begin(),
-        //                                         valid_neg_decimal_lat_s.end(),
-        //                                         jt::decimal_lat_rx);
-        // auto match_end = std::sregex_iterator();
-
-        // CHECK_TRUE(match_begin != match_end);
-        // CHECK_TRUE(match_begin->str() == valid_neg_decimal_lat_s);
     }
 
     SECTION("positive decimal") {
@@ -246,7 +238,7 @@ TEST_CASE(MyFixture, Coordinate) {
     }
 
     SECTION("decimal coordinates") {
-        string coord{"\"51.05011, -114.08529\""};
+        string coord{"(51.05011, -114.08529)"};
 
         auto match_begin = std::sregex_iterator(coord.begin(), coord.end(),
                                                 jt::decimal_coordinate_rx);
@@ -257,7 +249,7 @@ TEST_CASE(MyFixture, Coordinate) {
     }
 
     SECTION("decimal coordinates bad input") {
-        string coord{"\"51.05011, -114.\""};
+        string coord{"(51.05011, -114.)"};
 
         auto match_begin = std::sregex_iterator(coord.begin(), coord.end(),
                                                 jt::decimal_coordinate_rx);
@@ -266,7 +258,7 @@ TEST_CASE(MyFixture, Coordinate) {
         CHECK_TRUE(match_begin == match_end);
     }
     SECTION("dms coordinates") {
-        string coord{"\"36° 00' N, 138° 00' E\""};
+        string coord{"(36° 00' N, 138° 00' E)"};
 
         auto match_begin = std::sregex_iterator(coord.begin(), coord.end(),
                                                 jt::deg_min_cooordinate_rx);
@@ -277,7 +269,7 @@ TEST_CASE(MyFixture, Coordinate) {
     }
 
     SECTION("dms coordinates bad input") {
-        string coord{"\"36° 00' N, 138° 00' K\""};
+        string coord{"(36° 00' N, 138° 00' K)"};
 
         auto match_begin = std::sregex_iterator(coord.begin(), coord.end(),
                                                 jt::deg_min_cooordinate_rx);

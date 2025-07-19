@@ -1,6 +1,6 @@
 #include "parse_utils.hpp"
 
-// #include <print>
+#include <print>
 #include <ranges>
 #include <regex>
 #include <string>
@@ -11,6 +11,7 @@
 using namespace std::string_literals;
 
 namespace {
+using std::println;
 using std::string;
 using std::vector;
 
@@ -26,8 +27,10 @@ struct MyFixture : general_fixture {
     const string integer_zero{"0"};
     const string integer_negative{"-9"};
     const string text{"Howdy! 🤠"};
-    const string geo_decimal{R"("-1.23456, 179.99999")"};
-    const string geo_dms{R"("89° 59' N, 0° 00' W")"};
+    const string geo_decimal{R"-((-1.23456, 179.99999))-"};
+    const string geo_dms{R"-((89° 59' N, 0° 00' W))-"};
+    const string csv_geo_decimal{R"("-1.23456, 179.99999")"};
+    const string csv_geo_dms{R"("89° 59' N, 0° 00' W")"};
     const string tags_0{R"("""""")"};
     const string tags_1{R"("""Tag A""")"};
     const string tags_2{R"("""Tag A, Tag B""")"};
@@ -102,18 +105,23 @@ TEST_CASE(MyFixture, ParseUtils) {
     SECTION("combine decimal coordinate fields") {
         const string input_s{R"(1200,"51.05011, -114.08529",Yes)"};
         const vector<string> input = split_row(input_s);
-        const string expected{"1200"s + ","s + MyFixture::dec_cord_start +
-                              comma_substitute + MyFixture::dec_cord_end +
+        const string expected{"1200"s + ","s + MyFixture::csv_dec_cord_start +
+                              comma_substitute + MyFixture::csv_dec_cord_end +
                               ","s + "Yes"s};
         auto result = combine_coordinate_fields(input);
         CHECK_TRUE(result == expected);
+        if (result != expected) {
+            println(stderr, "\n\ncombine decimal coordinate fields:");
+            println(stderr, "result  : {}", result);
+            println(stderr, "expected: {}\n\n", expected);
+        }
     }
 
     SECTION("combine dms coordinate fields") {
         const string input_s{R"(600,"36° 00' N, 138° 00' E",,Asia)"};
         const vector<string> input = split_row(input_s);
-        const string expected = "600"s + ","s + MyFixture::dms_cord_start +
-                                comma_substitute + MyFixture::dms_cord_end +
+        const string expected = "600"s + ","s + MyFixture::csv_dms_cord_start +
+                                comma_substitute + MyFixture::csv_dms_cord_end +
                                 ","s + ""s + ","s + "Asia"s;
         const string result = combine_coordinate_fields(input);
         CHECK_TRUE(result == expected);
@@ -149,9 +157,18 @@ TEST_CASE(MyFixture, ParseUtils) {
     SECTION("fix quoted fields") {
         string row_s(MyFixture::sample_row_3);
         auto result = fix_quoted_fields(row_s);
-        int i = 0;
-        CHECK_TRUE(valid_decimal_coord == result[6]);
+        CHECK_TRUE(valid_csv_decimal_coord == result[6]);
         CHECK_TRUE(valid_tag_sample_row_3 == result[12]);
+
+        if ((valid_csv_decimal_coord != result[6]) ||
+            (valid_tag_sample_row_3 != result[12])) {
+            println(stderr, "fix quoted fields - result:");
+            int i = 0;
+            for (auto it = result.begin(); it != result.end(); ++it, ++i) {
+                println(stderr, "\tresult[{}]: {}", i, *it);
+            }
+            println(stderr, "\n");
+        }
     }
 
     SECTION("test determine_data_field_e_cell_data_type") {

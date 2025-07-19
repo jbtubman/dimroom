@@ -54,22 +54,33 @@ struct general_fixture {
 
     const float valid_decimal_lat{51.05011};
     const float valid_decimal_long{-114.08529};
-    const string valid_decimal_coord{R"("51.05011, -114.08529")"};
+    const string valid_decimal_coord{R"-((51.05011, -114.08529))-"};
+    const string valid_csv_decimal_coord{R"-("51.05011, -114.08529")-"};
     const string valid_pos_decimal_lat_s{R"(51.05011,)"};
     const string valid_neg_decimal_lat_s{R"(-51.05011,)"};
 
     const float valid_deg_min_lat{6.0};
     const float valid_deg_min_long{-138.0};
-    const string valid_deg_min_coord{R"("6° 00' N, 138° 00' W")"};
+    const string valid_deg_min_coord{R"-((6° 00' N, 138° 00' W))-"};
+    const string valid_csv_deg_min_coord{R"-("6° 00' N, 138° 00' W")-"};
 
-    const string invalid_decimal_coord{R"("51.05011 -114.08529")"};
-    const string invalid_deg_min_coord{R"("36° 00' K, 138° 00' E")"};
+    const string invalid_decimal_coord{R"-((51.05011 -114.08529))-"};
+    const string invalid_deg_min_coord{R"-((36° 00' K, 138° 00' E))-"};
 
-    const string dec_cord_start{R"("51.05011)"};
-    const string dec_cord_end{R"( -114.08529")"};
+    const string invalid_csv_decimal_coord{R"-("51.05011 -114.08529")-"};
+    const string invalid_csv_deg_min_coord{R"-("36° 00' K, 138° 00' E")-"};
 
-    const string dms_cord_start{R"("36° 00' N)"};
-    const string dms_cord_end{R"( 138° 00' E")"};
+    const string dec_cord_start{R"-((51.05011)-"};
+    const string dec_cord_end{R"-( -114.08529))-"};
+
+    const string csv_dec_cord_start{R"-("51.05011)-"};
+    const string csv_dec_cord_end{R"-( -114.08529")-"};
+
+    const string dms_cord_start{R"-((36° 00' N)-"};
+    const string dms_cord_end{R"-( 138° 00' E))-"};
+
+    const string csv_dms_cord_start{R"-("36° 00' N)-"};
+    const string csv_dms_cord_end{R"-( 138° 00' E")-"};
 
     const string valid_tag_sample_row_0 = R"("""Johnson, Volcano, Dusk""")";
     const string valid_tag_sample_row_2 = R"("""Mt Fuji, Fog""")";

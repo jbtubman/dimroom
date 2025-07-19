@@ -35,19 +35,41 @@ using std::operator""s;
 const string deg_min_lat_s{R"-(((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,)-"};
 const regex deg_min_lat_rx{deg_min_lat_s};
 
-const string deg_min_lat_starts_s{R"-(("(\d{1,2})°\s*(\d{1,2})'\s*([NS])))-"};
+const string deg_min_lat_starts_s{R"-((\((\d{1,2})°\s*(\d{1,2})'\s*([NS])))-"};
 const regex deg_min_lat_starts_rx{deg_min_lat_starts_s};
+
+const string csv_deg_min_lat_starts_s{
+    R"-(("(\d{1,2})°\s*(\d{1,2})'\s*([NS])))-"};
+const regex csv_deg_min_lat_starts_rx{csv_deg_min_lat_starts_s};
 
 const string deg_min_long_s(R"-(((\d{1,3})°\s*(\d{1,2})'\s*([EW])))-");
 const regex deg_min_long_rx{deg_min_long_s};
 
-const string deg_min_long_end_s(R"-(\s\d{1,3}° \d{1,2}' [EW]")-");
+const string deg_min_long_end_s(R"-(\s\d{1,3}° \d{1,2}' [EW]\))-");
 const regex deg_min_long_end_rx{deg_min_long_end_s};
 
-// A complete coordinate has double quote marks around it.
-const string deg_min_cooordinate_s("(\"" + deg_min_lat_s + R"-(\s*)-" +
-                                   deg_min_long_s + "\")");
+const string csv_deg_min_long_end_s(R"-(\s\d{1,3}° \d{1,2}' [EW]")-");
+const regex csv_deg_min_long_end_rx{csv_deg_min_long_end_s};
+
+// A complete coordinate has parentheses around it.
+const string deg_min_cooordinate_s(R"-(\()-" + deg_min_lat_s + R"-(\s*)-" +
+                                   deg_min_long_s + R"-(\))-");
 const regex deg_min_cooordinate_rx{deg_min_cooordinate_s};
+
+// A complete CSV coordinate has double quotes around it.
+const string csv_deg_min_cooordinate_s(R"-(")-" + deg_min_lat_s + R"-(\s*)-" +
+                                       deg_min_long_s + R"-(")-");
+const regex csv_deg_min_cooordinate_rx{csv_deg_min_cooordinate_s};
+
+// Magic index numbers into deg_min_cooordinate_rx and
+// csv_deg_min_cooordinate_rx.
+constexpr size_t lat_dm_degrees_match_index{2};
+constexpr size_t lat_dm_minutes_match_index{3};
+constexpr size_t lat_dm_sign_match_index{4};
+
+constexpr size_t long_dm_degrees_match_index{6};
+constexpr size_t long_dm_minutes_match_index{7};
+constexpr size_t long_dm_sign_match_index{8};
 
 // These constants give the index to the iterator in the formatter that
 // contains the subexpression for that part of the degree/minute coordinate.
@@ -68,25 +90,38 @@ const string v2_decimal_coord_s{
     R"-(((-?\d{1,2})(\.\d{1,5})?)\b(?![\d°'])\s*,\s*((-?\d{1,3})(\.\d{1,5})?))-"};
 const regex v2_decimal_coord_rx{v2_decimal_coord_s};
 
-const string v2_quoted_decimal_coord_s = "\""s + v2_decimal_coord_s + "\""s;
-const regex v2_quoted_decimal_coord_rx{v2_quoted_decimal_coord_s};
-
 ///////////////////////////////////
 const string decimal_lat_s{R"-((-?\d{1,2}(\.\d{1,5})?)\s*,)-"};
 const regex decimal_lat_rx{decimal_lat_s};
 
-const string decimal_lat_starts_s{R"-(("(-?\d{1,2})(\.\d{1,5})?)\b(?![\d°'])\s*)-"};
+const string decimal_lat_starts_s{
+    R"-((\((-?\d{1,2})(\.\d{1,5})?)\b(?![\d°'])\s*)-"};
 const regex decimal_lat_starts_rx{decimal_lat_starts_s};
+
+const string csv_decimal_lat_starts_s{
+    R"-(("(-?\d{1,2})(\.\d{1,5})?)\b(?![\d°'])\s*)-"};
+const regex csv_decimal_lat_starts_rx{csv_decimal_lat_starts_s};
 
 const string decimal_long_s{R"-((-?\d{1,3}(\.\d{1,5})?))-"};
 const regex decimal_long_rx{decimal_long_s};
 
-const string decimal_long_end_s{R"((\s-?\d{1,3}(\.\d{1,5})?"))"};
+const string decimal_long_end_s{R"((\s-?\d{1,3}(\.\d{1,5})?\)))"};
 const regex decimal_long_end_rx{decimal_long_end_s};
 
-const string decimal_coordinate_s("(\"" + decimal_lat_s + R"-(\s*)-" +
-                                  decimal_long_s + "\")");
+const string csv_decimal_long_end_s{R"((\s-?\d{1,3}(\.\d{1,5})?"))"};
+const regex csv_decimal_long_end_rx{csv_decimal_long_end_s};
+
+const string decimal_coordinate_s(R"-((\()-" + decimal_lat_s + R"-(\s*)-" +
+                                  decimal_long_s + R"-(\)))-");
 const regex decimal_coordinate_rx{decimal_coordinate_s};
+
+const string csv_decimal_coordinate_s(R"-((")-" + decimal_lat_s + R"-(\s*)-" +
+                                      decimal_long_s + R"-("))-");
+const regex csv_decimal_coordinate_rx{csv_decimal_coordinate_s};
+
+// Magic index numbers into decimal_coordinate_rx and csv_decimal_coordinate_rx.
+constexpr size_t lat_decimal_match_index{2};
+constexpr size_t long_decimal_match_index{4};
 
 // Both types of coordinates.
 const string coordinate_s("^" + deg_min_cooordinate_s + "|" +
@@ -101,20 +136,26 @@ const int lat_decimal{1};
 const int long_decimal{2};
 
 inline bool is_deg_min_coordinate(const string& s) {
-    return regex_match(s, deg_min_cooordinate_rx);
+    return regex_match(s, deg_min_cooordinate_rx) ||
+           regex_match(s, csv_deg_min_cooordinate_rx);
 }
 
 inline bool is_decimal_coordinate(const string& s) {
-    return regex_match(s, decimal_coordinate_rx);
+    return regex_match(s, decimal_coordinate_rx) ||
+           regex_match(s, csv_decimal_coordinate_rx);
 }
 
 inline bool starts_with_coordinate(const string& s) {
-    return regex_match(s, decimal_lat_starts_rx) ||
+    return regex_match(s, csv_decimal_lat_starts_rx) ||
+           regex_match(s, csv_deg_min_lat_starts_rx) ||
+           regex_match(s, decimal_lat_starts_rx) ||
            regex_match(s, deg_min_lat_starts_rx);
 }
 
 inline bool ends_with_coordinate(const string& s) {
-    return regex_match(s, decimal_long_end_rx) ||
+    return regex_match(s, csv_decimal_long_end_rx) ||
+           regex_match(s, csv_deg_min_long_end_rx) ||
+           regex_match(s, decimal_long_end_rx) ||
            regex_match(s, deg_min_long_end_rx);
 }
 
@@ -193,10 +234,12 @@ inline std::expected<std::pair<float, float>, coordinate::format>
 parse_decimal_coordinate(const string& coord) {
     std::smatch m;
     const bool parsed_successfully =
-        std::regex_match(coord, m, jt::decimal_coordinate_rx);
+        std::regex_match(coord, m, decimal_coordinate_rx)
+            ? true
+            : std::regex_match(coord, m, csv_decimal_coordinate_rx);
     if (parsed_successfully) {
-        const string latitude_s = m[2];
-        const string longitude_s = m[4];
+        const string latitude_s = m[lat_decimal_match_index];
+        const string longitude_s = m[long_decimal_match_index];
         try {
             const float latitude = std::stof(latitude_s);
             const float longitude = std::stof(longitude_s);
@@ -214,15 +257,19 @@ std::expected<
                                                             deg_min_coord) {
     smatch m;
     const bool parsed_successfully =
-        regex_match(deg_min_coord, m, deg_min_cooordinate_rx);
+        regex_match(deg_min_coord, m, deg_min_cooordinate_rx)
+            ? true
+            : regex_match(deg_min_coord, m, csv_deg_min_cooordinate_rx);
 
     if (parsed_successfully) {
-        const string latitude_deg_s = m[3];
-        const string latitude_min_s = m[4];
-        const float latitude_sign = (m[5] == "N") ? 1.0 : -1.0;
-        const string longitude_deg_s = m[7];
-        const string longitude_min_s = m[8];
-        const float longitude_sign = (m[9] == "E") ? 1.0 : -1.0;
+        const string latitude_deg_s = m[lat_dm_degrees_match_index];
+        const string latitude_min_s = m[lat_dm_minutes_match_index];
+        const float latitude_sign =
+            (m[lat_dm_sign_match_index] == "N") ? 1.0 : -1.0;
+        const string longitude_deg_s = m[long_dm_degrees_match_index];
+        const string longitude_min_s = m[long_dm_minutes_match_index];
+        const float longitude_sign =
+            (m[long_dm_sign_match_index] == "E") ? 1.0 : -1.0;
         try {
             const float latitude =
                 (stof(latitude_deg_s) + (stof(latitude_min_s) / 60.0f)) *
