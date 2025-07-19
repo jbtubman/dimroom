@@ -34,18 +34,10 @@ struct std::formatter<jt::coordinate, char> {
     template <class FmtContext>
     FmtContext::iterator format(jt::coordinate coord, FmtContext& ctx) const {
         std::ostringstream out;
-        out << "{ ";
-        const string prefix =
-            long_format
-                ? ((coord.coordinate_format == jt::coordinate::format::decimal)
-                       ? "\"jt::coordinate<decimal>\""
-                       : "\"jt::coordinate<dm>\"")
-                : "\"coordinate\"";
-
-        out << prefix << " : { \"value\" : ";
+        // Ignoring long_format for now.
 
         if (coord.coordinate_format == jt::coordinate::format::decimal) {
-            out << "\"";
+            out << "(";
             const bool lat_negative = coord.latitude < 0;
             out << std::setprecision(5);
             out << std::fixed;
@@ -53,10 +45,10 @@ struct std::formatter<jt::coordinate, char> {
 
             const bool long_negative = coord.longitude < 0;
             out << coord.longitude;
-            out << "\"";
+            out << ")";
         } else if (coord.coordinate_format ==
                    jt::coordinate::format::degrees_minutes) {
-            out << "\"";
+            out << "(";
             const float lat_f = coord.latitude;
             const std::string direction = lat_f >= 0 ? "N" : "S";
             const float trunc_lat_f = std::trunc(std::abs(lat_f));
@@ -77,19 +69,10 @@ struct std::formatter<jt::coordinate, char> {
             const float fraction_long_f =
                 std::round((std::abs(long_f) - trunc_long_f) * 60.0f);
             out << fraction_long_f << "' " << long_direction;
-            out << "\"";
+            out << ")";
         } else {
             out << "\"INVALID_COORDINATE\"";
         }
-        out << ", ";
-
-        const string coord_format =
-            (coord.coordinate_format == jt::coordinate::format::decimal)
-                ? "\"decimal\""
-                : "\"dm\"";
-        out << "\"format\" : " << coord_format;
-
-        out << " } }";
 
         return std::ranges::copy(std::move(out).str(), ctx.out()).out;
     }
