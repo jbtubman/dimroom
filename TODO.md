@@ -6,7 +6,7 @@ Some work still remains.
 
 ## Things Completed
 
-As of July 18, 2025:
+As of July 19, 2025:
 
 * Reads in CSV file.
 * Parses the header and data rows.
