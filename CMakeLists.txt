@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.0)
 
-project(dimroom VERSION 2.1)
+project(dimroom VERSION 2.5)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
