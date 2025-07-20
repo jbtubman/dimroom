@@ -1,12 +1,12 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.5.
+This summarizes the state of things as of Version 2.6.
 
 Some work still remains.
 
 ## Things Completed
 
-As of July 19, 2025:
+As of July 20, 2025:
 
 * Reads in CSV file.
 * Parses the header and data rows.
@@ -18,6 +18,7 @@ As of July 19, 2025:
 * Floating point queries work.
 * Boolean queries work.
 * Renamed some classes and aliases to better match their real meaning.
+* Refactored query dispatching from command_interpreter class to query class.
 
 ## Things Remaining
 
