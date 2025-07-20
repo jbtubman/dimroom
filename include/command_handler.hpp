@@ -58,13 +58,13 @@ class command_handler {
 
     bool write_csv_file(const string& filname, table) { return false; }
 
-    query create_query(const string& query_text, table table_to_search);
+    // query create_query(const string& query_text, table table_to_search);
 
-    query create_tags_query(vector<tag_value> tag_values,
-                            table table_to_search);
+    // query create_tags_query(vector<tag_value> tag_values,
+    //                         table table_to_search);
 
-    query create_geo_query(coordinate location, polygon bounding_polygon,
-                           table table_to_search);
+    // query create_geo_query(coordinate location, polygon bounding_polygon,
+    //                        table table_to_search);
 
     // vector<deprecated_row> run_query(query q, table table_to_search);
 
