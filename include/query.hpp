@@ -46,11 +46,6 @@ class query {
 
     table::rows execute(const string& query_value_s);
 
-    expected<string, int> do_string_query(table& tb,
-                                          const string& query_string) {
-        return std::unexpected(EXIT_FAILURE);
-    }
-
     table::rows string_match(const string& query_value,
                              table::opt_rows rows_to_query = table::opt_rows{});
 
