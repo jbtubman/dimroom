@@ -301,29 +301,6 @@ static inline table::cell_column get_data_column(table& t, size_t column_idx) {
     return t.get_data_column(column_idx);
 }
 
-// TODO: This appears to be only used in tests. Remove?
-static inline table::rows string_matchx(
-    table& t, const string& col_name, const string& query_value,
-    table::opt_rows rows_to_query = table::opt_rows{}) {
-    table::rows targets = rows_to_query ? *rows_to_query : t.rows_;
-    const auto ex_col_idx = t.index_for_column_name(col_name);
-    if (!ex_col_idx) return table::rows{};
-    auto col_idx = *ex_col_idx;
-    auto result =
-        ranges::fold_left(targets, table::rows{},
-                          [&query_value, &col_idx](table::rows acc, row rw) {
-                              const cell_value_type cvt = rw[col_idx].value;
-                              if (cvt) {
-                                  const string s = std::get<string>(*cvt);
-                                  if (s == query_value) {
-                                      acc.push_back(rw);
-                                  }
-                              }
-                              return acc;
-                          });
-    return result;
-}
-
 }  // namespace jt
 
 #define TABLE_INCLUDE_FORMATTER
