@@ -36,77 +36,67 @@ using std::regex_match;
 namespace ranges = std::ranges;
 namespace views = std::ranges::views;
 
-auto vw_string_match(table& t, const string& col_name,
-                     const string& query_value,
-                     ranges::ref_view<table::rows> targets);
-
-table::rows string_match(
-    table& t, const string& col_name, const string& query_value,
-    table::opt_rows rows_to_query = table::opt_rows{});
-
-auto vw_integer_match(table& t, const string& col_name,
-                      const string& query_value,
-                      ranges::ref_view<table::rows> targets);
-
-table::rows integer_match(
-    table& t, const string& col_name, const string& query_value,
-    table::opt_rows rows_to_query = table::opt_rows{});
-
-table::rows integer_match(
-    table& t, const string& col_name, int query_value,
-    table::opt_rows rows_to_query = table::opt_rows{});
-
-auto vw_boolean_match(table& t, const string& col_name, bool query_value,
-                      ranges::ref_view<table::rows> targets);
-
-table::rows boolean_match(
-    table& t, const string& col_name, bool query_value,
-    table::opt_rows rows_to_query = table::opt_rows{});
-
-table::rows boolean_match(
-    table& t, const string& col_name, const string& query_value,
-    table::opt_rows rows_to_query = table::opt_rows{});
-
-auto vw_floating_match(table& t, const string& col_name, float query_value,
-                       ranges::ref_view<table::rows> targets);
-
-table::rows floating_match(
-    table& t, const string& col_name, float query_value,
-    table::opt_rows rows_to_query = table::opt_rows{});
-
-table::rows floating_match(
-    table& t, const string& col_name, const string& query_value,
-    table::opt_rows rows_to_query = table::opt_rows{});
-
-auto vw_geo_query_match(table& t, const string& col_name,
-                        const coordinate& coord,
-                        ranges::ref_view<table::rows> targets);
-
-table::rows geo_query_match(
-    table& t, const string& col_name, const coordinate& coord,
-    table::opt_rows rows_to_query = table::opt_rows{});
-
-table::rows geo_query_match(
-    table& t, const string& col_name, const string& coord,
-    table::opt_rows rows_to_query = table::opt_rows{});
-
-
-
-struct query {
-    table& table_ref;
+/// @brief Query interface.
+class query {
+   public:
+    table& t;
     string column_name{};
-    vector<string> arguments{};
 
-    query(table& t, const string& c_name, const vector<string> args)
-        : table_ref{t}, column_name{c_name}, arguments{args} {}
+    query(table& tb, const string& c_name) : t{tb}, column_name{c_name} {}
 
-    query(table& t, const string& c_name) : table_ref{t}, column_name{c_name} {}
+    table::rows execute(const string& query_value_s);
 
-    query(table& t) : table_ref{t} {}
-
-    expected<string, int> do_string_query(table& t,
+    expected<string, int> do_string_query(table& tb,
                                           const string& query_string) {
         return std::unexpected(EXIT_FAILURE);
     }
+
+    table::rows string_match(const string& query_value,
+                             table::opt_rows rows_to_query = table::opt_rows{});
+
+    table::rows integer_match(
+        const string& query_value,
+        table::opt_rows rows_to_query = table::opt_rows{});
+
+    table::rows integer_match(
+        int query_value, table::opt_rows rows_to_query = table::opt_rows{});
+
+    table::rows boolean_match(
+        bool query_value, table::opt_rows rows_to_query = table::opt_rows{});
+
+    table::rows boolean_match(
+        const string& query_value,
+        table::opt_rows rows_to_query = table::opt_rows{});
+
+    table::rows floating_match(
+        float query_value, table::opt_rows rows_to_query = table::opt_rows{});
+
+    table::rows floating_match(
+        const string& query_value,
+        table::opt_rows rows_to_query = table::opt_rows{});
+
+    table::rows geo_query_match(
+        const coordinate& coord,
+        table::opt_rows rows_to_query = table::opt_rows{});
+
+    table::rows geo_query_match(
+        const string& coord,
+        table::opt_rows rows_to_query = table::opt_rows{});
+
+   private:
+    auto vw_string_match(const string& query_value,
+                         ranges::ref_view<table::rows> targets);
+
+    auto vw_integer_match(int query_value,
+                          ranges::ref_view<table::rows> targets);
+
+    auto vw_boolean_match(bool query_value,
+                          ranges::ref_view<table::rows> targets);
+
+    auto vw_floating_match(float query_value,
+                           ranges::ref_view<table::rows> targets);
+
+    auto vw_geo_query_match(const coordinate& coord,
+                            ranges::ref_view<table::rows> targets);
 };
 }  // namespace jt

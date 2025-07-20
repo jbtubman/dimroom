@@ -5,10 +5,11 @@
 #include <string>
 #include <type_traits>
 
-#include "coordinates.hpp"
-#include "table.hpp"
 #include "CppUnitTestFramework.hpp"
+#include "coordinates.hpp"
 #include "general_fixture.hpp"
+#include "query.hpp"
+#include "table.hpp"
 
 namespace {
 using std::string;
@@ -36,7 +37,8 @@ TEST_CASE(MyFixture, TextTest) {
         const string column_name = "Filename";
         const auto column_idx = test_table.index_for_column_name(column_name);
         const string column_value = "Iceland.png";
-        auto q_result = string_match(test_table, column_name, column_value);
+        query q(test_table, column_name);
+        auto q_result = q.string_match(column_value);
         CHECK_TRUE(!q_result.empty());
         CHECK_TRUE(q_result.size() == 1);
         const auto s_result = q_result[0][*column_idx].get_string();
@@ -54,7 +56,8 @@ TEST_CASE(MyFixture, TextTest) {
         const string column_name = "Type";
         const auto column_idx = test_table.index_for_column_name(column_name);
         const string column_value = "jpeg";
-        auto q_result = string_match(test_table, column_name, column_value);
+        query q(test_table, column_name);
+        auto q_result = q.string_match(column_value);
         CHECK_TRUE(!q_result.empty());
         CHECK_TRUE(q_result.size() == 2);
         auto s_result = q_result[0][*column_idx].get_string();
@@ -73,7 +76,8 @@ TEST_CASE(MyFixture, TextTest) {
         const string column_name = "Type";
         const auto column_idx = test_table.index_for_column_name(column_name);
         const string column_value = "Wolseley";
-        auto q_result = string_match(test_table, column_name, column_value);
+        query q(test_table, column_name);
+        auto q_result = q.string_match(column_value);
         CHECK_TRUE(q_result.empty());
         CHECK_TRUE(q_result.size() == 0);
     }
@@ -90,7 +94,8 @@ TEST_CASE(MyFixture, IntegerTest) {
         const string column_name = "Image X";
         const auto column_idx = test_table.index_for_column_name(column_name);
         const int column_value = 42;
-        auto q_result = integer_match(test_table, column_name, column_value);
+        query q(test_table, column_name);
+        auto q_result = q.integer_match(column_value);
         CHECK_TRUE(q_result.empty());
         CHECK_TRUE(q_result.size() == 0);
     }
@@ -105,7 +110,8 @@ TEST_CASE(MyFixture, IntegerTest) {
         const string column_name = "Image X";
         const auto column_idx = test_table.index_for_column_name(column_name);
         const int column_value = 900;
-        auto q_result = integer_match(test_table, column_name, column_value);
+        query q(test_table, column_name);
+        auto q_result = q.integer_match(column_value);
         CHECK_TRUE(!q_result.empty());
         CHECK_TRUE(q_result.size() == 1);
     }
@@ -120,7 +126,8 @@ TEST_CASE(MyFixture, IntegerTest) {
         const string column_name = "Image X";
         const auto column_idx = test_table.index_for_column_name(column_name);
         const auto column_value = 600;
-        auto q_result = integer_match(test_table, column_name, column_value);
+        query q(test_table, column_name);
+        auto q_result = q.integer_match(column_value);
         CHECK_TRUE(!q_result.empty());
         CHECK_TRUE(q_result.size() == 4);
     }

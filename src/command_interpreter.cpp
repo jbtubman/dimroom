@@ -91,44 +91,10 @@ void command_line::do_query(table& t, const string& query_line) {
     const string column_name = m[1].str();
     // m[4] for string values; m[5] for integers.
     const string query_value_s = m[4].str().empty() ? m[5].str() : m[4].str();
-    table::rows results;
-    // Determine the column's value type and dispatch the query
-    // appropriately.
+
     ecdt col_type = t.column_type(column_name);
-    if (col_type == ecdt::text) {
-        results = string_match(t, column_name, query_value_s);
-    } else if (col_type == ecdt::boolean) {
-        const auto query_value = s_to_boolean(query_value_s);
-        if (query_value) {
-            const bool query_b = *query_value;
-            results = boolean_match(t, column_name, query_b);
-        }
-    } else if (col_type == ecdt::floating) {
-        const auto query_value = s_to_floating(query_value_s);
-        if (query_value) {
-            const float query_f = *query_value;
-            results = floating_match(t, column_name, query_f);
-        }
-    } else if (col_type == ecdt::geo_coordinate) {
-        const auto query_value = s_to_geo_coordinate(query_value_s);
-        if (query_value) {
-            const coordinate coord = *query_value;
-            results = geo_query_match(t, column_name, coord);
-        }
-    } else if (col_type == ecdt::integer) {
-        const auto query_value = std::stoi(query_value_s);
-        results = integer_match(t, column_name, query_value);
-    } else if (col_type == ecdt::tags) {
-        // TODO
-    } else {
-        auto expected_idx = t.index_for_column_name(column_name);
-        if (!expected_idx) {
-            println(stderr, "Column \"{}\" is not in this file.", column_name);
-            println(stderr,
-                    "Use the \"describe\" command to see the column names and "
-                    "types.");
-        }
-    }
+    query q(t, column_name);
+    auto results = q.execute(query_value_s);
 
     // Print out the column names.
     bool first_field = true;
@@ -144,8 +110,6 @@ void command_line::do_query(table& t, const string& query_line) {
     println("{}", column_names_output);
 
     // print the rows.
-
-    using zzz = decltype(results[0]);
     bool first_row = true;
     ranges::for_each(results, [](const row& rw) {
         string row_str = row_to_string(rw);
