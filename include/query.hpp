@@ -70,13 +70,18 @@ class query {
         const string& query_value,
         table::opt_rows rows_to_query = table::opt_rows{});
 
-    table::rows geo_query_match(
+    table::rows geo_coordinate_match(
         const coordinate& coord,
         table::opt_rows rows_to_query = table::opt_rows{});
 
-    table::rows geo_query_match(
-        const string& coord,
-        table::opt_rows rows_to_query = table::opt_rows{});
+    table::rows geo_coordinate_match(
+        const string& coord, table::opt_rows rows_to_query = table::opt_rows{});
+
+    table::rows tags_match(const string& tags_string,
+                           table::opt_rows rows_to_query = table::opt_rows{});
+
+    table::rows tags_match(const vector<string>& tags,
+                           table::opt_rows rows_to_query = table::opt_rows{});
 
    private:
     auto vw_string_match(const string& query_value,
@@ -93,5 +98,8 @@ class query {
 
     auto vw_geo_query_match(const coordinate& coord,
                             ranges::ref_view<table::rows> targets);
+
+    auto vw_tags_match(const vector<string>& tags,
+                       ranges::ref_view<table::rows> targets);
 };
 }  // namespace jt

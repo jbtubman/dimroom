@@ -1,12 +1,12 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.6.
+This summarizes the state of things as of Version 2.7.
 
 Some work still remains.
 
 ## Things Completed
 
-As of July 20, 2025:
+As of July 21, 2025:
 
 * Reads in CSV file.
 * Parses the header and data rows.
@@ -17,14 +17,14 @@ As of July 20, 2025:
 * Integer queries work.
 * Floating point queries work.
 * Boolean queries work.
+* Tags queries work.
 * Renamed some classes and aliases to better match their real meaning.
 * Refactored query dispatching from command_interpreter class to query class.
 
 ## Things Remaining
 
 * Rename some of the classes and data types to be less confusing.
-  * Partly done.
-* Implement tag queries.
+  * Continuing.
 * Implement "within polygon" queries. (The code for determining that is
   present, but not hooked up to the user interface.)
 * Implement the ANDing of queries.
