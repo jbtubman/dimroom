@@ -51,8 +51,26 @@ class query {
         inside,
         tags
     };
+
+    enum class comparison {
+        invalid,
+        equal_to,
+        not_equal_to,
+        greater,
+        less,
+        greater_equal,
+        less_equal,
+        inside,
+        tags
+    };
     table& t;
     string column_name{};
+    // comparison comp{comparison::equal_to};
+
+    // query(table& tb, const string& c_name,
+    //       comparison comp_ = comparison::equal_to)
+    //     : t{tb}, column_name{c_name}, comp{comp_} {}
+
 
     query(table& tb, const string& c_name) : t{tb}, column_name{c_name} {}
 
