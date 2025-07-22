@@ -128,6 +128,12 @@ const string coordinate_s("^" + deg_min_cooordinate_s + "|" +
                           decimal_coordinate_s + "$");
 const regex coordinate_rx{coordinate_s};
 
+const string single_coordinate_s(R"-((?:\s*)()-" + deg_min_cooordinate_s + "|" +
+                                 decimal_coordinate_s + R"-()(?:\s*))-");
+
+const string multiple_coordinate_s(R"-((?:\s*)-" + single_coordinate_s +
+                                   R"-(\s*)+)-");
+
 // These constants give the index to the iterator in the formatter that
 // contains the subexpression for that part of the decimal coordinate.
 // (They are magic numbers that were determined empirically for decimal
@@ -221,7 +227,7 @@ class coordinate {
 
 /// @brief Polygon represented by a vector of coordinates. Assumed to be a
 /// closed polygon.
-using polygon = std::vector<coordinate>;
+using polygon_t = std::vector<coordinate>;
 
 inline coordinate::format coordinate_format(const string& s) noexcept {
     return is_deg_min_coordinate(s)

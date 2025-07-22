@@ -225,8 +225,6 @@ TEST_CASE(MyFixture, Coordinate) {
     }
 
     SECTION("parse deg min coordinates") {
-        cerr << flush << endl << "!!!!!!jt::deg_min_cooordinate_s:"
-        << endl << jt::deg_min_cooordinate_s << endl << endl << flush;
         auto result = parse_deg_min_coordinate(MyFixture::valid_deg_min_coord);
         CHECK_TRUE(result);
 

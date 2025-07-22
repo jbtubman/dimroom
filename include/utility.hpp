@@ -205,10 +205,21 @@ auto shove_back(Container&& acc, T&& v) {
     return result;
 }
 
-inline string& trim(string& line) {
+/// @brief Returns a trimmed copy of the input string.
+/// @param const string& line
+/// @return string
+[[nodiscard]] inline string trim(const string& line) {
+    string result{line};
+    result.erase(std::remove(result.begin(), result.end(), '\n'), result.end());
+    result.erase(std::remove(result.begin(), result.end(), '\r'), result.end());
+    return result;
+}
+
+/// @brief Trims the string given as argument.
+/// @param line
+inline void trim(string& line) {
     line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
     line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
-    return line;
 }
 
 inline std::expected<bool, convert_error> s_to_boolean(const string& s) {

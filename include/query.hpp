@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <concepts>
 #include <cstdlib>
 #include <expected>
 #include <format>
@@ -83,6 +84,10 @@ class query {
     table::rows tags_match(const vector<string>& tags,
                            table::opt_rows rows_to_query = table::opt_rows{});
 
+    table::rows point_in_polygon_match(
+        const polygon_t& polygn,
+        table::opt_rows rows_to_query = table::opt_rows{});
+
    private:
     auto vw_string_match(const string& query_value,
                          ranges::ref_view<table::rows> targets);
@@ -101,5 +106,8 @@ class query {
 
     auto vw_tags_match(const vector<string>& tags,
                        ranges::ref_view<table::rows> targets);
+
+    auto vw_point_in_polygon_match(const polygon_t& polygn,
+                                   ranges::ref_view<table::rows> targets);
 };
 }  // namespace jt

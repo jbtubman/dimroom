@@ -20,7 +20,7 @@ namespace jt {
 // }
 
 // query command_handler::create_geo_query(coordinate location,
-//                                         polygon bounding_polygon,
+//                                         polygon_t bounding_polygon,
 //                                         table table_to_search) {
 //     return query(table_to_search);
 // }

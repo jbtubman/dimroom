@@ -1,6 +1,6 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.7.
+This summarizes the state of things as of Version 2.8.
 
 Some work still remains.
 
@@ -13,6 +13,7 @@ As of July 21, 2025:
 * Deduces the probable data types of each column, where there is sufficient data.
 * Much more comprehensive test coverage.
 * Simple geographic queries now work.
+* Coordinate within polygon queries now work.
 * Text queries work.
 * Integer queries work.
 * Floating point queries work.
@@ -23,10 +24,6 @@ As of July 21, 2025:
 
 ## Things Remaining
 
-* Rename some of the classes and data types to be less confusing.
-  * Continuing.
-* Implement "within polygon" queries. (The code for determining that is
-  present, but not hooked up to the user interface.)
 * Implement the ANDing of queries.
   * The internals of the queries use `std::ranges::views` for eventually
     implementing this efficiently.

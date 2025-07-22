@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <expected>
 #include <format>
 #include <iostream>
 #include <optional>
@@ -14,6 +15,7 @@
 #include <vector>
 
 #include "command_handler.hpp"
+#include "coordinates.hpp"
 #include "dimroomConfig.h"
 #include "query.hpp"
 #include "table.hpp"
@@ -37,6 +39,7 @@ using std::regex;
 using std::regex_match;
 namespace ranges = std::ranges;
 namespace views = std::ranges::views;
+using expected_polygon_t = std::expected<polygon_t, convert_error>;
 
 class command_line {
     // TODO.
@@ -54,8 +57,11 @@ class command_line {
 
     const vector<string> help_strings{
         "\"describe\" - describe the table",
-        "\"query (\"column name\" = value)\" - do a query",
-        "\"exit\" - end program", "\"quit\" - end program",
+        "\"query (\"column name\" value)\" - do a regular query",
+        "\"query (\"column name\" in (coordinate) (coordinate) (coordinate))\" "
+        "- look for coordinates inside a polygon of at least 3 points ",
+        "\"exit\" - end program",
+        "\"quit\" - end program",
         "\"help\" - print help message"};
 
     const regex quit_cmd_rx{R"(^\s*(quit|exit)\b.*)", regex::icase};
@@ -118,4 +124,7 @@ class command_line {
         return EXIT_SUCCESS;
     }
 };
+
+expected_polygon_t parse_points_in_query(const string& query_line);
+
 }  // namespace jt

@@ -1,4 +1,4 @@
-# DIMROOM (V2.7)
+# DIMROOM (V2.8)
 
 Jim Tubman
 June/July 2025
@@ -24,15 +24,16 @@ A greeting and the command prompt will appear.
 
     Welcome to DimRoom
     Enter the command "help" for help.
-    dimroom-2.7>
+    dimroom-2.8>
 
 ### Getting Help
 
 Very basic help is available.
 
-    dimroom-2.7> help
+    dimroom-2.8> help
     "describe" - describe the table
-    "query ("column name" = value)" - do a query
+    "query ("column name" value)" - do a regular query
+    "query ("column name" in (coordinate) (coordinate) (coordinate)...)" - look for coordinates inside a polygon of at least 3 points
     "exit" - end program
     "quit" - end program
     "help" - print help message
@@ -41,7 +42,7 @@ Very basic help is available.
 
 The _describe_ command provides information about the file that was read.
 
-    dimroom-2.7> describe
+    dimroom-2.8> describe
     Column Name: "Filename"; Column Type : "text"
     Column Name: "Type"; Column Type : "text"
     Column Name: "Image Size (MB)"; Column Type : "floating"
@@ -61,43 +62,49 @@ The _describe_ command provides information about the file that was read.
 Simple queries on single columns are support for text, integer, boolean, and
 floating point values.
 
-    dimroom-2.7> query ("Type" "png")
+    dimroom-2.8> query ("Type" "png")
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk"""
     Italy.png,png,10.5,600,800,96,,1,Europe,,,,
     2 rows found
 
-    dimroom-2.7> query ("Image Size (MB)" 26.4)
+    dimroom-2.8> query ("Image Size (MB)" 26.4)
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Japan.jpeg,jpeg,26.4,600,800,600,{ "coordinate" : { "value" : "36° 00' N, 138° 00' E", "format" : "dm" } },,Asia,,,,"""Mt Fuji, Fog"""
     1 rows found
 
-    dimroom-2.7> query ("DPI"  72)
+    dimroom-2.8> query ("DPI"  72)
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk"""
     Edmonton.jpg,jpeg,5.6,900,400,72,{ "coordinate" : { "value" : "53.55014, -113.46871", "format" : "decimal" } },,,,,Oilers,
     2 rows found
 
-    dimroom-2.7> query ("(Center) Coordinate" (36° 00' N, 138° 00' E))
+    dimroom-2.8> query ("(Center) Coordinate" (36° 00' N, 138° 00' E))
     geo_query_match: coord = (36° 00' N, 138° 00' E)
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Japan.jpeg,jpeg,26.4,600,800,600,(36° 00' N, 138° 00' E),,Asia,,,,"""Mt Fuji, Fog"""
     1 rows found
 
-    dimroom-2.7> query ("User Tags" "Dusk")
+    dimroom-2.8> query ("(Center) Coordinate" in (60.129, -120.010) (40.742, -120.948) (40.748, -100.867) (60.129, -100.867) )
+    Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
+    Calgary.tif,tiff,30.6,600,800,1200,(51.05011, -114.08529),1,,32,Y,Flames,"""Urban, Dusk"""
+    Edmonton.jpg,jpeg,5.6,900,400,72,(53.55014, -113.46871),,,,,Oilers,
+    2 rows found
+
+    dimroom-2.8> query ("User Tags" "Dusk")
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk"""
     Calgary.tif,tiff,30.6,600,800,1200,(51.05011, -114.08529),1,,32,Y,Flames,"""Urban, Dusk"""
     2 rows found
 
-    dimroom-2.7> query ("User Tags" "Mt Fuji")
+    dimroom-2.8> query ("User Tags" "Mt Fuji")
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Japan.jpeg,jpeg,26.4,600,800,600,(36° 00' N, 138° 00' E),,Asia,,,,"""Mt Fuji, Fog"""
     1 rows found
 
 If you search for a non-existent column, you will be told that it is not present.
 
-    dimroom-2.7> query ("Flavour" "Lemon")
+    dimroom-2.8> query ("Flavour" "Lemon")
     Column "Flavour" is not in this file.
     Use the "describe" command to see the column names and types.
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
@@ -105,9 +112,6 @@ If you search for a non-existent column, you will be told that it is not present
 
 #### Unsupported Queries
 
-* **Coordinates within polygons queries.** This was blocked by the command line parsing problem
-  mentioned in the previous point. (The code to determine this is actually in the file `contains.hpp`.
-  It is based on a C original (with credit given), but translated into modern C++/STL.)
 * **ANDing queries together.** Not yet available. (Internally, lazily evaluated STL range views are
   used for future support of this feature).
 

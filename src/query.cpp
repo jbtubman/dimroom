@@ -8,6 +8,7 @@
 #include <string_view>
 #include <variant>
 
+#include "contains.hpp"
 #include "table.hpp"
 #include "utility.hpp"
 
@@ -167,6 +168,21 @@ auto query::vw_tags_match(const vector<string>& tags,
     return result;
 }
 
+auto query::vw_point_in_polygon_match(const polygon_t& polygn,
+                                      ranges::ref_view<table::rows> targets) {
+    const auto col_idx = t.index_for_column_name(column_name);
+
+    auto result = targets | views::filter([&polygn, col_idx](const row& rw) {
+                      if (!col_idx) return false;
+                      const cell_value_type cvt = rw[*col_idx].value;
+                      if (!cvt) return false;
+                      const coordinate& coord = std::get<coordinate>(*cvt);
+                      return point_in_polygon(coord, polygn);
+                  });
+
+    return result;
+}
+
 table::rows query::string_match(const string& query_value,
                                 table::opt_rows rows_to_query) {
     table::rows targets = rows_to_query ? *rows_to_query : t.rows_;
@@ -265,6 +281,16 @@ table::rows query::tags_match(const vector<string>& tags,
     auto targets_vw = views::all(targets);
     auto tags_match_view = vw_tags_match(tags, targets);
     auto result = ranges::to<table::rows>(tags_match_view);
+    return result;
+}
+
+table::rows query::point_in_polygon_match(const polygon_t& polygn,
+                                          table::opt_rows rows_to_query) {
+    table::rows targets = rows_to_query ? *rows_to_query : t.rows_;
+    auto targets_vw = views::all(targets);
+    auto point_in_polygon_match_view =
+        vw_point_in_polygon_match(polygn, targets);
+    auto result = ranges::to<table::rows>(point_in_polygon_match_view);
     return result;
 }
 }  // namespace jt
