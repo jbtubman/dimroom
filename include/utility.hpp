@@ -250,6 +250,19 @@ inline std::expected<int, convert_error> s_to_integer(const string& s) {
     return i;
 }
 
+inline void to_lower(string& s) {
+    ranges::transform(
+        s.begin(), s.end(), s.begin(),
+        [](unsigned char c) -> unsigned char { return std::tolower(c); });
+}
+
+template <class String>
+[[nodiscard]] inline string to_lower(String&& s) {
+    string tmp{std::forward<String>(s)};
+    to_lower(tmp);
+    return tmp;
+}
+
 // /**
 //  * @brief Returns a container containing the `index`th element of each
 //  vector.
