@@ -58,8 +58,9 @@ class command_line {
     const vector<string> help_strings{
         "\"describe\" - describe the table",
         "\"query (\"column name\" value)\" - do a regular query",
-        "\"query (\"column name\" in (coordinate) (coordinate) (coordinate))\" "
+        "\"query (\"column name\" inside (coordinate) (coordinate) (coordinate)...)\" "
         "- look for coordinates inside a polygon of at least 3 points ",
+        "\"query (\"column name\" tags \"tag1\" \"tag2\"...)\" - look for tags in a column",
         "\"exit\" - end program",
         "\"quit\" - end program",
         "\"help\" - print help message"};

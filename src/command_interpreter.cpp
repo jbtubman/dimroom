@@ -34,6 +34,14 @@ using std::pair;
 
 enum class query_error { bad_format };
 
+// Query pattern that matches comparison operators.
+// If no operator is found, assume =.
+// TODO: incorporate into queries.
+// Later, for ANDing, separate clauses with &&.
+const string new_query_pattern_s{
+    R"-(^\s*query\s*\(\s*"([^"]*)"\s+((tags|inside|=|!=|<|<=|>|>=)\s+)?(.*)\))-"};
+const regex new_query_pattern_rx{new_query_pattern_s};
+
 string row_to_string(const row& rw) {
     std::ostringstream sout{};
     bool first_column = true;
@@ -53,7 +61,7 @@ string row_to_string(const row& rw) {
 }
 
 const string points_in_query_s{
-    R"-(^\s*query\s*\(\s*"(.*)"\s+(?:(("(.*)")|(\((.*)\)))\s*)?\s*in\b\s*(.+))-"};
+    R"-(^\s*query\s*\(\s*"(.*)"\s+(?:(("(.*)")|(\((.*)\)))\s*)?\s*inside\b\s*(.+))-"};
 const regex points_in_query_rx{points_in_query_s};
 
 // m[1] = column name.
@@ -61,6 +69,22 @@ constexpr size_t points_in_query_column_name_idx{1};
 
 // m[2] = all the coordinates after the "in".
 constexpr size_t points_in_query_polygon_idx{7};
+
+query::comparison str_to_comparison(const string& ss) {
+    using qc = query::comparison;
+    const string s = to_lower(ss);
+
+    if (s == "=") return qc::equal_to;
+    if (s == "!=") return qc::not_equal_to;
+    if (s == ">") return qc::greater;
+    if (s == "<") return qc::less;
+    if (s == ">=") return qc::greater_equal;
+    if (s == "<=") return qc::less_equal;
+    if (s == "inside") return qc::inside;
+    if (s == "tags") return qc::tags;
+    if (s == "") return qc::equal_to;
+    return qc::invalid;
+}
 
 expected_polygon_t parse_points_in_query(const string& query_line) {
     smatch query_match;
@@ -137,12 +161,17 @@ void command_line::do_query(table& t, const string& query_line) {
         }
     } else {
         // m[1] is the column name.
+        // m[3] is the operator (may be empty).
         // m[4] is the query value.
-        regex_search(query_line, m, simple_query_rx);
+        regex_search(query_line, m, new_query_pattern_rx);
         if (m.empty()) {
             println(stderr, "could not parse query \"{}\"", query_line);
             return;
             // Will need to change this when handling more complex queries.
+        }
+        size_t i{0};
+        for (auto it = m.begin(); it != m.end(); ++it, ++i) {
+            println(stderr, "m[{}] = “{}”", i, m[i].str());
         }
 
         const string column_name = m[1].str();
@@ -150,8 +179,17 @@ void command_line::do_query(table& t, const string& query_line) {
         const string query_value_s =
             m[4].str().empty() ? m[5].str() : m[4].str();
 
+        auto op = m[3];
+        if (!op.str().empty()) {
+            println(stderr, "do_query: operator = “{}”", op.str());
+        } else {
+            println(stderr, "do_query: operator is empty");
+        }
+        const query::comparison comp = str_to_comparison(op.str());
+        println(stderr, "comp = {}", static_cast<unsigned int>(comp));
+
         ecdt col_type = t.column_type(column_name);
-        query q(t, column_name);
+        query q(t, column_name, comp);
         results = q.execute(query_value_s);
     }
 
