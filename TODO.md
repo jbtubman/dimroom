@@ -24,6 +24,9 @@ As of July 21, 2025:
 
 ## Things Remaining
 
+* Prevent crashes from occurring when the wrong data type is used in a query.
+* Implement numeric comparisons for greater and lesser, as well as for equals.
+* Allow searching for multiple tags at once.
 * Implement the ANDing of queries.
   * The internals of the queries use `std::ranges::views` for eventually
     implementing this efficiently.
