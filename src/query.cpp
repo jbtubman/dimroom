@@ -21,6 +21,13 @@ using std::string;
 using std::operator""s;
 using std::operator""sv;
 
+table::rows error_report(const string& col_name, const string& bad_input,
+                         e_cell_data_type expected_type) {
+    println(stderr, "Error: input {} for column {} was not of type {}",
+            bad_input, col_name, expected_type);
+    return table::rows{};
+}
+
 /// @brief Determine the query's type and dispatch it accordingly.
 /// @param query_value_s
 /// @return table::rows of information matching the query.
@@ -40,22 +47,33 @@ table::rows query::execute(const string& query_value_s) {
         if (query_value) {
             const bool query_b = *query_value;
             results = boolean_match(query_b);
+        } else {
+            results = error_report(column_name, query_value_s, ecdt::boolean);
         }
     } else if (col_type == ecdt::floating) {
         const auto query_value = s_to_floating(query_value_s);
         if (query_value) {
             const float query_f = *query_value;
             results = floating_match(query_f);
+        } else {
+            results = error_report(column_name, query_value_s, ecdt::floating);
         }
     } else if (col_type == ecdt::geo_coordinate) {
         const auto query_value = s_to_geo_coordinate(query_value_s);
         if (query_value) {
             const coordinate coord = *query_value;
             results = geo_coordinate_match(coord);
+        } else {
+            results =
+                error_report(column_name, query_value_s, ecdt::geo_coordinate);
         }
     } else if (col_type == ecdt::integer) {
-        const auto query_value = std::stoi(query_value_s);
-        results = integer_match(query_value);
+        try {
+            const auto query_value = std::stoi(query_value_s);
+            results = integer_match(query_value);
+        } catch (const std::exception& e) {
+            results = error_report(column_name, query_value_s, ecdt::integer);
+        }
     } else if (col_type == ecdt::tags) {
         results = tags_match(query_value_s);
     } else {

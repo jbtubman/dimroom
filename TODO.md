@@ -1,12 +1,12 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.8.
+This summarizes the state of things as of Version 2.9.
 
 Some work still remains.
 
 ## Things Completed
 
-As of July 21, 2025:
+As of July 22, 2025:
 
 * Reads in CSV file.
 * Parses the header and data rows.
@@ -21,10 +21,10 @@ As of July 21, 2025:
 * Tags queries work.
 * Renamed some classes and aliases to better match their real meaning.
 * Refactored query dispatching from command_interpreter class to query class.
+* No longer crashes if incorrect data types are used in queries.
 
 ## Things Remaining
 
-* Prevent crashes from occurring when the wrong data type is used in a query.
 * Implement numeric comparisons for greater and lesser, as well as for equals.
 * Allow searching for multiple tags at once.
 * Implement the ANDing of queries.
