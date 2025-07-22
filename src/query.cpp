@@ -2,10 +2,12 @@
 
 #include <algorithm>
 #include <expected>
+#include <functional>
 #include <optional>
 #include <ranges>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <variant>
 
 #include "contains.hpp"
@@ -20,6 +22,10 @@ namespace views = std::ranges::views;
 using std::string;
 using std::operator""s;
 using std::operator""sv;
+
+/// @brief Type of a function that allows comparison between two things.
+template <typename T>
+using comparison_fn_t = std::function<bool(T, T)>;
 
 table::rows error_report(const string& col_name, const string& bad_input,
                          e_cell_data_type expected_type) {
@@ -68,10 +74,10 @@ table::rows query::execute(const string& query_value_s) {
                 error_report(column_name, query_value_s, ecdt::geo_coordinate);
         }
     } else if (col_type == ecdt::integer) {
-        try {
-            const auto query_value = std::stoi(query_value_s);
-            results = integer_match(query_value);
-        } catch (const std::exception& e) {
+        const auto query_value = s_to_integer(query_value_s);
+        if (query_value) {
+            results = integer_match(*query_value);
+        } else {
             results = error_report(column_name, query_value_s, ecdt::integer);
         }
     } else if (col_type == ecdt::tags) {
@@ -90,17 +96,148 @@ table::rows query::execute(const string& query_value_s) {
     return results;
 }
 
+// General template for getting the comparison function.
+template <typename T>
+comparison_fn_t<T> get_comparison_function(query::comparison c) {
+    comparison_fn_t<T> result;
+    switch (c) {
+        case query::comparison::equal_to:
+            result = std::equal_to<T>{};
+            break;
+
+        case query::comparison::greater:
+            result = std::greater<T>{};
+            break;
+
+        case query::comparison::greater_equal:
+            result = std::greater_equal<T>{};
+            break;
+
+        case query::comparison::less:
+            result = std::less<T>{};
+            break;
+
+        case query::comparison::less_equal:
+            result = std::less_equal<T>{};
+            break;
+
+        case query::comparison::not_equal_to:
+            result = std::not_equal_to<T>{};
+            break;
+
+        default:
+            result = std::equal_to<T>{};
+            break;
+    }
+
+    return result;
+}
+
+// bool is a special case.
+// Assume false < true.
+// Assume nothing is greater than true.
+// Assume nothing is less than false.
+// Bool comparison functions are found in utility.hpp.
+template <>
+comparison_fn_t<bool> get_comparison_function<bool>(query::comparison c) {
+    comparison_fn_t<bool> result;
+    switch (c) {
+        case query::comparison::equal_to:
+            result = jt::bool_equal_to;
+            break;
+
+        case query::comparison::greater:
+            result = jt::bool_greater;
+            break;
+
+        case query::comparison::greater_equal:
+            result = jt::bool_greater_equal;
+            break;
+
+        case query::comparison::less:
+            result = jt::bool_less;
+            break;
+
+        case query::comparison::less_equal:
+            result = jt::bool_less_equal;
+            break;
+
+        case query::comparison::not_equal_to:
+            result = jt::bool_not_equal_to;
+            break;
+
+        default:
+            result = jt::bool_equal_to;
+            break;
+    }
+
+    return result;
+}
+
+// float is a special case.
+// Floating point numbers have to be compared for closeness, not equality.
+// They are considered close if they are within 0.00001 of each other.
+// close function is found in utility.hpp.
+template <>
+comparison_fn_t<float> get_comparison_function<float>(query::comparison c) {
+    comparison_fn_t<float> result;
+    switch (c) {
+        case query::comparison::equal_to:
+            result = [](float lhs, float rhs) -> bool {
+                return jt::close(lhs, rhs);
+            };
+            break;
+
+        case query::comparison::greater:
+            result = std::greater<float>{};
+            break;
+
+        case query::comparison::greater_equal:
+            result = [](float lhs, float rhs) -> bool {
+                return jt::close(lhs, rhs) || (lhs >= rhs);
+            };
+            break;
+
+        case query::comparison::less:
+            result = std::less<float>{};
+            break;
+
+        case query::comparison::less_equal:
+            result = [](float lhs, float rhs) -> bool {
+                return jt::close(lhs, rhs) || (lhs <= rhs);
+            };
+            break;
+
+        case query::comparison::not_equal_to:
+            result = [](float lhs, float rhs) -> bool {
+                return !close(lhs, rhs);
+            };
+            break;
+
+        default:
+            result = [](float lhs, float rhs) -> bool {
+                return jt::close(lhs, rhs);
+            };
+            break;
+    }
+
+    return result;
+}
+
 auto query::vw_string_match(const string& query_value,
                             ranges::ref_view<table::rows> targets) {
     const auto col_idx = t.index_for_column_name(column_name);
+    std::function<bool(string, string)> comparitor =
+        get_comparison_function<string>(comp);
 
-    auto result = targets | views::filter([&query_value, col_idx](auto dcs) {
-                      if (!col_idx) return false;
-                      const cell_value_type cvt = dcs[*col_idx].value;
-                      if (!cvt) return false;
-                      const string s = std::get<string>(*cvt);
-                      return (s == query_value);
-                  });
+    auto result =
+        targets | views::filter([&query_value, col_idx, comparitor](auto dcs) {
+            if (!col_idx) return false;
+            const cell_value_type cvt = dcs[*col_idx].value;
+            // Empty cells are treated as empty strings.
+            const string s = (cvt) ? std::get<string>(*cvt) : string{};
+            return comparitor(s, query_value);
+        });
 
     return result;
 }
@@ -108,49 +245,59 @@ auto query::vw_string_match(const string& query_value,
 auto query::vw_integer_match(int query_value,
                              ranges::ref_view<table::rows> targets) {
     const auto col_idx = t.index_for_column_name(column_name);
+    std::function<bool(int, int)> comparitor =
+        get_comparison_function<int>(comp);
+    auto this_comp = comp;
 
-    auto result =
-        targets | views::filter([query_value, col_idx](const row& rw) {
-            if (!col_idx) return false;
-            const cell_value_type& cvt = rw[*col_idx].value;
-            if (!cvt) {
-                return false;
-            }
-            const int i = std::get<int>(*cvt);
-            return (i == query_value);
-        });
+    auto result = targets | views::filter([query_value, col_idx, comparitor,
+                                           this_comp](const row& rw) {
+                      if (!col_idx) return false;
+                      const cell_value_type& cvt = rw[*col_idx].value;
+                      if (!cvt) {
+                          // An empty cell is not equal to anything.
+                          return (this_comp == comparison::not_equal_to);
+                      }
+                      const int i = std::get<int>(*cvt);
+                      return comparitor(i, query_value);
+                  });
     return result;
 }
 
 auto query::vw_boolean_match(bool query_value,
                              ranges::ref_view<table::rows> targets) {
     const auto col_idx = t.index_for_column_name(column_name);
+    std::function<bool(bool, bool)> comparitor =
+        get_comparison_function<bool>(comp);
 
-    auto result =
-        targets | views::filter([query_value, col_idx](const row& rw) {
-            if (!col_idx) return false;
-            const cell_value_type cvt = rw[*col_idx].value;
-            if (!cvt) {
-                return !query_value;
-            }
-            const int i = std::get<bool>(*cvt);
-            return (i == query_value);
-        });
+    auto result = targets | views::filter([query_value, col_idx,
+                                           comparitor](const row& rw) {
+                      if (!col_idx) return false;
+                      const cell_value_type cvt = rw[*col_idx].value;
+                      // Assume that a cell with no value counts as false.
+                      const bool b = (cvt) ? std::get<bool>(*cvt) : false;
+                      return comparitor(b, query_value);
+                  });
     return result;
 }
 
 auto query::vw_floating_match(float query_value,
                               ranges::ref_view<table::rows> targets) {
     const auto col_idx = t.index_for_column_name(column_name);
+    std::function<bool(float, float)> comparitor =
+        get_comparison_function<float>(comp);
+    auto this_comp = comp;
 
-    auto result =
-        targets | views::filter([query_value, col_idx](const row& rw) {
-            if (!col_idx) return false;
-            const cell_value_type cvt = rw[*col_idx].value;
-            if (!cvt) return false;
-            const float f = std::get<float>(*cvt);
-            return close(f, query_value);
-        });
+    auto result = targets | views::filter([query_value, col_idx, comparitor,
+                                           this_comp](const row& rw) {
+                      if (!col_idx) return false;
+                      const cell_value_type cvt = rw[*col_idx].value;
+                      if (!cvt) {
+                          // An empty cell is not equal to anything.
+                          return (this_comp == comparison::not_equal_to);
+                      }
+                      const float f = std::get<float>(*cvt);
+                      return comparitor(f, query_value);
+                  });
     return result;
 }
 
@@ -208,7 +355,9 @@ table::rows query::string_match(const string& query_value,
     table::rows targets = rows_to_query ? *rows_to_query : t.rows_;
     auto targets_vw = views::all(targets);
 
-    auto string_match_view = vw_string_match(query_value, targets_vw);
+    const string q_value = dequote(query_value);
+
+    auto string_match_view = vw_string_match(q_value, targets_vw);
     auto result = ranges::to<table::rows>(string_match_view);
     return result;
 }

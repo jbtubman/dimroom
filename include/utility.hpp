@@ -6,6 +6,7 @@
 #include <expected>
 #include <iterator>
 #include <ranges>
+#include <regex>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -23,10 +24,7 @@ enum class convert_error {
     tags_convert_error
 };
 
-enum class runtime_error {
-    file_not_found,
-    column_name_not_found
-};
+enum class runtime_error { file_not_found, column_name_not_found };
 
 using std::pair;
 using std::vector;
@@ -222,11 +220,27 @@ inline void trim(string& line) {
     line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
 }
 
+/// @brief Gets rid of opening and closing double quotes.
+/// @param s
+/// @return A copy of s without the quotes.
+[[nodiscard]] inline string dequote(const string& s) {
+    std::regex quoted_rx{R"-(^"([^"]*)"$)-"};
+    std::smatch m;
+    return std::regex_match(s, m, quoted_rx) ? m[1].str() : string{s};
+}
+
+/// @brief Alters a string to remove opening and closing quotes.
+/// @param s
+inline void dequote(string& s) {
+    const string& ss = s;
+    s = dequote(ss);
+}
+
 inline std::expected<bool, convert_error> s_to_boolean(const string& s) {
     string ss{s};
     std::transform(ss.begin(), ss.end(), ss.begin(), ::tolower);
-    if (ss == "yes" || ss == "true") return true;
-    if (ss == "no" || ss == "false") return false;
+    if (ss == "yes" || ss == "true" || ss == "1") return true;
+    if (ss == "no" || ss == "false" || ss == "0") return false;
     return std::unexpected(convert_error::boolean_convert_error);
 }
 
@@ -263,25 +277,35 @@ template <class String>
     return tmp;
 }
 
-// /**
-//  * @brief Returns a container containing the `index`th element of each
-//  vector.
-//  * @attention Does not work yet!
-//  */
-// template <typename T, HasPushBack Container = vector<T>,
-//           HasForwardIterator SuperContainer = vector<Container>>
-// Container slice(SuperContainer&& vec_of_vec, size_t index) {
-//     auto super_container = std::forward<SuperContainer>(vec_of_vec);
-//     return ranges::fold_left(super_container, Container({}),
-//                              [&index](Container&& acc, Container&& val) {
-//                                  auto the_acc = std::forward<Container>(acc);
-//                                  auto the_val = std::forward<Container>(val);
-//                                  return shove_back(the_acc, the_val[index]);
-//                              });
-// }
+// Comparisons for bool. Assume false < true;
+// This implies that nothing is less than false or greater than true.
 
-// template<IsRandomAccess Container...>
-// Container superslice(Container ...c) {
+inline constexpr bool bool_equal_to(bool lhs, bool rhs) {
+    return lhs == rhs;
+}
+
+inline constexpr bool bool_not_equal_to(bool lhs, bool rhs) {
+    return lhs != rhs;
+}
+
+inline constexpr bool bool_less(bool lhs, bool rhs) {
+    if (lhs == false && rhs == true) {
+        return true;
+    }
+    return false;
+}
+
+inline constexpr bool bool_less_equal(bool lhs, bool rhs) {
+    return bool_less(lhs, rhs) || bool_equal_to(lhs, rhs);
+}
+
+inline constexpr bool bool_greater(bool lhs, bool rhs) {
+    return !bool_less_equal(lhs, rhs);
+}
+
+inline constexpr bool bool_greater_equal(bool lhs, bool rhs) {
+    return !bool_less(lhs, rhs);
+}
 
 // }
 

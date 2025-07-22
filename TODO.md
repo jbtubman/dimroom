@@ -1,6 +1,6 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.9.
+This summarizes the state of things as of Version 2.10.
 
 Some work still remains.
 
@@ -22,10 +22,11 @@ As of July 22, 2025:
 * Renamed some classes and aliases to better match their real meaning.
 * Refactored query dispatching from command_interpreter class to query class.
 * No longer crashes if incorrect data types are used in queries.
+* Implemented numeric comparisons for `=`, `!=`, `>`, `>=`, `<`, and `<=`.
+* Updated help text.
 
 ## Things Remaining
 
-* Implement numeric comparisons for greater and lesser, as well as for equals.
 * Allow searching for multiple tags at once.
 * Implement the ANDing of queries.
   * The internals of the queries use `std::ranges::views` for eventually

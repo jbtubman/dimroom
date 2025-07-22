@@ -169,10 +169,6 @@ void command_line::do_query(table& t, const string& query_line) {
             return;
             // Will need to change this when handling more complex queries.
         }
-        size_t i{0};
-        for (auto it = m.begin(); it != m.end(); ++it, ++i) {
-            println(stderr, "m[{}] = “{}”", i, m[i].str());
-        }
 
         const string column_name = m[1].str();
         // m[4] for string values; m[5] for integers.
@@ -180,13 +176,7 @@ void command_line::do_query(table& t, const string& query_line) {
             m[4].str().empty() ? m[5].str() : m[4].str();
 
         auto op = m[3];
-        if (!op.str().empty()) {
-            println(stderr, "do_query: operator = “{}”", op.str());
-        } else {
-            println(stderr, "do_query: operator is empty");
-        }
         const query::comparison comp = str_to_comparison(op.str());
-        println(stderr, "comp = {}", static_cast<unsigned int>(comp));
 
         ecdt col_type = t.column_type(column_name);
         query q(t, column_name, comp);

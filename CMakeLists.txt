@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 4.0)
 
-project(dimroom VERSION 2.9)
+project(dimroom VERSION 2.10)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(dimroom_VERSION_MAJOR 2)
-set(dimroom_VERSION_MINOR 9)
+set(dimroom_VERSION_MINOR 10)
 
 configure_file(${PROJECT_SOURCE_DIR}/include/dimroomConfig.h.in ${PROJECT_SOURCE_DIR}/include/dimroomConfig.h)
 
