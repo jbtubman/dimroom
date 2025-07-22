@@ -18,9 +18,6 @@ namespace ranges = std::ranges;
 
 struct MyFixture : general_fixture {
     // ...
-    // TODO: This does not appear to be used anywhere but the first test case.
-    const string coords_foo =
-        R"-(^\s*query\s*\()\s*"([^"]+)"\s+"("(-?\d{1,2}(\.\d{1,5})?),\s*(-?\d{1,3}(\.\d{1,5})?)"|"((\d{1,2})°\s+(\d{1,2})'\s+([NS]))\s*,\s*((\d{1,3})°\s+(\d{1,2})'\s+([EW]))")"\s*$)-";
 };
 }  // namespace
 
@@ -34,12 +31,6 @@ using std::regex_match;
 using std::smatch;
 using std::string;
 
-TEST_CASE(MyFixture, FOO) {
-    SECTION("coords_foo") {
-        println(stderr, "\n\n???????coords_foo:\n\n{}\n\n??????\n",
-                MyFixture::coords_foo);
-    }
-}
 
 TEST_CASE(MyFixture, StartEndCoordinates) {
     SECTION("starts with") {
@@ -82,15 +73,6 @@ TEST_CASE(MyFixture, ParseLatitude) {
             std::regex_match(lat, m, jt::decimal_lat_rx);
 
         CHECK_FALSE(should_be_false);
-
-        if (!should_be_false) {
-            std::cerr << std::flush;
-            int i = 0;
-            for (auto s = m.begin(); s != m.end(); ++s) {
-                cerr << "m[" << i++ << "] = \"" << *s << "\"" << endl;
-                std::cerr << std::flush;
-            }
-        }
     }
 
     SECTION("north dms") {
@@ -187,29 +169,11 @@ TEST_CASE(MyFixture, Coordinate) {
             jt::parse_decimal_coordinate(MyFixture::valid_decimal_coord);
         CHECK_TRUE(result);
 
-        cerr << flush << "jt::decimal_coordinate_s =" << endl
-             << jt::decimal_coordinate_s << endl
-             << flush;
-
         const auto lat = std::get<0>(*result);
         CHECK_TRUE(close(lat, MyFixture::valid_decimal_lat));
-        if (!close(lat, MyFixture::valid_decimal_lat)) {
-            cerr << flush << endl << "lat = " << lat << endl;
-            cerr << "MyFixture::valid_decimal_lat = "
-                 << MyFixture::valid_decimal_lat << endl
-                 << endl
-                 << flush;
-        }
 
         const auto lng = std::get<1>(*result);
         CHECK_TRUE(close(lng, MyFixture::valid_decimal_long));
-        if (!close(lng, MyFixture::valid_decimal_long)) {
-            cerr << flush << "lng = " << lng << endl;
-            cerr << "MyFixture::valid_decimal_long = "
-                 << MyFixture::valid_decimal_long << endl
-                 << endl
-                 << flush;
-        }
     }
 
     SECTION("parse invalid decimal coordinates") {

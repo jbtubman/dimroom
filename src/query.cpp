@@ -112,7 +112,9 @@ auto query::vw_boolean_match(bool query_value,
         targets | views::filter([query_value, col_idx](const row& rw) {
             if (!col_idx) return false;
             const cell_value_type cvt = rw[*col_idx].value;
-            if (!cvt) return false;
+            if (!cvt) {
+                return !query_value;
+            }
             const int i = std::get<bool>(*cvt);
             return (i == query_value);
         });

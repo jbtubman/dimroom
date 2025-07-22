@@ -102,6 +102,26 @@ floating point values.
     Japan.jpeg,jpeg,26.4,600,800,600,(36° 00' N, 138° 00' E),,Asia,,,,"""Mt Fuji, Fog"""
     1 rows found
 
+    dimroom-2.8> query ("Favorite" false)
+    Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
+    Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk"""
+    Japan.jpeg,jpeg,26.4,600,800,600,(36° 00' N, 138° 00' E),,Asia,,,,"""Mt Fuji, Fog"""
+    Edmonton.jpg,jpeg,5.6,900,400,72,(53.55014, -113.46871),,,,,Oilers,
+    3 rows found
+
+    dimroom-2.8> query ("Favorite" No)
+    Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
+    Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk"""
+    Japan.jpeg,jpeg,26.4,600,800,600,(36° 00' N, 138° 00' E),,Asia,,,,"""Mt Fuji, Fog"""
+    Edmonton.jpg,jpeg,5.6,900,400,72,(53.55014, -113.46871),,,,,Oilers,
+    3 rows found
+
+    dimroom-2.8> query ("Favorite" yes)
+    Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
+    Italy.png,png,10.5,600,800,96,,1,Europe,,,,
+    Calgary.tif,tiff,30.6,600,800,1200,(51.05011, -114.08529),1,,32,Y,Flames,"""Urban, Dusk"""
+    2 rows found
+
 If you search for a non-existent column, you will be told that it is not present.
 
     dimroom-2.8> query ("Flavour" "Lemon")
