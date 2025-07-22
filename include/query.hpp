@@ -40,6 +40,17 @@ namespace views = std::ranges::views;
 /// @brief Query interface.
 class query {
    public:
+    enum class comparison {
+        invalid,
+        equal_to,
+        not_equal_to,
+        greater,
+        less,
+        greater_equal,
+        less_equal,
+        inside,
+        tags
+    };
     table& t;
     string column_name{};
 
