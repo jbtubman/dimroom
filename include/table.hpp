@@ -30,6 +30,7 @@ namespace views = std::ranges::views;
 
 using std::operator""s;
 using std::operator""sv;
+using std::move;
 
 const bool has_enumerate_view =
 #if defined(__cpp_lib_ranges_enumerate)
@@ -92,9 +93,20 @@ class table {
                ranges::to<column_name_index_map_t>();
     }
 
+   private:
+    static auto make_ifstream(const string& filename) {
+        std::filesystem::path fsp{filename};
+        return std::ifstream(fsp);
+    }
+
    public:
+    /// @brief Default constructor.
     table() {};
 
+    /// @brief Constructor taking headers, rows, and a name.
+    /// @param hfs
+    /// @param rws
+    /// @param name
     table(const parser::header_fields& hfs, const rows& rws,
           string name = "unnamed"s)
         : header_fields_{hfs},
@@ -107,19 +119,77 @@ class table {
                                   ranges::to<column_name_to_type_map_t>();
     }
 
+    /// @brief Constructor taking headers and data.
+    /// @param h_and_d
     table(const parser::header_and_data& h_and_d)
         : table(h_and_d.header_fields_,
                 data_cell::make_all_data_cells(h_and_d.get_data_fields())) {}
 
+    /// @brief Copy constructor.
+    /// @param other
+    table(const table& other)
+        : header_fields_{other.header_fields_},
+          rows_{other.rows_},
+          name{other.name},
+          column_name_index_map{other.column_name_index_map},
+          column_name_to_type_map{other.column_name_to_type_map} {}
+
+    /// @brief Special copy constructor that replaces the rows.
+    /// @param other_table
+    /// @param rows_subset
+    table(const table& other_table, const rows& rows_subset)
+        : header_fields_{other_table.header_fields_},
+          name{other_table.name},
+          column_name_index_map{other_table.column_name_index_map},
+          column_name_to_type_map{other_table.column_name_to_type_map},
+          rows_{rows_subset} {}
+
+    /// @brief Special copy constructor that replaces the optional rows.
+    /// @param other_table
+    /// @param rows_subset
+    table(const table& other_table, const opt_rows& rows_subset)
+        : header_fields_{other_table.header_fields_},
+          name{other_table.name},
+          column_name_index_map{other_table.column_name_index_map},
+          column_name_to_type_map{other_table.column_name_to_type_map},
+          rows_{rows_subset ? *rows_subset : other_table.rows_} {}
+
+    /// @brief Move constructor.
+    /// @param other
+    table(table&& other)
+        : header_fields_{std::move(other.header_fields_)},
+          rows_{std::move(other.rows_)},
+          name{std::move(other.name)},
+          column_name_index_map{std::move(other.column_name_index_map)},
+          column_name_to_type_map{std::move(other.column_name_to_type_map)} {}
+
+    /// @brief Special move constructor that replaces the rows.
+    /// @param other_table
+    /// @param rows_subset
+    table(table&& other_table, rows&& rows_subset)
+        : header_fields_{std::move(other_table.header_fields_)},
+          name{std::move(other_table.name)},
+          column_name_index_map{std::move(other_table.column_name_index_map)},
+          column_name_to_type_map{std::move(other_table.column_name_to_type_map)},
+          rows_{std::move(rows_subset)} {}
+
+    /// @brief Special move constructor that replaces the optional rows.
+    /// @param other_table
+    /// @param rows_subset
+    table(table&& other_table, opt_rows&& rows_subset)
+        : header_fields_{other_table.header_fields_},
+          name{other_table.name},
+          column_name_index_map{other_table.column_name_index_map},
+          column_name_to_type_map{other_table.column_name_to_type_map},
+          rows_{rows_subset ? std::move(*rows_subset) : std::move(other_table.rows_)} {}
+
+    /// @brief Constructor that reads input values from a stream.
+    /// @param instream
     table(std::ifstream& instream) : table(parse_lines(instream)) {}
 
-   private:
-    static auto make_ifstream(const string& filename) {
-        std::filesystem::path fsp{filename};
-        return std::ifstream(fsp);
-    }
-
-   public:
+    /// @brief Static factory function for tables from files.
+    /// @param filename
+    /// @return
     static table make_table_from_file(const string& filename) {
         std::filesystem::path fp{filename};
         auto afp = std::filesystem::absolute(fp);
@@ -130,20 +200,6 @@ class table {
         return result;
     }
 
-    table(const table& other)
-        : header_fields_{other.header_fields_},
-          rows_{other.rows_},
-          name{other.name},
-          column_name_index_map{other.column_name_index_map},
-          column_name_to_type_map{other.column_name_to_type_map} {}
-
-    table(table&& other)
-        : header_fields_{std::move(other.header_fields_)},
-          rows_{std::move(other.rows_)},
-          name{std::move(other.name)},
-          column_name_index_map{std::move(other.column_name_index_map)},
-          column_name_to_type_map{std::move(other.column_name_to_type_map)} {}
-
     void swap(table& other) {
         using std::swap;
         swap(header_fields_, other.header_fields_);
@@ -153,12 +209,18 @@ class table {
         swap(column_name_to_type_map, other.column_name_to_type_map);
     }
 
+    /// @brief Copy assignment.
+    /// @param other
+    /// @return
     table& operator=(const table& other) {
         table tmp{other};
         swap(tmp);
         return *this;
     }
 
+    /// @brief Move assignment.
+    /// @param other
+    /// @return
     table& operator=(table&& other) {
         table tmp{std::move(other)};
         swap(tmp);

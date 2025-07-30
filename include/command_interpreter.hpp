@@ -12,6 +12,7 @@
 #include <ranges>
 #include <regex>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "command_handler.hpp"
@@ -33,6 +34,7 @@ using std::cout;
 using std::endl;
 using std::flush;
 using std::getline;
+using std::pair;
 using std::print;
 using std::println;
 using std::regex;
@@ -59,9 +61,11 @@ class command_line {
         "\"describe\" - describe the table",
         "\"query (\"column name\" operator value)\" - do a regular query",
         "\tavailable operators are = != > >= < <=",
-        "\"query (\"column name\" inside (coordinate) (coordinate) (coordinate)...)\" "
+        "\"query (\"column name\" inside (coordinate) (coordinate) "
+        "(coordinate)...)\" "
         "- look for coordinates inside a polygon of at least 3 points ",
-        "\"query (\"column name\" tags \"tag1\" \"tag2\"...)\" - look for tags in a column",
+        "\"query (\"column name\" tags \"tag1\" \"tag2\"...)\" - look for tags "
+        "in a column",
         "\"exit\" - end program",
         "\"quit\" - end program",
         "\"help\" - print help message"};
@@ -92,6 +96,26 @@ class command_line {
 
     void do_query(table& t, const string& query_line);
 
+    /// @brief Experimental attempt to parse ANDed queries.
+    /// @param t
+    /// @param query_line
+    void new_do_query(table& t, const string& query_line);
+
+    table _do_one_query(const table& t, const string& query_clause);
+
+    table _do_one_query(table&& t, const string& query_clause);
+
+    /// @brief Take a query string and a set of current results and run the
+    /// query on those results.
+    /// @param t
+    /// @param query_clause
+    /// @param rows_to_query
+    /// @return
+    template <class TABLE>
+    table do_one_query(TABLE&& t, const string& query_clause) {
+        return _do_one_query(std::forward<TABLE>(t), query_clause);
+    }
+
     int read_eval_print(table& table_to_use) {
         println(stderr, "Welcome to DimRoom");
         println(stderr, "Enter the command \"help\" for help.");
@@ -111,7 +135,8 @@ class command_line {
             } else if (regex_match(input_line, describe_cmd_rx)) {
                 describe_table(table_to_use);
             } else if (regex_match(input_line, query_cmd_rx)) {
-                do_query(table_to_use, input_line);
+                // do_query(table_to_use, input_line);
+                new_do_query(table_to_use, input_line);
             }
 
             else {
@@ -125,6 +150,10 @@ class command_line {
         println("Goodbye.");
         return EXIT_SUCCESS;
     }
+
+    jt::table::rows parse_non_poly_query(table& t, const string& query_line);
+
+    jt::table::rows parse_queries(table& t, const vector<string>& query_lines);
 };
 
 expected_polygon_t parse_points_in_query(const string& query_line);
