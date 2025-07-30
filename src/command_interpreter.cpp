@@ -145,13 +145,13 @@ expected_polygon_t parse_points_in_query(const string& query_line) {
 /// @brief Parses ANDed queries.
 /// @param t
 /// @param query_line
-void command_line::new_do_query(table& t, const string& query_line) {
+void command_line::do_query(table& t, const string& query_line) {
     // First, match the long query pattern to get everything after the word
     // "query".
     smatch m;
     bool success = regex_match(query_line, m, long_query_pattern_rx);
     if (!success) {
-        println(stderr, "new_do_query: could not match long_query_pattern_rx");
+        println(stderr, "do_query: could not match long_query_pattern_rx");
         return;
     }
 
@@ -188,61 +188,6 @@ void command_line::new_do_query(table& t, const string& query_line) {
     println("{}", column_names_output);
 
     const auto& results = query_table.rows_;
-
-    // print the rows.
-    bool first_row = true;
-    ranges::for_each(results, [](const row& rw) {
-        string row_str = row_to_string(rw);
-        println("{}", row_str);
-    });
-    println("{} rows found", results.size());
-}
-
-void command_line::do_query(table& t, const string& query_line) {
-    // Most of this stuff should be refactored elsewhere.
-    const string query_prefix_s{R"-(^\s*query\s*)-"};
-
-    // Used regex101.com to work this out.
-    // https://regex101.com/r/5AgL7v/1
-    // This one matches queries like:
-    // query ("Filename" "Iceland.png")
-    //  query ("Type"  "png")
-    // query("Image X" 600)
-    regex simple_query_rx{
-        R"-(^\s*query\s*\(\s*"(.*)"\s+(("(.*)")|(.*))\s*\)\s*$)-",
-        regex::icase};
-
-    table::rows results{};
-
-    smatch m;
-
-    const bool possible_points_in_polygon_query =
-        regex_match(query_line, m, points_in_query_rx);
-    // If it is a point-in-polygon query, handle it specially.
-    if (possible_points_in_polygon_query) {
-        const auto possible_polygon = parse_points_in_query(query_line);
-        if (possible_polygon) {
-            const auto& polygn = *possible_polygon;
-            const string column_name = m[points_in_query_column_name_idx];
-            query q(t, column_name);
-            results = q.point_in_polygon_match(polygn);
-        }
-    } else {
-        results = parse_non_poly_query(t, query_line);
-    }
-
-    // Print out the column names.
-    bool first_field = true;
-    string column_names_output{};
-    ranges::for_each(t.header_fields_, [&first_field, &column_names_output](
-                                           const parser::header_field& hf) {
-        if (!first_field) {
-            column_names_output.append(",");
-        }
-        first_field = false;
-        column_names_output.append(hf.name);
-    });
-    println("{}", column_names_output);
 
     // print the rows.
     bool first_row = true;

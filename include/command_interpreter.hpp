@@ -94,12 +94,10 @@ class command_line {
         });
     }
 
-    void do_query(table& t, const string& query_line);
-
     /// @brief Experimental attempt to parse ANDed queries.
     /// @param t
     /// @param query_line
-    void new_do_query(table& t, const string& query_line);
+    void do_query(table& t, const string& query_line);
 
     table _do_one_query(const table& t, const string& query_clause);
 
@@ -135,7 +133,7 @@ class command_line {
             } else if (regex_match(input_line, describe_cmd_rx)) {
                 describe_table(table_to_use);
             } else if (regex_match(input_line, query_cmd_rx)) {
-                new_do_query(table_to_use, input_line);
+                do_query(table_to_use, input_line);
             }
 
             else {
