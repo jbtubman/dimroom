@@ -135,7 +135,6 @@ class command_line {
             } else if (regex_match(input_line, describe_cmd_rx)) {
                 describe_table(table_to_use);
             } else if (regex_match(input_line, query_cmd_rx)) {
-                // do_query(table_to_use, input_line);
                 new_do_query(table_to_use, input_line);
             }
 
