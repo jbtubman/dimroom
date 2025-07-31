@@ -31,7 +31,6 @@ using std::regex_match;
 using std::smatch;
 using std::string;
 
-
 TEST_CASE(MyFixture, StartEndCoordinates) {
     SECTION("starts with") {
         CHECK_TRUE(starts_with_coordinate(MyFixture::dec_cord_start));
@@ -170,10 +169,10 @@ TEST_CASE(MyFixture, Coordinate) {
         CHECK_TRUE(result);
 
         const auto lat = std::get<0>(*result);
-        CHECK_TRUE(close(lat, MyFixture::valid_decimal_lat));
+        CHECK_TRUE(is_close(lat, MyFixture::valid_decimal_lat));
 
         const auto lng = std::get<1>(*result);
-        CHECK_TRUE(close(lng, MyFixture::valid_decimal_long));
+        CHECK_TRUE(is_close(lng, MyFixture::valid_decimal_long));
     }
 
     SECTION("parse invalid decimal coordinates") {
@@ -193,10 +192,10 @@ TEST_CASE(MyFixture, Coordinate) {
         CHECK_TRUE(result);
 
         const auto lat = std::get<0>(*result);
-        CHECK_TRUE(close(lat, MyFixture::valid_deg_min_lat));
+        CHECK_TRUE(is_close(lat, MyFixture::valid_deg_min_lat));
 
         const auto lng = std::get<1>(*result);
-        CHECK_TRUE(close(lng, MyFixture::valid_deg_min_long));
+        CHECK_TRUE(is_close(lng, MyFixture::valid_deg_min_long));
     }
 
     SECTION("decimal coordinates") {
@@ -245,8 +244,8 @@ TEST_CASE(MyFixture, Create) {
     SECTION("valid decimal coordinates") {
         auto coord = jt::make_coordinate(MyFixture::valid_decimal_coord);
         CHECK_TRUE(coord.coordinate_format == jt::coordinate::format::decimal);
-        CHECK_TRUE(close(coord.latitude, MyFixture::valid_decimal_lat));
-        CHECK_TRUE(close(coord.longitude, MyFixture::valid_decimal_long));
+        CHECK_TRUE(is_close(coord.latitude, MyFixture::valid_decimal_lat));
+        CHECK_TRUE(is_close(coord.longitude, MyFixture::valid_decimal_long));
         coord.coordinate_format = jt::coordinate::format::degrees_minutes;
     }
 
@@ -254,8 +253,8 @@ TEST_CASE(MyFixture, Create) {
         auto coord = jt::make_coordinate(MyFixture::valid_deg_min_coord);
         CHECK_TRUE(coord.coordinate_format ==
                    jt::coordinate::format::degrees_minutes);
-        CHECK_TRUE(close(coord.latitude, MyFixture::valid_deg_min_lat));
-        CHECK_TRUE(close(coord.longitude, MyFixture::valid_deg_min_long));
+        CHECK_TRUE(is_close(coord.latitude, MyFixture::valid_deg_min_lat));
+        CHECK_TRUE(is_close(coord.longitude, MyFixture::valid_deg_min_long));
     }
 }
 

@@ -52,103 +52,103 @@ namespace ranges = std::ranges;
 namespace views = std::views;
 
 TEST_CASE(MyFixture, CloseFloat) {
-    SECTION("close same float should work") {
+    SECTION("is_close same float should work") {
         const auto long_to_match_f = std::stof(MyFixture::long_to_match);
-        CHECK_TRUE(close(long_to_match_f, long_to_match_f));
+        CHECK_TRUE(is_close(long_to_match_f, long_to_match_f));
     }
 
-    SECTION("close near float below should work") {
+    SECTION("is_close near float below should work") {
         const auto long_to_match_f = std::stof(MyFixture::long_to_match);
         const auto long_close_below_f = std::stof(MyFixture::long_close_below);
-        CHECK_TRUE(close(long_to_match_f, long_close_below_f));
+        CHECK_TRUE(is_close(long_to_match_f, long_close_below_f));
     }
 
-    SECTION("close near float above should work") {
+    SECTION("is_close near float above should work") {
         const auto long_to_match_f = std::stof(MyFixture::long_to_match);
         const auto long_close_above_f = std::stof(MyFixture::long_close_above);
-        CHECK_TRUE(close(long_to_match_f, long_close_above_f));
+        CHECK_TRUE(is_close(long_to_match_f, long_close_above_f));
     }
 
-    SECTION("close not near float below should fail") {
+    SECTION("is_close not near float below should fail") {
         const auto long_to_match_f = std::stof(MyFixture::long_to_match);
         const auto long_below_should_fail_f =
             std::stof(MyFixture::long_below_should_fail);
-        CHECK_FALSE(close(long_to_match_f, long_below_should_fail_f));
+        CHECK_FALSE(is_close(long_to_match_f, long_below_should_fail_f));
     }
 
-    SECTION("close not near float above should fail") {
+    SECTION("is_close not near float above should fail") {
         const auto long_to_match_f = std::stof(MyFixture::long_to_match);
         const auto llong_above_should_fail_f =
             std::stof(MyFixture::long_above_should_fail);
-        CHECK_FALSE(close(long_to_match_f, llong_above_should_fail_f));
+        CHECK_FALSE(is_close(long_to_match_f, llong_above_should_fail_f));
     }
 }
 
 TEST_CASE(MyFixture, CloseDouble) {
-    SECTION("close same double should work") {
+    SECTION("is_close same double should work") {
         const auto long_to_match_d = std::stod(MyFixture::long_to_match);
-        CHECK_TRUE(close(long_to_match_d, long_to_match_d));
+        CHECK_TRUE(is_close(long_to_match_d, long_to_match_d));
     }
 
-    SECTION("close near double below should work") {
+    SECTION("is_close near double below should work") {
         const auto long_to_match_d = std::stod(MyFixture::long_to_match);
         const auto long_close_below_d = std::stod(MyFixture::long_close_below);
-        CHECK_TRUE(close(long_to_match_d, long_close_below_d));
+        CHECK_TRUE(is_close(long_to_match_d, long_close_below_d));
     }
 
-    SECTION("close near double above should work") {
+    SECTION("is_close near double above should work") {
         const auto long_to_match_d = std::stod(MyFixture::long_to_match);
         const auto long_close_above_d = std::stod(MyFixture::long_close_above);
-        CHECK_TRUE(close(long_to_match_d, long_close_above_d));
+        CHECK_TRUE(is_close(long_to_match_d, long_close_above_d));
     }
 
-    SECTION("close not near double below should fail") {
+    SECTION("is_close not near double below should fail") {
         const auto long_to_match_d = std::stod(MyFixture::long_to_match);
         const auto long_below_should_fail_d =
             std::stod(MyFixture::long_below_should_fail);
-        CHECK_FALSE(close(long_to_match_d, long_below_should_fail_d));
+        CHECK_FALSE(is_close(long_to_match_d, long_below_should_fail_d));
     }
 
-    SECTION("close not near double above should fail") {
+    SECTION("is_close not near double above should fail") {
         const auto long_to_match_d = std::stod(MyFixture::long_to_match);
         const auto long_above_should_fail_d =
             std::stod(MyFixture::long_above_should_fail);
-        CHECK_FALSE(close(long_to_match_d, long_above_should_fail_d));
+        CHECK_FALSE(is_close(long_to_match_d, long_above_should_fail_d));
     }
 }
 
 TEST_CASE(MyFixture, CloseLongDouble) {
-    SECTION("close same long double should work") {
+    SECTION("is_close same long double should work") {
         const auto long_to_match_ld = std::stold(MyFixture::long_to_match);
-        CHECK_TRUE(close(long_to_match_ld, long_to_match_ld));
+        CHECK_TRUE(is_close(long_to_match_ld, long_to_match_ld));
     }
 
-    SECTION("close near long double below should work") {
+    SECTION("is_close near long double below should work") {
         const auto long_to_match_ld = std::stold(MyFixture::long_to_match);
         const auto long_close_below_ld =
             std::stold(MyFixture::long_close_below);
-        CHECK_TRUE(close(long_to_match_ld, long_close_below_ld));
+        CHECK_TRUE(is_close(long_to_match_ld, long_close_below_ld));
     }
 
-    SECTION("close near long double above should work") {
+    SECTION("is_close near long double above should work") {
         const auto long_to_match_ld = std::stold(MyFixture::long_to_match);
         const auto long_close_above_ld =
             std::stold(MyFixture::long_close_above);
-        CHECK_TRUE(close(long_to_match_ld, long_close_above_ld));
+        CHECK_TRUE(is_close(long_to_match_ld, long_close_above_ld));
     }
 
-    SECTION("close not near long double below should fail") {
+    SECTION("is_close not near long double below should fail") {
         const auto long_to_match_ld = std::stold(MyFixture::long_to_match);
         const auto long_below_should_fail_ld =
             std::stold(MyFixture::long_below_should_fail);
-        CHECK_FALSE(close(long_to_match_ld, long_below_should_fail_ld));
+        CHECK_FALSE(is_close(long_to_match_ld, long_below_should_fail_ld));
     }
 
-    SECTION("close not near long double above should fail") {
+    SECTION("is_close not near long double above should fail") {
         const auto long_to_match_ld = std::stold(MyFixture::long_to_match);
         const auto long_above_should_fail_ld =
             std::stold(MyFixture::long_above_should_fail);
-        CHECK_FALSE(close(long_to_match_ld, long_above_should_fail_ld));
+        CHECK_FALSE(is_close(long_to_match_ld, long_above_should_fail_ld));
     }
 }
 

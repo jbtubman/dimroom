@@ -65,7 +65,7 @@ consteval long double epsilon<long double>() {
 /// @return bool
 template <std::floating_point T1, std::floating_point T2,
           typename CommonT = std::common_type_t<T1, T2>>
-constexpr bool close(T1 lhs, T2 rhs) {
+constexpr bool is_close(T1 lhs, T2 rhs) {
     const CommonT clhs{lhs};
     const CommonT crhs{rhs};
 

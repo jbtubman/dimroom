@@ -8,10 +8,10 @@
 #include <string_view>
 #include <vector>
 
-#include "cell_types.hpp"
-#include "parser.hpp"
 #include "CppUnitTestFramework.hpp"
+#include "cell_types.hpp"
 #include "general_fixture.hpp"
+#include "parser.hpp"
 
 namespace {
 using std::string;
@@ -87,7 +87,7 @@ TEST_CASE(MyFixture, MakeCellTypes) {
         CHECK_TRUE(result);
         using foo = decltype(*result);
         const float result_f = std::get<float>(*result);
-        CHECK_TRUE(close(result_f, 8.35));
+        CHECK_TRUE(is_close(result_f, 8.35));
     }
     // const data_field sample_integer_df{"800", ecdt::integer};
     SECTION("make_cell_value_type integer") {

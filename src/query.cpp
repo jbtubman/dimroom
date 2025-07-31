@@ -177,14 +177,14 @@ comparison_fn_t<bool> get_comparison_function<bool>(query::comparison c) {
 // float is a special case.
 // Floating point numbers have to be compared for closeness, not equality.
 // They are considered close if they are within 0.00001 of each other.
-// close function is found in utility.hpp.
+// is_close function is found in utility.hpp.
 template <>
 comparison_fn_t<float> get_comparison_function<float>(query::comparison c) {
     comparison_fn_t<float> result;
     switch (c) {
         case query::comparison::equal_to:
             result = [](float lhs, float rhs) -> bool {
-                return jt::close(lhs, rhs);
+                return jt::is_close(lhs, rhs);
             };
             break;
 
@@ -194,7 +194,7 @@ comparison_fn_t<float> get_comparison_function<float>(query::comparison c) {
 
         case query::comparison::greater_equal:
             result = [](float lhs, float rhs) -> bool {
-                return jt::close(lhs, rhs) || (lhs >= rhs);
+                return jt::is_close(lhs, rhs) || (lhs >= rhs);
             };
             break;
 
@@ -204,19 +204,19 @@ comparison_fn_t<float> get_comparison_function<float>(query::comparison c) {
 
         case query::comparison::less_equal:
             result = [](float lhs, float rhs) -> bool {
-                return jt::close(lhs, rhs) || (lhs <= rhs);
+                return jt::is_close(lhs, rhs) || (lhs <= rhs);
             };
             break;
 
         case query::comparison::not_equal_to:
             result = [](float lhs, float rhs) -> bool {
-                return !close(lhs, rhs);
+                return !is_close(lhs, rhs);
             };
             break;
 
         default:
             result = [](float lhs, float rhs) -> bool {
-                return jt::close(lhs, rhs);
+                return jt::is_close(lhs, rhs);
             };
             break;
     }
@@ -310,8 +310,8 @@ auto query::vw_geo_query_match(const coordinate& coord,
                       const cell_value_type cvt = rw[*col_idx].value;
                       if (!cvt) return false;
                       const coordinate cr = std::get<coordinate>(*cvt);
-                      return (close(cr.latitude, coord.latitude) &&
-                              close(cr.longitude, coord.longitude));
+                      return (is_close(cr.latitude, coord.latitude) &&
+                              is_close(cr.longitude, coord.longitude));
                   });
     return result;
 }
