@@ -1,4 +1,4 @@
-# DIMROOM (V2.11)
+# DIMROOM (V2.12)
 
 Jim Tubman
 June/July 2025
@@ -24,13 +24,13 @@ A greeting and the command prompt will appear.
 
     Welcome to DimRoom
     Enter the command "help" for help.
-    dimroom-2.11>
+    dimroom-2.12>
 
 ### Getting Help
 
 Very basic help is available.
 
-    dimroom-2.11> help
+    dimroom-2.12> help
     "describe" - describe the table
     "query ("column name" operator value)" - do a regular query
             available operators are = != > >= < <=
@@ -44,7 +44,7 @@ Very basic help is available.
 
 The _describe_ command provides information about the file that was read.
 
-    dimroom-2.11> describe
+    dimroom-2.12> describe
     Column Name: "Filename"; Column Type : "text"
     Column Name: "Type"; Column Type : "text"
     Column Name: "Image Size (MB)"; Column Type : "floating"
@@ -64,68 +64,78 @@ The _describe_ command provides information about the file that was read.
 Simple queries on single columns are support for text, integer, boolean, and
 floating point values.
 
-    dimroom-2.11> query ("Type" = "png")
+    dimroom-2.12> query ("Type" = "png")
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk"""
     Italy.png,png,10.5,600,800,96,,1,Europe,,,,
     2 rows found
 
-    dimroom-2.11> query ("Image Size (MB)" = 26.4)
+    dimroom-2.12> query ("Image Size (MB)" = 26.4)
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Japan.jpeg,jpeg,26.4,600,800,600,{ "coordinate" : { "value" : "36° 00' N, 138° 00' E", "format" : "dm" } },,Asia,,,,"""Mt Fuji, Fog"""
     1 rows found
 
-    dimroom-2.11> query ("Image Size (MB)" > 10.0)
+    dimroom-2.12> query ("Image Size (MB)" > 10.0)
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Italy.png,png,10.5,600,800,96,,1,Europe,,,,
     Japan.jpeg,jpeg,26.4,600,800,600,(36° 00' N, 138° 00' E),,Asia,,,,"""Mt Fuji, Fog"""
     Calgary.tif,tiff,30.6,600,800,1200,(51.05011, -114.08529),1,,32,Y,Flames,"""Urban, Dusk"""
     3 rows found
 
-    dimroom-2.11> query ("DPI" = 72)
+    dimroom-2.12> query ("DPI" = 72)
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk"""
     Edmonton.jpg,jpeg,5.6,900,400,72,{ "coordinate" : { "value" : "53.55014, -113.46871", "format" : "decimal" } },,,,,Oilers,
     2 rows found
 
-    dimroom-2.11> query ("(Center) Coordinate" = (36° 00' N, 138° 00' E))
+    dimroom-2.12> query ("(Center) Coordinate" = (36° 00' N, 138° 00' E))
     geo_query_match: coord = (36° 00' N, 138° 00' E)
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Japan.jpeg,jpeg,26.4,600,800,600,(36° 00' N, 138° 00' E),,Asia,,,,"""Mt Fuji, Fog"""
     1 rows found
 
-    dimroom-2.11> query ("(Center) Coordinate" inside (60.129, -120.010) (40.742, -120.948) (40.748, -100.867) (60.129, -100.867) )
+    dimroom-2.12> query ("(Center) Coordinate" inside (60.129, -120.010) (40.742, -120.948) (40.748, -100.867) (60.129, -100.867) )
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Calgary.tif,tiff,30.6,600,800,1200,(51.05011, -114.08529),1,,32,Y,Flames,"""Urban, Dusk"""
     Edmonton.jpg,jpeg,5.6,900,400,72,(53.55014, -113.46871),,,,,Oilers,
     2 rows found
 
-    dimroom-2.11> query ("User Tags" tags "Dusk")
+When searching for user tags, double quote marks are optional for single-word tags.
+
+    dimroom-2.12> query ("User Tags" tags "Dusk")
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk"""
     Calgary.tif,tiff,30.6,600,800,1200,(51.05011, -114.08529),1,,32,Y,Flames,"""Urban, Dusk"""
     2 rows found
 
-    dimroom-2.11> query ("User Tags" tags "Mt Fuji")
-    Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
-    Japan.jpeg,jpeg,26.4,600,800,600,(36° 00' N, 138° 00' E),,Asia,,,,"""Mt Fuji, Fog"""
-    1 rows found
+To search for multiple tags, separate the tags with a comma and a space.
+The results returned are all the rows that match _any_ tag.
 
-    dimroom-2.11> query ("Favorite" = false)
+    dimroom-2.12> query ("User Tags" tags "Mt Fuji", Dusk)
+    Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
+    Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk"""
+    Japan.jpeg,jpeg,26.4,600,800,600,(36° 00' N, 138° 00' E),,Asia,,,,"""Mt Fuji, Fog"""
+    Calgary.tif,tiff,30.6,600,800,1200,(51.05011, -114.08529),1,,32,Y,Flames,"""Urban, Dusk"""
+    3 rows found
+
+When searching for boolean values, `true` can be represented by `true`, `Yes`, `yes`, or `1`.
+`false` can be represented by `false`, `No`, `no`, or `0`.
+
+    dimroom-2.12> query ("Favorite" = false)
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk"""
     Japan.jpeg,jpeg,26.4,600,800,600,(36° 00' N, 138° 00' E),,Asia,,,,"""Mt Fuji, Fog"""
     Edmonton.jpg,jpeg,5.6,900,400,72,(53.55014, -113.46871),,,,,Oilers,
     3 rows found
 
-    dimroom-2.11> query ("Favorite" = No)
+    dimroom-2.12> query ("Favorite" = No)
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson, Volcano, Dusk"""
     Japan.jpeg,jpeg,26.4,600,800,600,(36° 00' N, 138° 00' E),,Asia,,,,"""Mt Fuji, Fog"""
     Edmonton.jpg,jpeg,5.6,900,400,72,(53.55014, -113.46871),,,,,Oilers,
     3 rows found
 
-    dimroom-2.11> query ("Favorite" = yes)
+    dimroom-2.12> query ("Favorite" = yes)
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Italy.png,png,10.5,600,800,96,,1,Europe,,,,
     Calgary.tif,tiff,30.6,600,800,1200,(51.05011, -114.08529),1,,32,Y,Flames,"""Urban, Dusk"""
@@ -133,14 +143,14 @@ floating point values.
 
 You can search by more than one criterion by inserting `&&` between the search clauses.
 
-    dimroom-2.11> query ("Image X" = 600) && ("Type" = png) && ("Continent" = "Europe")
+    dimroom-2.12> query ("Image X" = 600) && ("Type" = png) && ("Continent" = "Europe")
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     Italy.png,png,10.5,600,800,96,,1,Europe,,,,
     1 rows found
 
 If you search for a non-existent column, you will be told that it is not present.
 
-    dimroom-2.11> query ("Flavour" = "Lemon")
+    dimroom-2.12> query ("Flavour" = "Lemon")
     Column "Flavour" is not in this file.
     Use the "describe" command to see the column names and types.
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
@@ -148,15 +158,10 @@ If you search for a non-existent column, you will be told that it is not present
 
 If you search using a data type that is not appropriate for that column, you will get an error message.
 
-    dimroom-2.11> query ("Favorite" 300)
+    dimroom-2.12> query ("Favorite" 300)
     Error: input 300 for column Favorite was not of type "boolean"
     Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags
     0 rows found
-
-#### Unsupported Queries
-
-* **ANDing queries together.** Not yet available. (Internally, lazily evaluated STL range views are
-  used for future support of this feature).
 
 ### Ending the Program
 

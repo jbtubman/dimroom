@@ -438,9 +438,14 @@ table::rows query::geo_coordinate_match(const string& query_value,
 table::rows query::tags_match(const string& tags_string,
                               table::opt_rows rows_to_query) {
     // Assume the tags string has values separated by commas.
-    const auto tags =
+
+    const auto split_tags =
         tags_string | views::split(", "sv) | ranges::to<vector<string>>();
 
+    auto dequoter = [](auto&& s) { return dequote(s); };
+    const auto tags =
+        split_tags | views::transform(dequoter) | ranges::to<vector<string>>();
+    // TODO: figure out how to chain the split to the transform in one line.
     return tags_match(tags, rows_to_query);
 }
 

@@ -1,6 +1,6 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.11.
+This summarizes the state of things as of Version 2.12.
 
 Some work still remains.
 
@@ -24,9 +24,9 @@ As of July 31, 2025:
 * No longer crashes if incorrect data types are used in queries.
 * Implemented numeric comparisons for `=`, `!=`, `>`, `>=`, `<`, and `<=`.
 * Updated help text.
-* ANDed queries work. However, tag queries are broken.
+* ANDed queries work.
 
 ## Things Remaining
 
-* Allow searching for multiple tags at once.
-* Fix tag searching.
+* Improve documentation.
+* Improve test coverage.
