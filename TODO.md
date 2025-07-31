@@ -1,12 +1,12 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.10.
+This summarizes the state of things as of Version 2.11.
 
 Some work still remains.
 
 ## Things Completed
 
-As of July 22, 2025:
+As of July 31, 2025:
 
 * Reads in CSV file.
 * Parses the header and data rows.
@@ -24,10 +24,9 @@ As of July 22, 2025:
 * No longer crashes if incorrect data types are used in queries.
 * Implemented numeric comparisons for `=`, `!=`, `>`, `>=`, `<`, and `<=`.
 * Updated help text.
+* ANDed queries work. However, tag queries are broken.
 
 ## Things Remaining
 
 * Allow searching for multiple tags at once.
-* Implement the ANDing of queries.
-  * The internals of the queries use `std::ranges::views` for eventually
-    implementing this efficiently.
+* Fix tag searching.
