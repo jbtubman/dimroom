@@ -45,16 +45,18 @@ consteval float epsilon<float>() {
 
 template <>
 consteval double epsilon<double>() {
-    return (0.00002 - 0.00001);
+    // Had to adjust slightly for double.
+    return (0.0000201 - 0.00001);
 }
 
 template <>
 consteval long double epsilon<long double>() {
-    return (0.00002l - 0.00001l);
+    // Had to adjust slightly for long double.
+    return (0.0000201L - 0.00001L);
 }
 
 /// @brief Returns true if the difference between two floating point numbers is
-/// less than 0.00001.
+/// less than or equal to about 0.00001.
 /// @tparam CommonT
 /// @tparam T1
 /// @tparam T2
@@ -66,9 +68,8 @@ template <std::floating_point T1, std::floating_point T2,
 constexpr bool close(T1 lhs, T2 rhs) {
     const CommonT clhs{lhs};
     const CommonT crhs{rhs};
-    const CommonT cepsilon{epsilon<CommonT>()};
 
-    return (std::abs(clhs - crhs) < cepsilon);
+    return (std::abs(clhs - crhs) <= epsilon<CommonT>());
 }
 
 template <typename T1, typename T2 = T1>
@@ -280,9 +281,7 @@ template <class String>
 // Comparisons for bool. Assume false < true;
 // This implies that nothing is less than false or greater than true.
 
-inline constexpr bool bool_equal_to(bool lhs, bool rhs) {
-    return lhs == rhs;
-}
+inline constexpr bool bool_equal_to(bool lhs, bool rhs) { return lhs == rhs; }
 
 inline constexpr bool bool_not_equal_to(bool lhs, bool rhs) {
     return lhs != rhs;
