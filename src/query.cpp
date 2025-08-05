@@ -5,6 +5,7 @@
 #include <functional>
 #include <optional>
 #include <ranges>
+#include <regex>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -438,9 +439,13 @@ table::rows query::geo_coordinate_match(const string& query_value,
 table::rows query::tags_match(const string& tags_string,
                               table::opt_rows rows_to_query) {
     // Assume the tags string has values separated by commas.
+    // First, regularize the commas and spaces separating them.
+    const std::regex comma_spitter_rx{R"-(\s*,\s*)-"};
+    const string regularized =
+        std::regex_replace(tags_string, comma_spitter_rx, ", ");
 
     const auto split_tags =
-        tags_string | views::split(", "sv) | ranges::to<vector<string>>();
+        regularized | views::split(", "sv) | ranges::to<vector<string>>();
 
     auto dequoter = [](auto&& s) { return dequote(s); };
     const auto tags =
