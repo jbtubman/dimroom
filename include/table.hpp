@@ -3,6 +3,7 @@
 // holds the column and row information.
 
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <map>
 #include <optional>
@@ -84,7 +85,7 @@ class table {
     /// @brief Creates a map of column names to header index values.
     /// @param hfs
     /// @return
-    constexpr static column_name_index_map_t headers_to_column_name_index_map(
+    static column_name_index_map_t headers_to_column_name_index_map(
         parser::header_fields hfs) {
         auto hf_names = hfs | views::transform([](parser::header_field hf) {
                             return hf.name;
@@ -195,7 +196,8 @@ class table {
         auto afp = std::filesystem::absolute(fp);
         std::ifstream ifs{afp};
         table result(ifs);
-        const string table_name = afp.filename();
+        const string table_name = path_to_string(afp);
+        result.name = path_to_string(afp);
         result.name = table_name;
         return result;
     }
@@ -249,57 +251,57 @@ class table {
         return result;
     }
 
-    constexpr bool is_undetermined(const std::string& col_name) const {
+    bool is_undetermined(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
         return header_at_index(*idx).data_type ==
                e_cell_data_type::undetermined;
     }
 
-    constexpr bool is_invalid(const std::string& col_name) const {
+    bool is_invalid(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
         return header_at_index(*idx).data_type == e_cell_data_type::invalid;
     }
 
-    constexpr bool is_boolean(const std::string& col_name) const {
+    bool is_boolean(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
         return header_at_index(*idx).data_type == e_cell_data_type::boolean;
     }
 
-    constexpr bool is_floating(const std::string& col_name) const {
+    bool is_floating(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
         return header_at_index(*idx).data_type == e_cell_data_type::floating;
     }
 
-    constexpr bool is_integer(const std::string& col_name) const {
+    bool is_integer(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
         return header_at_index(*idx).data_type == e_cell_data_type::integer;
     }
 
-    constexpr bool is_text(const std::string& col_name) const {
+    bool is_text(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
         return header_at_index(*idx).data_type == e_cell_data_type::text;
     }
 
-    constexpr bool is_geo_coordinate(const std::string& col_name) const {
+    bool is_geo_coordinate(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
         return header_at_index(*idx).data_type ==
                e_cell_data_type::geo_coordinate;
     }
 
-    constexpr bool is_tags(const std::string& col_name) const {
+    bool is_tags(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
         return header_at_index(*idx).data_type == e_cell_data_type::tags;
     }
 
-    constexpr e_cell_data_type column_type(const std::string& col_name) const {
+    e_cell_data_type column_type(const std::string& col_name) const {
         using ecdt = e_cell_data_type;
 
         if (is_undetermined(col_name)) {

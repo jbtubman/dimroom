@@ -31,13 +31,13 @@ struct MyFixture : general_fixture {
     using ecdt_pair_t =
         cross_product_pair_t<e_cell_data_type, e_cell_data_type>;
 
-    static consteval cross_product_output_t<e_cell_data_type> all_cdt_combos() {
+    static /* consteval */ cross_product_output_t<e_cell_data_type> all_cdt_combos() {
         auto v1 = all_e_cell_data_types();
         auto v2 = all_e_cell_data_types();
         return cross_product<e_cell_data_type>(v1, v2);
     }
 
-    const vector<ecdt_pair_t> all_e_cell_data_type_combos = all_cdt_combos();
+    vector<ecdt_pair_t> all_e_cell_data_type_combos = all_cdt_combos();
 };
 }  // namespace
 

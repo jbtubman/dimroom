@@ -3,8 +3,11 @@
 #include <algorithm>
 #include <cctype>
 #include <concepts>
+#include <cstdlib>
 #include <expected>
+#include <filesystem>
 #include <iterator>
+#include <memory>
 #include <ranges>
 #include <regex>
 #include <string>
@@ -338,6 +341,26 @@ inline constexpr bool bool_greater(bool lhs, bool rhs) {
 
 inline constexpr bool bool_greater_equal(bool lhs, bool rhs) {
     return !bool_less(lhs, rhs);
+}
+
+inline string path_to_string(const std::filesystem::path& fsp) {
+#if _WIN64
+    // Calculating the length of the multibyte string
+    const size_t len = wcstombs(nullptr, fsp.c_str(), 0) + 1;
+        // Creating a buffer to hold the multibyte string
+    //char* buffer = new char[len];
+    auto buffer = std::make_unique<char[]>(len);
+
+    // Converting wstring to string
+    wcstombs(buffer.get(), fsp.c_str(), len);
+
+    // Creating std::string from char buffer()
+    string str(buffer.get());
+
+    return str;
+#else
+    return fsp.filename();
+#endif
 }
 
 // }

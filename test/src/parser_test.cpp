@@ -9,6 +9,7 @@
 #include <string_view>
 #include <tuple>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include "CppUnitTestFramework.hpp"
@@ -65,11 +66,12 @@ TEST_CASE(MyFixture, ParseHeader) {
         const string input = MyFixture::sample_header;
         const vector<string> expected = MyFixture::sample_header_fields;
         const parser::header_fields result = parser::parse_header(input);
+        using pair_type = std::pair<parser::header_field, string>;
 
         CHECK_TRUE(result.size() == expected.size());
 
         CHECK_TRUE(ranges::all_of(
-            ranges::zip_view(result, expected), [](auto r_e_pair) {
+            ranges::zip_view(result, expected), [](const pair_type& r_e_pair) {
                 return r_e_pair.first.name == r_e_pair.second;
             }));
 

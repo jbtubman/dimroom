@@ -31,8 +31,8 @@ using namespace std::string_literals;
 using std::operator""sv;
 using std::operator""s;
 
-constexpr string comma_substitute{"<<<COMMA>>>"};
-constexpr string tags_regex_s{R"("""(.*)(,.*)*""")"};
+const string comma_substitute{"<<<COMMA>>>"};
+const string tags_regex_s{R"("""(.*)(,.*)*""")"};
 static const regex tags_regex(tags_regex_s);
 
 // Does a first pass at breaking a row on the commas.
@@ -72,7 +72,7 @@ inline string combine_coordinate_fields(const vector<string>& ss) {
         });
 }
 
-inline constexpr bool is_coordinate_pair(string_view lhs, string_view rhs) {
+inline bool is_coordinate_pair(string_view lhs, string_view rhs) {
     return (starts_with_coordinate({lhs.cbegin(), lhs.cend()}) &&
             ends_with_coordinate({rhs.cbegin(), rhs.cend()}));
 }
