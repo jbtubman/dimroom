@@ -74,7 +74,7 @@ Makefile.in
 *.dll
 *.exe
 *.out
-./geologic
+./dimroom
 dimroom
 test/test
 test_dimroom
@@ -90,7 +90,7 @@ test_dimroom
 *.cache
 *.vscodeignore
 *.code-workspace
-/geologic
+/dimroom
 
 # ==================================================
 # 🔹 Package manager files (vcpkg, Conan)
