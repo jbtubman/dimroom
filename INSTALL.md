@@ -2,8 +2,11 @@
 
 ## Installation (Using CMAKE)
 
-Installing and running this package requires a C++ compiler, the Git version control system,
-and the CMake build tool.
+Installing and running this package requires:
+
+* a C++ compiler;
+* the [Git](https://git-scm.com/downloads) version control system; and
+* the [CMake](https://cmake.org/download/) build tool.
 
 Dimroom was originally built and tested on a Mac Studio (MacOS 15.5), using the Clang 17.0.0
 C++ compiler and VSCode. It does compile without error in that environment.
@@ -13,7 +16,7 @@ compiler for VSCode.
 
 ### Obtaining the Source Code
 
-The source code is available on GitHub. 
+The source code is available on GitHub.
 
 #### Mac OS
 
@@ -24,6 +27,8 @@ Clone `git@github.com:jbtubman/dimroom.git` into a directory.
     $ cd dimroom
 
 #### Windows
+
+The instructions for Windows must be done in a command window.
 
 Clone `git@github.com:jbtubman/dimroom.git` into a folder.
 
@@ -77,7 +82,7 @@ This will build the execuable file `dimroom.exe` in the `build\Debug` folder
 and the executable file `test_dimroom.exe` in the `build\test\Debug` folder.
 (You can also use `Release` instead of `Debug` if desired.)
 
-To run the tests, in the `dimroom/build` folder, enter the command:
+To run the tests, in the `dimroom\build` folder, enter the command:
 
     C:\Users\asmithee\src\dimroom\build> .\test\Debug\test_dimroom.exe
 

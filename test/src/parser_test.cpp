@@ -115,8 +115,6 @@ TEST_CASE(MyFixture, ParseFile) {
 
     SECTION("parse_lines from ifstream") {
         const string filename = MyFixture::csv_input_file;
-        // const string
-        // filename{"/Users/jbtubman/src/c++20/geologic/test/data/sample.csv"};
         CHECK_TRUE(std::filesystem::exists(filename));
         auto fp = std::filesystem::relative(filename);
         auto cp = std::filesystem::current_path();
