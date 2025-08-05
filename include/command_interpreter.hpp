@@ -44,7 +44,6 @@ namespace views = std::ranges::views;
 using expected_polygon_t = std::expected<polygon_t, convert_error>;
 
 class command_line {
-    // TODO.
    public:
     // This is intended to extract the name of the input CSV file from the
     // command line.

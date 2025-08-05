@@ -148,7 +148,7 @@ class columns {
         return *it;
     }
 
-    // TODO: Delete colummns.
+    // TODO: Delete columns.
 };
 
 }  // namespace jt

@@ -16,7 +16,6 @@
 #include <vector>
 
 #include "cell_types.hpp"
-#include "column.hpp"
 #include "coordinates.hpp"
 #include "parser.hpp"
 

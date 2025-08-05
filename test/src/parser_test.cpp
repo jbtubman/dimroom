@@ -11,11 +11,11 @@
 #include <type_traits>
 #include <vector>
 
+#include "CppUnitTestFramework.hpp"
 #include "cell_types.hpp"
+#include "general_fixture.hpp"
 #include "parse_utils.hpp"
 #include "parser_formatter.hpp"
-#include "CppUnitTestFramework.hpp"
-#include "general_fixture.hpp"
 
 namespace {
 using std::string;
@@ -26,26 +26,6 @@ namespace views = std::views;
 using std::operator""s;
 
 struct MyFixture : general_fixture {
-    //...
-
-    // TODO: move column-related stuff to the column tests.
-    const vector<column> sample_cols = {column("Filename", 0),
-                                        column("Type", 1),
-                                        column("Image Size (MB)", 2),
-                                        column("Image X", 3),
-                                        column("Image Y", 4),
-                                        column("DPI", 5),
-                                        column("(Center) Coordinate", 6),
-                                        column("Favorite", 7),
-                                        column("Continent", 8),
-                                        column("Bit color", 9),
-                                        column("Alpha", 10),
-                                        column("Hockey Team", 11),
-                                        column("User Tags", 12)};
-    using cols_view_t = decltype(views::all(sample_cols));
-    cols_view_t sample_cols_view = views::all(sample_cols);
-    const columns sample_columns{sample_cols_view};
-
     using ecdt = e_cell_data_type;
     // const string sample_row_0 =
     //     R"(Iceland.png,png,8.35,600,800,72,,,,,,Team Iceland,"""Johnson,

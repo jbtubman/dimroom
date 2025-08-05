@@ -85,12 +85,6 @@ const int long_dir{8};
 
 // decimal coordinates regexps.
 
-// TODO: Clean up the string and regex declarations.
-const string v2_decimal_coord_s{
-    R"-(((-?\d{1,2})(\.\d{1,5})?)\b(?![\d°'])\s*,\s*((-?\d{1,3})(\.\d{1,5})?))-"};
-const regex v2_decimal_coord_rx{v2_decimal_coord_s};
-
-///////////////////////////////////
 const string decimal_lat_s{R"-((-?\d{1,2}(\.\d{1,5})?)\s*,)-"};
 const regex decimal_lat_rx{decimal_lat_s};
 
@@ -122,17 +116,6 @@ const regex csv_decimal_coordinate_rx{csv_decimal_coordinate_s};
 // Magic index numbers into decimal_coordinate_rx and csv_decimal_coordinate_rx.
 constexpr size_t lat_decimal_match_index{2};
 constexpr size_t long_decimal_match_index{4};
-
-// Both types of coordinates.
-const string coordinate_s("^" + deg_min_cooordinate_s + "|" +
-                          decimal_coordinate_s + "$");
-const regex coordinate_rx{coordinate_s};
-
-const string single_coordinate_s(R"-((?:\s*)()-" + deg_min_cooordinate_s + "|" +
-                                 decimal_coordinate_s + R"-()(?:\s*))-");
-
-const string multiple_coordinate_s(R"-((?:\s*)-" + single_coordinate_s +
-                                   R"-(\s*)+)-");
 
 // These constants give the index to the iterator in the formatter that
 // contains the subexpression for that part of the decimal coordinate.

@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "cell_types.hpp"
-#include "column.hpp"
 #include "parse_utils.hpp"
 #include "utility.hpp"
 
