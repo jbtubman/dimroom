@@ -1,12 +1,10 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.12.
-
-Some work still remains.
+This summarizes the state of things as of Version 2.13.
 
 ## Things Completed
 
-As of July 31, 2025:
+As of August 5, 2025:
 
 * Reads in CSV file.
 * Parses the header and data rows.
@@ -25,6 +23,7 @@ As of July 31, 2025:
 * Implemented numeric comparisons for `=`, `!=`, `>`, `>=`, `<`, and `<=`.
 * Updated help text.
 * ANDed queries work.
+* Code cleanup continuing.
 
 ## Things Remaining
 

@@ -63,7 +63,7 @@ class command_line {
         "\"query (\"column name\" inside (coordinate) (coordinate) "
         "(coordinate)...)\" "
         "- look for coordinates inside a polygon of at least 3 points ",
-        "\"query (\"column name\" tags \"tag1\" \"tag2\"...)\" - look for tags "
+        "\"query (\"column name\" tags \"tag1\", \"tag2\", ...)\" - look for tags "
         "in a column",
         "\"exit\" - end program",
         "\"quit\" - end program",
