@@ -169,8 +169,9 @@ TEST_CASE(MyFixture, Cell) {
     }
 
     SECTION("converting 1") {
-        const parser::header_and_data input =
-            parse_lines(MyFixture::sample_csv_rows);
+        auto input_ = parse_lines(MyFixture::sample_csv_rows);
+        CHECK_TRUE(input_.has_value());
+        const parser::header_and_data input = *input_;
         const auto all_data_cells =
             data_cell::make_all_data_cells(input.get_data_fields());
         const auto first_row_data_cells =
@@ -183,8 +184,9 @@ TEST_CASE(MyFixture, Cell) {
     }
 
     SECTION("converting Japan") {
-        const parser::header_and_data input =
-            parse_lines(MyFixture::sample_csv_rows);
+        auto input_ = parse_lines(MyFixture::sample_csv_rows);
+        CHECK_TRUE(input_.has_value());
+        const parser::header_and_data input = *input_;
         const auto all_data_cells =
             data_cell::make_all_data_cells(input.get_data_fields());
         // Japan is the third row.

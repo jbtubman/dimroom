@@ -14,7 +14,7 @@
 
 #include "CppUnitTestFramework.hpp"
 #include "cell_types.hpp"
-#include "general_fixture.hpp"
+#include "../include/general_fixture.hpp"
 #include "parse_utils.hpp"
 #include "parser_formatter.hpp"
 
@@ -65,17 +65,18 @@ TEST_CASE(MyFixture, ParseHeader) {
     SECTION("parse sample header") {
         const string input = MyFixture::sample_header;
         const vector<string> expected = MyFixture::sample_header_fields;
-        const parser::header_fields result = parser::parse_header(input);
+        const auto result = parser::parse_header(input);
+        CHECK_TRUE(result.has_value());
         using pair_type = std::pair<parser::header_field, string>;
 
-        CHECK_TRUE(result.size() == expected.size());
+        CHECK_TRUE(result->size() == expected.size());
 
         CHECK_TRUE(ranges::all_of(
-            ranges::zip_view(result, expected), [](const pair_type& r_e_pair) {
+            ranges::zip_view(*result, expected), [](const pair_type& r_e_pair) {
                 return r_e_pair.first.name == r_e_pair.second;
             }));
 
-        CHECK_TRUE(ranges::all_of(result, [](auto h) {
+        CHECK_TRUE(ranges::all_of(*result, [](auto h) {
             return h.data_type == e_cell_data_type::undetermined;
         }));
     }
@@ -92,7 +93,9 @@ TEST_CASE(MyFixture, ParseRow) {
                 return parser::data_field{pr.first, pr.second};
             }) |
             ranges::to<parser::data_fields>();
-        const parser::data_fields result = parser::parse_data_row(input);
+        auto result_ = parser::parse_data_row(input);
+        CHECK_TRUE(result_.has_value());
+        auto result = *result_;
         auto r_it = result.begin();
         auto e_it = expected.begin();
         size_t index = 0;
@@ -108,7 +111,9 @@ TEST_CASE(MyFixture, ParseRow) {
 TEST_CASE(MyFixture, ParseFile) {
     SECTION("parse_lines") {
         const vector<string> input = MyFixture::sample_csv_rows;
-        parser::header_and_data result = parse_lines(input);
+        auto result_ = parse_lines(input);
+        CHECK_TRUE(result_.has_value());
+        parser::header_and_data result = *result_;
         CHECK_TRUE(!result.header_fields_.empty());
         CHECK_TRUE(result.data_fields_vec_.size() == input.size() - 1);
     }
@@ -128,9 +133,12 @@ TEST_CASE(MyFixture, GetDataTypeForAllColumns) {
     SECTION("get_data_types_for_all_columns") {
         using ecdt = e_cell_data_type;
         const vector<string> input = MyFixture::sample_csv_rows;
-        const parser::header_and_data hd = parse_lines(input);
+        auto hd_ = parse_lines(input);
+        CHECK_TRUE(hd_.has_value());
+        const parser::header_and_data hd = *hd_;
         const parser::all_data_fields adf = hd.get_data_fields();
-        const auto result = parser::get_data_types_for_all_columns(adf);
+        const auto result_ = parser::get_data_types_for_all_columns(adf);
+        const auto result = *result_;
         const vector<e_cell_data_type> expected = {// Filename
                                                    ecdt::text,
                                                    // Type

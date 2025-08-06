@@ -26,7 +26,9 @@ TEST_CASE(MyFixture, Table) {
     SECTION("create from table") {
         filesystem::path p{MyFixture::csv_input_file};
         CHECK_TRUE(filesystem::exists(MyFixture::csv_input_file));
-        jt::table test_table =
+        auto test_table_ex =
             table::make_table_from_file(MyFixture::csv_input_file);
+        CHECK_TRUE(test_table_ex.has_value());
+        jt::table test_table = *test_table_ex;
     }
 }

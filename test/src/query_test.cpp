@@ -28,8 +28,9 @@ using std::string;
 
 TEST_CASE(MyFixture, TextTest) {
     SECTION("string search 1") {
-        const parser::header_and_data input =
-            parse_lines(MyFixture::sample_csv_rows);
+        auto input_ = parse_lines(MyFixture::sample_csv_rows);
+        CHECK_TRUE(input_.has_value());
+        const parser::header_and_data input = *input_;
         const auto all_data_cells =
             data_cell::make_all_data_cells(input.get_data_fields());
         table test_table(input.header_fields_, all_data_cells);
@@ -46,8 +47,9 @@ TEST_CASE(MyFixture, TextTest) {
     }
 
     SECTION("string search 2") {
-        const parser::header_and_data input =
-            parse_lines(MyFixture::sample_csv_rows);
+        auto input_ = parse_lines(MyFixture::sample_csv_rows);
+        CHECK_TRUE(input_.has_value());
+        const parser::header_and_data input = *input_;
         const auto all_data_cells =
             data_cell::make_all_data_cells(input.get_data_fields());
         table test_table(input.header_fields_, all_data_cells);
@@ -67,8 +69,9 @@ TEST_CASE(MyFixture, TextTest) {
     }
 
     SECTION("string search empty") {
-        const parser::header_and_data input =
-            parse_lines(MyFixture::sample_csv_rows);
+        auto input_ = parse_lines(MyFixture::sample_csv_rows);
+        CHECK_TRUE(input_.has_value());
+        const parser::header_and_data input = *input_;
         const auto all_data_cells =
             data_cell::make_all_data_cells(input.get_data_fields());
         table test_table(input.header_fields_, all_data_cells);
@@ -85,8 +88,9 @@ TEST_CASE(MyFixture, TextTest) {
 
 TEST_CASE(MyFixture, IntegerTest) {
     SECTION("integer search 0") {
-        const parser::header_and_data input =
-            parse_lines(MyFixture::sample_csv_rows);
+        auto input_ = parse_lines(MyFixture::sample_csv_rows);
+        CHECK_TRUE(input_.has_value());
+        const parser::header_and_data input = *input_;
         const auto all_data_cells =
             data_cell::make_all_data_cells(input.get_data_fields());
         table test_table(input.header_fields_, all_data_cells);
@@ -101,8 +105,9 @@ TEST_CASE(MyFixture, IntegerTest) {
     }
 
     SECTION("integer search 1") {
-        const parser::header_and_data input =
-            parse_lines(MyFixture::sample_csv_rows);
+        auto input_ = parse_lines(MyFixture::sample_csv_rows);
+        CHECK_TRUE(input_.has_value());
+        const parser::header_and_data input = *input_;
         const auto all_data_cells =
             data_cell::make_all_data_cells(input.get_data_fields());
         table test_table(input.header_fields_, all_data_cells);
@@ -117,8 +122,9 @@ TEST_CASE(MyFixture, IntegerTest) {
     }
 
     SECTION("integer search 4") {
-        const parser::header_and_data input =
-            parse_lines(MyFixture::sample_csv_rows);
+        auto input_ = parse_lines(MyFixture::sample_csv_rows);
+        CHECK_TRUE(input_.has_value());
+        const parser::header_and_data input = *input_;
         const auto all_data_cells =
             data_cell::make_all_data_cells(input.get_data_fields());
         table test_table(input.header_fields_, all_data_cells);

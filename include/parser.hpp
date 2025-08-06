@@ -1,5 +1,6 @@
 #pragma once
 
+#include <expected>
 #include <fstream>
 #include <iostream>
 #include <print>
@@ -8,18 +9,22 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include "cell_types.hpp"
+#include "jt_concepts.hpp"
 #include "parse_utils.hpp"
 #include "utility.hpp"
 
 namespace jt {
+using std::expected;
 using std::print;
 using std::println;
 using std::regex;
 using std::string;
 using std::string_view;
+using std::unexpected;
 using std::vector;
 namespace ranges = std::ranges;
 namespace views = std::views;
@@ -27,6 +32,13 @@ using namespace std::string_literals;
 
 class parser {
    public:
+    enum class error {
+        file_exist_error,
+        file_read_error,
+        file_empty_error,
+        file_parse_error
+    };
+
     class header_field {
        public:
         string name{};
@@ -135,13 +147,19 @@ class parser {
             return data_fields_vec_;
         }
         all_data_fields& get_data_fields() { return data_fields_vec_; }
+
+        void swap(header_and_data& other) {
+            using std::swap;
+            swap(header_fields_, other.header_fields_);
+            swap(data_fields_vec_, other.data_fields_vec_);
+        }
     };
 
     /// @brief determine the cell data types for all the columns.
     /// @param all_df vector of vector of data_field objects.
     /// @return vector of e_cell_data_type values.
-    static vector<e_cell_data_type> get_data_types_for_all_columns(
-        const parser::all_data_fields& all_df) {
+    static expected<vector<e_cell_data_type>, parser::error>
+    get_data_types_for_all_columns(const parser::all_data_fields& all_df) {
         const auto row_count = all_df.size();
         const auto column_count = row_count > 0 ? all_df[0].size() : 0;
         vector<e_cell_data_type> result{};
@@ -152,6 +170,9 @@ class parser {
             e_cell_data_type ecdt = e_cell_data_type::undetermined;
             for (size_t row_index = 0; row_index < row_count; ++row_index) {
                 const parser::data_fields the_row = all_df[row_index];
+                if (the_row.size() < (column_index + 1)) {
+                    return unexpected(parser::error::file_parse_error);
+                }
                 const parser::data_field the_data_field = the_row[column_index];
                 ecdt = ecdt || the_data_field.data_type;
             }
@@ -161,41 +182,52 @@ class parser {
         return result;
     }
 
-    static header_fields parse_header(const string& header) {
+    static expected<header_fields, parser::error> parse_header(
+        const string& header) {
         using std::operator""sv;
+        try {
+            header_fields result;
 
-        header_fields result;
+            string_view header_sv{header};
 
-        string_view header_sv{header};
+            auto split_header =
+                header_sv | views::split(","sv) | ranges::to<vector<string>>();
 
-        auto split_header =
-            header_sv | views::split(","sv) | ranges::to<vector<string>>();
+            ranges::transform(
+                split_header, std::back_inserter(result), [](auto header_text) {
+                    return header_field{header_text,
+                                        e_cell_data_type::undetermined};
+                });
 
-        ranges::transform(split_header, std::back_inserter(result),
-                          [](auto header_text) {
-                              return header_field{
-                                  header_text, e_cell_data_type::undetermined};
-                          });
-
-        return result;
+            return result;
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+        }
+        return unexpected(parser::error::file_parse_error);
     }
 
-    static data_fields parse_data_row(const string& data_row) {
-        data_fields result;
+    static expected<data_fields, parser::error> parse_data_row(
+        const string& data_row) {
+        try {
+            data_fields result;
 
-        auto split_row =
-            data_row | views::split(","s) | ranges::to<vector<string>>();
+            auto split_row =
+                data_row | views::split(","s) | ranges::to<vector<string>>();
 
-        auto fixed_split_row = fix_quoted_fields(split_row);
+            auto fixed_split_row = fix_quoted_fields(split_row);
 
-        auto foo = ranges::transform(
-            fixed_split_row, std::back_inserter(result),
-            [](auto data_row_text) {
-                return data_field{
-                    data_row_text,
-                    determine_data_field_e_cell_data_type(data_row_text)};
-            });
-        return result;
+            auto foo = ranges::transform(
+                fixed_split_row, std::back_inserter(result),
+                [](auto data_row_text) {
+                    return data_field{
+                        data_row_text,
+                        determine_data_field_e_cell_data_type(data_row_text)};
+                });
+            return result;
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+        }
+        return unexpected(parser::error::file_parse_error);
     }
 
     /**
@@ -230,31 +262,51 @@ static inline e_cell_data_type get_data_type_for_column(
         });
 }
 
-static inline parser::header_and_data __parse_lines(
+static inline expected<parser::header_and_data, parser::error> __parse_lines(
     const vector<string>& in_lines) {
     auto len = in_lines.size();
     auto first = in_lines.begin();
     auto last = in_lines.end();
     if (first == last) {
-        return parser::header_and_data();
+        return unexpected(parser::error::file_empty_error);
     }
 
     auto second = ++first;
     if (second == last) {
-        return parser::header_and_data(parser::parse_header(in_lines[0]));
+        auto h_and_d = parser::parse_header(in_lines[0]);
+        if (h_and_d) {
+            return parser::header_and_data(*h_and_d);
+        }
+        return unexpected(parser::error::file_parse_error);
     }
 
-    parser::header_and_data result(parser::parse_header(in_lines[0]));
+    auto h_and_d = parser::parse_header(in_lines[0]);
+    if (!h_and_d) {
+        return unexpected(parser::error::file_parse_error);
+    }
+    parser::header_and_data result(*h_and_d);
     auto data_range = ranges::subrange(second, last);
 
+    size_t data_col_idx = 1;
     for (auto current = second; current != last; ++current) {
         const string& s = *current;
-        parser::data_fields dfs = parser::parse_data_row(s);
-        result.data_fields_vec_.push_back(dfs);
+        auto dfs = parser::parse_data_row(s);
+        if (dfs) {
+            result.data_fields_vec_.push_back(*dfs);
+        } else {
+            println(stderr, "could not parse data at column {}", data_col_idx);
+            return unexpected(parser::error::file_parse_error);
+        }
+        ++data_col_idx;
     }
 
-    const vector<e_cell_data_type> cell_data_types_vec =
+    auto cell_data_types_vec_ex =
         parser::get_data_types_for_all_columns(result.data_fields_vec_);
+    if (!cell_data_types_vec_ex) {
+        return unexpected(cell_data_types_vec_ex.error());
+    }
+    const vector<e_cell_data_type> cell_data_types_vec =
+        *cell_data_types_vec_ex;
 
     // Add the cell data info to the headers.
     parser::header_fields& hfs = result.header_fields_;
@@ -272,37 +324,63 @@ static inline parser::header_and_data __parse_lines(
     return result;
 }
 
-template <typename VectorString>
-static parser::header_and_data parse_lines(VectorString&& input_lines) {
+template <class VectorString>
+    requires IsVector<VectorString>
+static expected<parser::header_and_data, parser::error> parse_lines(
+    const VectorString& input_lines) {
+    return __parse_lines(input_lines);
+}
+
+template <class VectorString>
+    requires IsVector<VectorString>
+static expected<parser::header_and_data, parser::error> parse_lines(
+    VectorString&& input_lines) {
     const VectorString in_lines{std::forward<VectorString>(input_lines)};
     return __parse_lines(in_lines);
 }
 
-static inline parser::header_and_data parse_lines(std::ifstream& instream) {
+static inline expected<parser::header_and_data, parser::error> parse_lines(
+    std::ifstream& instream) {
     if (!instream) {
-        return parser::header_and_data();
+        return unexpected(parser::error::file_empty_error);
     }
 
     string header_line;
     std::getline(instream, header_line);
     trim(header_line);
+    auto parsed_header_ex = parser::parse_header(header_line);
+    if (!parsed_header_ex) {
+        return unexpected(parser::error::file_parse_error);
+    }
+    parser::header_and_data result{*parsed_header_ex};
 
-    parser::header_and_data result(parser::parse_header(header_line));
-
+    // Is there anything in the file after the header?
     if (!instream) {
         println(stderr, "No data rows in file");
     }
 
     string data_line;
+    size_t data_row_idx = 1;
     while (std::getline(instream, data_line)) {
         trim(data_line);
 
-        parser::data_fields dfs = parser::parse_data_row(data_line);
-        result.data_fields_vec_.push_back(dfs);
+        auto dfs = parser::parse_data_row(data_line);
+        if (dfs) {
+            result.data_fields_vec_.push_back(*dfs);
+        } else {
+            println(stderr, "could not parse data in line {}", data_row_idx);
+            return unexpected(parser::error::file_parse_error);
+        }
+        ++data_row_idx;
     }
 
-    const vector<e_cell_data_type> cell_data_types_vec =
+    auto cell_data_types_vec_ex =
         parser::get_data_types_for_all_columns(result.data_fields_vec_);
+    if (!cell_data_types_vec_ex) {
+        return unexpected(cell_data_types_vec_ex.error());
+    }
+    const vector<e_cell_data_type> cell_data_types_vec =
+        *cell_data_types_vec_ex;
 
     // Add the cell data info to the headers.
     parser::header_fields& hfs = result.header_fields_;

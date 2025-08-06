@@ -3,6 +3,7 @@
 // holds the column and row information.
 
 #include <algorithm>
+#include <expected>
 #include <filesystem>
 #include <fstream>
 #include <map>
@@ -19,11 +20,13 @@
 #include "utility.hpp"
 
 namespace jt {
+using std::expected;
 using std::map;
 using std::pair;
 using std::set;
 using std::string;
 using std::string_view;
+using std::unexpected;
 using std::vector;
 using namespace std::string_literals;
 namespace ranges = std::ranges;
@@ -50,6 +53,14 @@ class table {
     using type_column_name_set = set<string>;
     using column_name_to_type_map_t =
         map<type_column_name_set, e_cell_data_type>;
+
+    /// @brief Errors that can happen when trying to create tables.
+    enum class error {
+        file_exist_error,
+        file_read_error,
+        file_empty_error,
+        file_parse_error
+    };
 
     /// @brief The names of the header fields and their e_cell_data_type values.
     parser::header_fields header_fields_{};
@@ -171,7 +182,8 @@ class table {
         : header_fields_{std::move(other_table.header_fields_)},
           name{std::move(other_table.name)},
           column_name_index_map{std::move(other_table.column_name_index_map)},
-          column_name_to_type_map{std::move(other_table.column_name_to_type_map)},
+          column_name_to_type_map{
+              std::move(other_table.column_name_to_type_map)},
           rows_{std::move(rows_subset)} {}
 
     /// @brief Special move constructor that replaces the optional rows.
@@ -182,20 +194,22 @@ class table {
           name{other_table.name},
           column_name_index_map{other_table.column_name_index_map},
           column_name_to_type_map{other_table.column_name_to_type_map},
-          rows_{rows_subset ? std::move(*rows_subset) : std::move(other_table.rows_)} {}
-
-    /// @brief Constructor that reads input values from a stream.
-    /// @param instream
-    table(std::ifstream& instream) : table(parse_lines(instream)) {}
+          rows_{rows_subset ? std::move(*rows_subset)
+                            : std::move(other_table.rows_)} {}
 
     /// @brief Static factory function for tables from files.
     /// @param filename
     /// @return
-    static table make_table_from_file(const string& filename) {
+    static expected<table, table::error> make_table_from_file(
+        const string& filename) {
         std::filesystem::path fp{filename};
         auto afp = std::filesystem::absolute(fp);
         std::ifstream ifs{afp};
-        table result(ifs);
+        auto parsed_lines = parse_lines(ifs);
+        if (!parsed_lines) {
+            return unexpected(table::error::file_parse_error);
+        }
+        table result{*parsed_lines};
         const string table_name = path_to_string(afp);
         result.name = path_to_string(afp);
         result.name = table_name;

@@ -7,6 +7,7 @@
 #include <deque>
 #include <forward_list>
 #include <list>
+#include <memory>
 #include <string>
 #include <tuple>
 #include <type_traits>
@@ -62,5 +63,22 @@ concept HasSize = requires(Collection c) { c.size(); };
 
 template <typename Collection, typename Iterator = Collection::iterator>
 concept HasRandomAccessIterator = std::random_access_iterator<Iterator>;
+
+namespace {
+template <typename T>
+struct _is_vector : std::false_type {};
+
+template <class T>
+struct _is_vector<std::vector<T, std::allocator<T>>> : std::true_type {};
+
+template <class T, class Allocator>
+struct _is_vector<std::vector<T, Allocator>> : std::true_type {};
+
+template <typename T>
+using _is_vector_v = _is_vector<T>::value;
+}  // namespace
+
+template <typename T>
+concept IsVector = _is_vector<T>::value;
 
 }  // namespace jt
