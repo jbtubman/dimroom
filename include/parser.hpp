@@ -65,8 +65,7 @@ class parser {
 
         void swap(header_field& other) {
             using std::swap;
-            header_field tmp{other};
-            swap(name, tmp.name);
+            swap(name, other.name);
             swap(data_type, other.data_type);
         }
 
