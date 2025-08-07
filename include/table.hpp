@@ -134,7 +134,7 @@ class table {
     /// @brief Constructor taking headers and data.
     /// @param h_and_d
     table(const parser::header_and_data& h_and_d)
-        : table(h_and_d.header_fields_,
+        : table(h_and_d.get_header_fields(),
                 data_cell::make_all_data_cells(h_and_d.get_data_fields())) {}
 
     /// @brief Copy constructor.

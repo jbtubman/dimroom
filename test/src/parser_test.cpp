@@ -12,9 +12,9 @@
 #include <utility>
 #include <vector>
 
+#include "../include/general_fixture.hpp"
 #include "CppUnitTestFramework.hpp"
 #include "cell_types.hpp"
-#include "../include/general_fixture.hpp"
 #include "parse_utils.hpp"
 #include "parser_formatter.hpp"
 
@@ -114,8 +114,8 @@ TEST_CASE(MyFixture, ParseFile) {
         auto result_ = parse_lines(input);
         CHECK_TRUE(result_.has_value());
         parser::header_and_data result = *result_;
-        CHECK_TRUE(!result.header_fields_.empty());
-        CHECK_TRUE(result.data_fields_vec_.size() == input.size() - 1);
+        CHECK_TRUE(!result.get_header_fields().empty());
+        CHECK_TRUE(result.get_data_fields().size() == input.size() - 1);
     }
 
     SECTION("parse_lines from ifstream") {
@@ -137,7 +137,7 @@ TEST_CASE(MyFixture, GetDataTypeForAllColumns) {
         CHECK_TRUE(hd_.has_value());
         const parser::header_and_data hd = *hd_;
         const parser::all_data_fields adf = hd.get_data_fields();
-        const auto result_ = parser::get_data_types_for_all_columns(adf);
+        const auto result_ = parser::get_data_types_for_all_columns(hd);
         const auto result = *result_;
         const vector<e_cell_data_type> expected = {// Filename
                                                    ecdt::text,
