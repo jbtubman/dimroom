@@ -76,7 +76,7 @@ inline std::ostream& operator<<(std::ostream& os,
 #pragma region header_fields
 
 template <>
-struct std::formatter<jt::parser::header_fields, char> {
+struct std::formatter<jt::parser::header_fields_t, char> {
     bool long_format = false;
 
     template <class ParseContext>
@@ -99,7 +99,7 @@ struct std::formatter<jt::parser::header_fields, char> {
     }
 
     template <class FmtContext>
-    FmtContext::iterator format(jt::parser::header_fields hfs,
+    FmtContext::iterator format(jt::parser::header_fields_t hfs,
                                 FmtContext& ctx) const {
         std::ostringstream out;
         const bool lfmt = long_format;
@@ -126,7 +126,7 @@ struct std::formatter<jt::parser::header_fields, char> {
 
 namespace std {
 inline std::ostream& operator<<(std::ostream& os,
-                                const jt::parser::header_fields& hfs) {
+                                const jt::parser::header_fields_t& hfs) {
     os << std::format("{}", hfs);
     return os;
 }
@@ -192,7 +192,7 @@ inline std::ostream& operator<<(std::ostream& os,
 #pragma region data_fields
 
 template <>
-struct std::formatter<jt::parser::data_fields, char> {
+struct std::formatter<jt::parser::data_fields_t, char> {
     bool long_format = false;
 
     template <class ParseContext>
@@ -215,7 +215,7 @@ struct std::formatter<jt::parser::data_fields, char> {
     }
 
     template <class FmtContext>
-    FmtContext::iterator format(jt::parser::data_fields dfs,
+    FmtContext::iterator format(jt::parser::data_fields_t dfs,
                                 FmtContext& ctx) const {
         std::ostringstream out;
         out << "{ ";
@@ -243,7 +243,7 @@ struct std::formatter<jt::parser::data_fields, char> {
 
 namespace std {
 inline std::ostream& operator<<(std::ostream& os,
-                                const jt::parser::data_fields& dfs) {
+                                const jt::parser::data_fields_t& dfs) {
     os << std::format("{}", dfs);
     return os;
 }

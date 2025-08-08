@@ -22,21 +22,23 @@ int main(int argc, char** argv) {
     command_line cl;
 
     vector<string> argv_sv(argv, argv + argc);
-    auto filename = cl.get_csv_filename(argc, argv_sv);
-    if (filename) {
-        println(stderr, "filename: \"{}\"", *filename);
-        command_handler ch;
-        auto t = ch.read_csv_file(*filename);
-        if (t) {
-            return cl.read_eval_print(*t);
-        } else {
-            println(stderr, "could not read CSV input file \"{}\"", *filename);
-            return EXIT_FAILURE;
-        }
-    } else {
-        println(stderr,
-                "{}: please specify a CSV filename (like ../test/data/sample.csv)",
-                argv_sv[0]);
+    auto filename_exp = cl.get_csv_filename(argc, argv_sv);
+    if (!filename_exp) {
+        println(
+            stderr,
+            "{}: please specify a CSV filename (like ../test/data/sample.csv)",
+            argv_sv[0]);
         return EXIT_FAILURE;
     }
+
+    auto filename = *filename_exp;
+    command_handler ch;
+    auto table_exp = ch.read_csv_file(filename);
+    if (!table_exp) {
+        println(stderr, "could not read CSV input file \"{}\"", filename);
+        return EXIT_FAILURE;
+    }
+
+    table tbl = *table_exp;
+    return cl.read_eval_print(tbl);
 }

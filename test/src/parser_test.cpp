@@ -86,13 +86,13 @@ TEST_CASE(MyFixture, ParseRow) {
     SECTION("parse_data_row") {
         using str_cell_pair = std::pair<string, e_cell_data_type>;
         const string input = MyFixture::sample_row_0;
-        const auto expected =
+        auto expected =
             ranges::zip_view(MyFixture::sample_row_texts_0,
                              MyFixture::sample_row_types_0) |
             views::transform([](std::pair<string, e_cell_data_type> pr) {
                 return parser::data_field{pr.first, pr.second};
             }) |
-            ranges::to<parser::data_fields>();
+            ranges::to<parser::data_fields_t>();
         auto result_ = parser::parse_data_row(input);
         CHECK_TRUE(result_.has_value());
         auto result = *result_;
@@ -114,8 +114,8 @@ TEST_CASE(MyFixture, ParseFile) {
         auto result_ = parse_lines(input);
         CHECK_TRUE(result_.has_value());
         parser::header_and_data result = *result_;
-        CHECK_TRUE(!result.hd_header_fields.empty());
-        CHECK_TRUE(result.hd_data_fields.size() == input.size() - 1);
+        CHECK_TRUE(!result.header_fields.empty());
+        CHECK_TRUE(result.all_data_fields.size() == input.size() - 1);
     }
 
     SECTION("parse_lines from ifstream") {
@@ -136,8 +136,8 @@ TEST_CASE(MyFixture, GetDataTypeForAllColumns) {
         auto hd_ = parse_lines(input);
         CHECK_TRUE(hd_.has_value());
         const parser::header_and_data hd = *hd_;
-        const parser::all_data_fields adf = hd.hd_data_fields;
-        const auto result_ = parser::get_data_types_for_all_columns(hd);
+        const parser::all_data_fields_t adf = hd.all_data_fields;
+        const auto result_ = parser::deduce_data_types_for_all_columns(hd);
         const auto result = *result_;
         const vector<e_cell_data_type> expected = {// Filename
                                                    ecdt::text,

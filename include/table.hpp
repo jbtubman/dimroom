@@ -63,7 +63,7 @@ class table {
     };
 
     /// @brief The names of the header fields and their e_cell_data_type values.
-    parser::header_fields header_fields_{};
+    parser::header_fields_t header_fields_{};
 
     /// @brief vector of rows of cells.
     rows rows_{};
@@ -97,7 +97,7 @@ class table {
     /// @param hfs
     /// @return
     static column_name_index_map_t headers_to_column_name_index_map(
-        parser::header_fields hfs) {
+        parser::header_fields_t hfs) {
         auto hf_names = hfs | views::transform([](parser::header_field hf) {
                             return hf.text;
                         });
@@ -119,7 +119,7 @@ class table {
     /// @param hfs
     /// @param rws
     /// @param name
-    table(const parser::header_fields& hfs, const rows& rws,
+    table(const parser::header_fields_t& hfs, const rows& rws,
           string name = "unnamed"s)
         : header_fields_{hfs},
           rows_{rws},
@@ -134,8 +134,8 @@ class table {
     /// @brief Constructor taking headers and data.
     /// @param h_and_d
     table(const parser::header_and_data& h_and_d)
-        : table(h_and_d.hd_header_fields,
-                data_cell::make_all_data_cells(h_and_d.hd_data_fields)) {}
+        : table(h_and_d.header_fields,
+                data_cell::make_all_data_cells(h_and_d.all_data_fields)) {}
 
     /// @brief Copy constructor.
     /// @param other
