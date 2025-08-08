@@ -43,12 +43,6 @@ enum class e_cell_data_type : size_t {
     SENTINEL
 };
 
-inline void swap(e_cell_data_type& lhs, e_cell_data_type& rhs) {
-    e_cell_data_type tmp = lhs;
-    lhs = rhs;
-    rhs = tmp;
-}
-
 inline constexpr vector<e_cell_data_type> all_e_cell_data_types() {
     return {e_cell_data_type::undetermined,   e_cell_data_type::invalid,
             e_cell_data_type::floating,       e_cell_data_type::boolean,
@@ -91,7 +85,6 @@ constexpr inline e_cell_data_type operator||(e_cell_data_type lhs,
     // that not all paths return a value.
     return e_cell_data_type::invalid;
 }
-
 
 /// @brief Variant containing all the possible data_cell data value types.
 using cell_value_types =
@@ -159,6 +152,14 @@ inline bool operator==(const cell_value_type& lhs, const cell_value_type& rhs) {
 }
 
 }  // namespace jt
+
+namespace std {
+inline void swap(jt::e_cell_data_type& lhs, jt::e_cell_data_type& rhs) {
+    jt::e_cell_data_type tmp{lhs};
+    lhs = rhs;
+    rhs = tmp;
+}
+}  // namespace std
 
 #define CELL_TYPES_INCLUDE_FORMATTER
 
