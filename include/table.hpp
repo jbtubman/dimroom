@@ -47,8 +47,6 @@ class table {
    public:
     using rows = vector<row>;
     using opt_rows = std::optional<rows>;
-    // TODO: We have another class for representing columns. Use it instead?
-    using cell_column = vector<data_cell>;
     using column_name_index_map_t = map<string, size_t>;
     using type_column_name_set = set<string>;
     using column_name_to_type_map_t =
@@ -349,14 +347,6 @@ class table {
 
     row& get_data_row(size_t row_idx) { return rows_[row_idx]; }
 
-    cell_column get_data_column(size_t column_idx) {
-        return ranges::fold_left(rows_, cell_column{},
-                                 [&column_idx](cell_column acc, row& rw) {
-                                     acc.push_back(rw[column_idx]);
-                                     return acc;
-                                 });
-    }
-
     e_cell_data_type get_column_data_type(size_t column_idx) {
         return header_at_index(column_idx).data_type;
     }
@@ -374,10 +364,6 @@ class table {
         return targets;
     }
 };
-
-static inline table::cell_column get_data_column(table& t, size_t column_idx) {
-    return t.get_data_column(column_idx);
-}
 
 }  // namespace jt
 
