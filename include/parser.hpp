@@ -26,15 +26,22 @@ using std::println;
 using std::regex;
 using std::string;
 using std::string_view;
+using std::tie;
 using std::unexpected;
 using std::vector;
 namespace ranges = std::ranges;
 namespace views = std::views;
 using namespace std::string_literals;
 
-/// @brief Parses the CSV files.
+/// @brief Parses the CSV files. The parser has no internal state; it is used
+/// via static functions.
 class parser {
    public:
+    // parsers are neither created nor destroyed. (Nor are they eternal.)
+    parser() = delete;
+    ~parser() = delete;
+
+    /// @brief the kinds of errors that can occur whilst parsing.
     enum class error {
         file_exist_error,
         file_read_error,
@@ -42,88 +49,52 @@ class parser {
         file_parse_error
     };
 
-    /// @brief Represents the first line of the CSV file. Column names and
-    /// types.
-    class header_field {
+   private:
+    /// @brief Base class for the header and data row classes.
+    template <class Derived>
+    class _csv_field {
        public:
-        string name{};
-        e_cell_data_type data_type{e_cell_data_type::undetermined};
+        /// @brief Used to distinguish the derived types.
+        using derived_type = Derived;
 
-        bool operator==(const header_field& other) const {
-            return data_type == other.data_type && name == other.name;
-        }
-
-        header_field() {}
-
-        header_field(const string& nm, e_cell_data_type e)
-            : name{nm}, data_type{e} {}
-
-        header_field(string&& nm, e_cell_data_type e)
-            : name{std::move(nm)}, data_type{e} {}
-
-        header_field(const header_field& other)
-            : name{other.name}, data_type{other.data_type} {}
-
-        header_field(header_field&& other)
-            : name{std::move(other.name)},
-              data_type{std::move(other.data_type)} {}
-
-        void swap(header_field& other) {
-            using std::swap;
-            swap(name, other.name);
-            swap(data_type, other.data_type);
-        }
-
-        header_field& operator=(const header_field& other) {
-            header_field tmp{other};
-            swap(tmp);
-            return *this;
-        }
-
-        header_field& operator=(header_field&& other) {
-            header_field tmp{std::move(other)};
-            swap(tmp);
-            return *this;
-        }
-    };
-
-    using header_fields = vector<header_field>;
-
-    /// A data field represents a single field read from a data row of a CSV
-    /// file. It does not have the actual parsed value (int, geo-coordinate,
-    /// whatever.)
-    /// This is the same as header_field, except how we refer to the string!
-    class data_field {
-       public:
         string text{""};
         e_cell_data_type data_type{e_cell_data_type::undetermined};
 
-        bool operator==(const data_field& other) const {
-            return data_type == other.data_type && text == other.text;
+        bool operator==(const _csv_field& other) const {
+            return tie(data_type, text) == tie(other.data_type, other.text);
         }
 
-        data_field(const string& s, e_cell_data_type ecdt)
-            : text{s}, data_type{ecdt} {}
-        data_field(const data_field& other)
+        _csv_field() {}
+
+        _csv_field(const string& nm, e_cell_data_type e)
+            : text{nm}, data_type{e} {}
+
+        _csv_field(string&& nm, e_cell_data_type e)
+            : text{std::move(nm)}, data_type{e} {}
+
+        // TODO: change copy and move constructors and swap and assignment to
+        // use the derived class.
+        _csv_field(const _csv_field& other)
             : text{other.text}, data_type{other.data_type} {}
-        data_field(data_field&& other)
+
+        _csv_field(_csv_field&& other)
             : text{std::move(other.text)},
               data_type{std::move(other.data_type)} {}
 
-        void swap(data_field& other) {
+        void swap(_csv_field& other) {
             using std::swap;
             swap(text, other.text);
             swap(data_type, other.data_type);
         }
 
-        data_field& operator=(const data_field& other) {
-            data_field tmp{other};
+        _csv_field& operator=(const _csv_field& other) {
+            _csv_field tmp{other};
             swap(tmp);
             return *this;
         }
 
-        data_field& operator=(data_field&& other) {
-            data_field tmp{std::move(other)};
+        _csv_field& operator=(_csv_field&& other) {
+            _csv_field tmp{std::move(other)};
             swap(tmp);
             return *this;
         }
@@ -133,54 +104,57 @@ class parser {
         e_cell_data_type& cell_data_type() { return data_type; }
     };
 
+   public:
+    /// @brief Represents the first line of the CSV file. In this case, the text
+    /// member represents the name of the CSV column.
+    class header_field : public _csv_field<header_field> {
+       public:
+        header_field(const string& nm, e_cell_data_type e)
+            : _csv_field(nm, e) {}
+    };
+
+    using header_fields = vector<header_field>;
+
+    /// A data field represents a single field read from a data row of a CSV
+    /// file. The text member is the string found between the delimiting commas.
+    class data_field : public _csv_field<data_field> {
+       public:
+        data_field(const string& s, e_cell_data_type ecdt)
+            : _csv_field(s, ecdt) {}
+    };
+
+    /// @brief The data fields in one row of the CSV file.
     using data_fields = vector<data_field>;
+
+    /// @brief The data fields in all the rows of the CSV file.
     using all_data_fields = vector<data_fields>;
 
     /// @brief Represents the entire CSV file while being parsed.
     class header_and_data {
-       private:
-        header_fields header_fields_{};
-        all_data_fields data_fields_vec_{};
-
        public:
+        header_fields hd_header_fields{};
+        all_data_fields hd_data_fields{};
+
         header_and_data() {}
 
-        header_and_data(const header_fields& hfs) : header_fields_{hfs} {}
+        header_and_data(const header_fields& hfs) : hd_header_fields{hfs} {}
 
-        header_and_data(header_fields&& hfs) : header_fields_{std::move(hfs)} {}
+        header_and_data(header_fields&& hfs)
+            : hd_header_fields{std::move(hfs)} {}
 
         template <class HeaderFields, class AllDataFields>
         header_and_data(HeaderFields&& hfs, AllDataFields&& adfs)
-            : header_fields_{std::forward<HeaderFields>(hfs)},
-              data_fields_vec_{std::forward<AllDataFields>(adfs)} {}
-
-        const header_fields& get_header_fields() const {
-            return header_fields_;
-        }
-
-        header_fields& get_header_fields() { return header_fields_; }
-
-        header_fields& set_header_fields(const header_fields& hf) {
-            header_fields_ = hf;
-            return header_fields_;
-        }
-
-        header_fields& set_header_fields(header_fields&& hf) {
-            header_fields_ = std::move(hf);
-            return header_fields_;
-        }
-
-        const all_data_fields& get_data_fields() const {
-            return data_fields_vec_;
-        }
-        all_data_fields& get_data_fields() { return data_fields_vec_; }
+            : hd_header_fields{std::forward<HeaderFields>(hfs)},
+              hd_data_fields{std::forward<AllDataFields>(adfs)} {}
 
         void swap(header_and_data& other) {
             using std::swap;
-            swap(header_fields_, other.header_fields_);
-            swap(data_fields_vec_, other.data_fields_vec_);
+            swap(hd_header_fields, other.hd_header_fields);
+            swap(hd_data_fields, other.hd_data_fields);
         }
     };
+
+    // Static functions.
 
     /// @brief Given a vector of data fields, return a vector of cell data types
     /// and the number of elements.
@@ -205,7 +179,7 @@ class parser {
     /// @return expected vector of e_cell_data_type values, or parser error.
     static expected<vector<e_cell_data_type>, parser::error>
     get_data_types_for_all_columns(const parser::header_and_data& h_and_d) {
-        const size_t header_column_count = h_and_d.get_header_fields().size();
+        const size_t header_column_count = h_and_d.hd_header_fields.size();
         // Initialize the result to have all undetermined cell types.
         vector<e_cell_data_type> data_types_for_all_columns(
             header_column_count, e_cell_data_type::undetermined);
@@ -219,7 +193,7 @@ class parser {
         // Data rows start at line 2 of the file (header is line 1).
         size_t data_row_line_idx{2};
 
-        for (const auto& row_data_fields : h_and_d.get_data_fields()) {
+        for (const auto& row_data_fields : h_and_d.hd_data_fields) {
             const auto row_data_types_and_counts =
                 get_row_data_types_and_counts(row_data_fields);
 
@@ -360,7 +334,7 @@ static inline expected<parser::header_and_data, parser::error> __parse_lines(
         const string& s = *current;
         auto dfs = parser::parse_data_row(s);
         if (dfs) {
-            result.get_data_fields().push_back(*dfs);
+            result.hd_data_fields.push_back(*dfs);
         } else {
             println(stderr, "could not parse data at column {}", data_col_idx);
             return unexpected(parser::error::file_parse_error);
@@ -377,15 +351,15 @@ static inline expected<parser::header_and_data, parser::error> __parse_lines(
         *cell_data_types_vec_ex;
 
     // Add the cell data info to the headers.
-    parser::header_fields& hfs = result.get_header_fields();
+    parser::header_fields& hfs = result.hd_header_fields;
     parser::header_fields hfs_result{};
 
     auto zipped = ranges::zip_view(hfs, cell_data_types_vec);
 
     for (std::pair<parser::header_field, e_cell_data_type> hf_cdt : zipped) {
-        hfs_result.emplace_back(hf_cdt.first.name, hf_cdt.second);
+        hfs_result.emplace_back(hf_cdt.first.text, hf_cdt.second);
     }
-    result.set_header_fields(hfs_result);
+    result.hd_header_fields = hfs_result;
 
     return result;
 }
@@ -432,7 +406,7 @@ static inline expected<parser::header_and_data, parser::error> parse_lines(
 
         auto dfs = parser::parse_data_row(data_line);
         if (dfs) {
-            result.get_data_fields().push_back(*dfs);
+            result.hd_data_fields.push_back(*dfs);
         } else {
             println(stderr, "could not parse data in line {}", data_row_idx);
             return unexpected(parser::error::file_parse_error);
@@ -449,15 +423,15 @@ static inline expected<parser::header_and_data, parser::error> parse_lines(
         *cell_data_types_vec_ex;
 
     // Add the cell data info to the headers.
-    parser::header_fields& hfs = result.get_header_fields();
+    parser::header_fields& hfs = result.hd_header_fields;
     parser::header_fields hfs_result{};
 
     auto zipped = ranges::zip_view(hfs, cell_data_types_vec);
 
     for (std::pair<parser::header_field, e_cell_data_type> hf_cdt : zipped) {
-        hfs_result.emplace_back(hf_cdt.first.name, hf_cdt.second);
+        hfs_result.emplace_back(hf_cdt.first.text, hf_cdt.second);
     }
-    result.set_header_fields(hfs_result);
+    result.hd_header_fields = hfs_result;
 
     return result;
 }

@@ -88,7 +88,7 @@ class command_line {
 
     void describe_table(table& t) {
         ranges::for_each(t.header_fields_, [](const parser::header_field& hf) {
-            println("Column Name: \"{}\"; Column Type : {}", hf.name,
+            println("Column Name: \"{}\"; Column Type : {}", hf.text,
                     hf.data_type);
         });
     }

@@ -50,7 +50,7 @@ struct std::formatter<jt::parser::header_field, char> {
         out << "{ ";
         const string prefix = long_format ? "jt::parser::" : "";
         out << "\"header_field\" : { ";
-        out << "\"name\" : \"" << hf.name << "\", ";
+        out << "\"name\" : \"" << hf.text << "\", ";
         out << "\"data_type\" : ";
         if (long_format) {
             out << std::vformat("{#}"sv, std::make_format_args(hf.data_type));

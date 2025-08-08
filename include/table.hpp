@@ -99,7 +99,7 @@ class table {
     static column_name_index_map_t headers_to_column_name_index_map(
         parser::header_fields hfs) {
         auto hf_names = hfs | views::transform([](parser::header_field hf) {
-                            return hf.name;
+                            return hf.text;
                         });
         return views::zip(hf_names, infinite_ints_vw()) |
                ranges::to<column_name_index_map_t>();
@@ -134,8 +134,8 @@ class table {
     /// @brief Constructor taking headers and data.
     /// @param h_and_d
     table(const parser::header_and_data& h_and_d)
-        : table(h_and_d.get_header_fields(),
-                data_cell::make_all_data_cells(h_and_d.get_data_fields())) {}
+        : table(h_and_d.hd_header_fields,
+                data_cell::make_all_data_cells(h_and_d.hd_data_fields)) {}
 
     /// @brief Copy constructor.
     /// @param other
@@ -248,7 +248,7 @@ class table {
     }
 
     const auto column_name_at_index(const size_t idx) const {
-        return header_fields_[idx].name;
+        return header_fields_[idx].text;
     }
 
     const std::expected<size_t, jt::runtime_error> index_for_column_name(

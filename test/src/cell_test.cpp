@@ -173,9 +173,9 @@ TEST_CASE(MyFixture, Cell) {
         CHECK_TRUE(input_.has_value());
         const parser::header_and_data input = *input_;
         const auto all_data_cells =
-            data_cell::make_all_data_cells(input.get_data_fields());
+            data_cell::make_all_data_cells(input.hd_data_fields);
         const auto first_row_data_cells =
-            data_cell::make_data_cells(input.get_data_fields()[0]);
+            data_cell::make_data_cells(input.hd_data_fields[0]);
         const auto first_result = first_row_data_cells[0];
         CHECK_TRUE(first_result.value);
         const auto val = *first_result.value;
@@ -188,7 +188,7 @@ TEST_CASE(MyFixture, Cell) {
         CHECK_TRUE(input_.has_value());
         const parser::header_and_data input = *input_;
         const auto all_data_cells =
-            data_cell::make_all_data_cells(input.get_data_fields());
+            data_cell::make_all_data_cells(input.hd_data_fields);
         // Japan is the third row.
         const auto cells = all_data_cells[2];
         // R"(Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center)

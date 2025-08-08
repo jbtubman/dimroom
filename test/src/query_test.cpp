@@ -32,8 +32,8 @@ TEST_CASE(MyFixture, TextTest) {
         CHECK_TRUE(input_.has_value());
         const parser::header_and_data input = *input_;
         const auto all_data_cells =
-            data_cell::make_all_data_cells(input.get_data_fields());
-        table test_table(input.get_header_fields(), all_data_cells);
+            data_cell::make_all_data_cells(input.hd_data_fields);
+        table test_table(input.hd_header_fields, all_data_cells);
 
         const string column_name = "Filename";
         const auto column_idx = test_table.index_for_column_name(column_name);
@@ -51,8 +51,8 @@ TEST_CASE(MyFixture, TextTest) {
         CHECK_TRUE(input_.has_value());
         const parser::header_and_data input = *input_;
         const auto all_data_cells =
-            data_cell::make_all_data_cells(input.get_data_fields());
-        table test_table(input.get_header_fields(), all_data_cells);
+            data_cell::make_all_data_cells(input.hd_data_fields);
+        table test_table(input.hd_header_fields, all_data_cells);
 
         // query q{test_table};
         const string column_name = "Type";
@@ -73,8 +73,8 @@ TEST_CASE(MyFixture, TextTest) {
         CHECK_TRUE(input_.has_value());
         const parser::header_and_data input = *input_;
         const auto all_data_cells =
-            data_cell::make_all_data_cells(input.get_data_fields());
-        table test_table(input.get_header_fields(), all_data_cells);
+            data_cell::make_all_data_cells(input.hd_data_fields);
+        table test_table(input.hd_header_fields, all_data_cells);
 
         const string column_name = "Type";
         const auto column_idx = test_table.index_for_column_name(column_name);
@@ -92,8 +92,8 @@ TEST_CASE(MyFixture, IntegerTest) {
         CHECK_TRUE(input_.has_value());
         const parser::header_and_data input = *input_;
         const auto all_data_cells =
-            data_cell::make_all_data_cells(input.get_data_fields());
-        table test_table(input.get_header_fields(), all_data_cells);
+            data_cell::make_all_data_cells(input.hd_data_fields);
+        table test_table(input.hd_header_fields, all_data_cells);
 
         const string column_name = "Image X";
         const auto column_idx = test_table.index_for_column_name(column_name);
@@ -109,8 +109,8 @@ TEST_CASE(MyFixture, IntegerTest) {
         CHECK_TRUE(input_.has_value());
         const parser::header_and_data input = *input_;
         const auto all_data_cells =
-            data_cell::make_all_data_cells(input.get_data_fields());
-        table test_table(input.get_header_fields(), all_data_cells);
+            data_cell::make_all_data_cells(input.hd_data_fields);
+        table test_table(input.hd_header_fields, all_data_cells);
 
         const string column_name = "Image X";
         const auto column_idx = test_table.index_for_column_name(column_name);
@@ -126,8 +126,8 @@ TEST_CASE(MyFixture, IntegerTest) {
         CHECK_TRUE(input_.has_value());
         const parser::header_and_data input = *input_;
         const auto all_data_cells =
-            data_cell::make_all_data_cells(input.get_data_fields());
-        table test_table(input.get_header_fields(), all_data_cells);
+            data_cell::make_all_data_cells(input.hd_data_fields);
+        table test_table(input.hd_header_fields, all_data_cells);
 
         const string column_name = "Image X";
         const auto column_idx = test_table.index_for_column_name(column_name);

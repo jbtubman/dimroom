@@ -183,7 +183,7 @@ void command_line::do_query(table& t, const string& query_line) {
                 column_names_output.append(",");
             }
             first_field = false;
-            column_names_output.append(hf.name);
+            column_names_output.append(hf.text);
         });
     println("{}", column_names_output);
 
