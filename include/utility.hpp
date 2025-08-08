@@ -156,46 +156,6 @@ ForwardIt adjacent_find(ForwardIt first, ForwardIt last, BinaryPred p) {
 
 #endif
 
-template <typename T>
-struct flip_pair_type {};
-
-template <typename T, typename U>
-struct flip_pair_type<std::pair<T, U>> {
-    using type = std::pair<U, T>;
-};
-
-template <typename T>
-using flip_pair_type_t = flip_pair_type<T>::type;
-
-template <typename T, typename U>
-std::pair<U, T> flip_pair(const pair<T, U>& pr) {
-    using result_type = pair<U, T>;
-    return result_type{pr.second, pr.first};
-}
-
-template <typename T, typename U>
-std::pair<U, T> flip_pair(pair<T, U>&& pr) {
-    std::pair<T, U> original_pair{std::move(pr)};
-    using result_type = pair<U, T>;
-    return result_type{original_pair.second, original_pair.first};
-}
-
-template <typename T, typename U>
-vector<pair<U, T>> flip_pairs(const vector<pair<T, U>>& pairs) {
-    using result_type = vector<std::pair<U, T>>;
-    auto flip_fn = [](pair<T, U> pr) { return flip_pair(pr); };
-    return pairs | views::transform(flip_fn) | ranges::to<result_type>();
-}
-
-template <typename T, typename U>
-vector<pair<U, T>> flip_pairs(vector<pair<T, U>>&& pairs) {
-    using result_type = vector<std::pair<U, T>>;
-    vector<pair<T, U>> original_pairs{std::move(pairs)};
-    auto flip_fn = [](pair<T, U> pr) { return flip_pair(pr); };
-    return original_pairs | views::transform(flip_fn) |
-           ranges::to<result_type>();
-}
-
 /// @brief  Like push_back but returns a reference to the accumulator.
 /// @tparam T
 /// @tparam Container
@@ -347,8 +307,8 @@ inline string path_to_string(const std::filesystem::path& fsp) {
 #if _WIN64
     // Calculating the length of the multibyte string
     const size_t len = wcstombs(nullptr, fsp.c_str(), 0) + 1;
-        // Creating a buffer to hold the multibyte string
-    //char* buffer = new char[len];
+    // Creating a buffer to hold the multibyte string
+    // char* buffer = new char[len];
     auto buffer = std::make_unique<char[]>(len);
 
     // Converting wstring to string

@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "CppUnitTestFramework.hpp"
-#include "general_fixture.hpp"
+#include "../include/general_fixture.hpp"
 
 namespace {
 using std::pair;
@@ -25,9 +25,6 @@ using std::operator""s;
 struct MyFixture : general_fixture {
     using pair_t = pair<int, char>;
     using pair_t_vec = vector<pair_t>;
-
-    using flipped_pair_t = flip_pair_type_t<pair_t>;
-    using flipped_pair_t_vec = vector<flipped_pair_t>;
 
     pair_t pair_1{1, 'a'};
     pair_t pair_2{2, 'b'};
@@ -149,23 +146,6 @@ TEST_CASE(MyFixture, CloseLongDouble) {
         const auto long_above_should_fail_ld =
             std::stold(MyFixture::long_above_should_fail);
         CHECK_FALSE(is_close(long_to_match_ld, long_above_should_fail_ld));
-    }
-}
-
-TEST_CASE(MyFixture, Flip) {
-    SECTION("flip_pair") {
-        const auto input = pair<int, char>(1, 'a');
-        const auto expected = flipped_pair_t{'a', 1};
-        // const auto result = flip_pair(std::pair<int,char>(1, 'a'));
-        const auto result = flip_pair(input);
-        CHECK_TRUE(result == expected);
-    }
-
-    SECTION("flip_pairs") {
-        const auto input = MyFixture::pair_vec;
-        const MyFixture::flipped_pair_t_vec expected{{'a', 1}, {'b', 2}};
-        const auto result = flip_pairs(input);
-        CHECK_TRUE(result == expected);
     }
 }
 
