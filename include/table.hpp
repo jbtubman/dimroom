@@ -200,7 +200,7 @@ class table {
         return *this;
     }
 
-    const auto& header_field_at_index(const size_t idx) const {
+    const parser::header_field& header_field_at_index(const size_t idx) const {
         return header_fields_[idx];
     }
 
@@ -300,13 +300,6 @@ class table {
             return ecdt::tags;
         }
         return ecdt::undetermined;
-    }
-
-    rows string_match(const string& col_name, const string& query_value,
-                      opt_rows query_targets = opt_rows{}) {
-        rows targets = query_targets ? *query_targets : rows_;
-
-        return targets;
     }
 };
 
