@@ -1,6 +1,6 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.13.
+This summarizes the state of things as of Version 2.16.
 
 ## Things Completed
 

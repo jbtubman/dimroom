@@ -33,20 +33,20 @@ struct query;
 
 class command_handler {
    public:
-    expected<table, table::error> read_csv_file(const string& filename) {
+    expected<table, parser::error> read_csv_file(const string& filename) {
         {
             filesystem::path fpath_{filename};
             auto fpath = filesystem::absolute(fpath_);
 
             if (!filesystem::exists(fpath)) {
                 println(stderr, "file \"{}\" does not exist", filename);
-                return std::unexpected(table::error::file_exist_error);
+                return std::unexpected(parser::error::file_exist_error);
             }
             std::ifstream instream(fpath);
             if (!instream) {
                 println(stderr, "file \"{}\" could not be opened for input",
                         filename);
-                return std::unexpected(table::error::file_read_error);
+                return std::unexpected(parser::error::file_read_error);
             }
         }
 

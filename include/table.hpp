@@ -11,7 +11,6 @@
 #include <ranges>
 #include <set>
 #include <string>
-#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -22,27 +21,16 @@
 namespace jt {
 using std::expected;
 using std::map;
-using std::pair;
 using std::set;
 using std::string;
-using std::string_view;
 using std::unexpected;
 using std::vector;
 using namespace std::string_literals;
 namespace ranges = std::ranges;
 namespace views = std::ranges::views;
-
 using std::operator""s;
-using std::operator""sv;
-using std::move;
 
-const bool has_enumerate_view =
-#if defined(__cpp_lib_ranges_enumerate)
-    true;
-#else
-    false;
-#endif
-
+/// @brief Holds the column names and data types, and the rows of data.
 class table {
    public:
     using rows = vector<row>;
@@ -52,20 +40,13 @@ class table {
     using column_name_to_type_map_t =
         map<type_column_name_set, e_cell_data_type>;
 
-    /// @brief Errors that can happen when trying to create tables.
-    enum class error {
-        file_exist_error,
-        file_read_error,
-        file_empty_error,
-        file_parse_error
-    };
-
     /// @brief The names of the header fields and their e_cell_data_type values.
     parser::header_fields_t header_fields_{};
 
     /// @brief vector of rows of cells.
     rows rows_{};
 
+    /// @brief Name of the table (based on the file read in).
     string name{"unnamed"};
 
    private:
@@ -87,10 +68,6 @@ class table {
                 geo_coordinate_fields, tags_fields};
     }
 
-    /// @brief Associates a column name with its corresponding
-    /// e_cell_data_type.
-    column_name_to_type_map_t column_name_to_type_map{};
-
     /// @brief Creates a map of column names to header index values.
     /// @param hfs
     /// @return
@@ -101,12 +78,6 @@ class table {
                         });
         return views::zip(hf_names, infinite_ints_vw()) |
                ranges::to<column_name_index_map_t>();
-    }
-
-   private:
-    static auto make_ifstream(const string& filename) {
-        std::filesystem::path fsp{filename};
-        return std::ifstream(fsp);
     }
 
    public:
@@ -123,11 +94,7 @@ class table {
           rows_{rws},
           name{name},
           column_name_index_map{
-              headers_to_column_name_index_map(header_fields_)} {
-        column_name_to_type_map = ranges::zip_view(all_type_column_name_sets(),
-                                                   all_e_cell_data_types()) |
-                                  ranges::to<column_name_to_type_map_t>();
-    }
+              headers_to_column_name_index_map(header_fields_)} {}
 
     /// @brief Constructor taking headers and data.
     /// @param h_and_d
@@ -141,8 +108,7 @@ class table {
         : header_fields_{other.header_fields_},
           rows_{other.rows_},
           name{other.name},
-          column_name_index_map{other.column_name_index_map},
-          column_name_to_type_map{other.column_name_to_type_map} {}
+          column_name_index_map{other.column_name_index_map} {}
 
     /// @brief Special copy constructor that replaces the rows.
     /// @param other_table
@@ -151,7 +117,6 @@ class table {
         : header_fields_{other_table.header_fields_},
           name{other_table.name},
           column_name_index_map{other_table.column_name_index_map},
-          column_name_to_type_map{other_table.column_name_to_type_map},
           rows_{rows_subset} {}
 
     /// @brief Special copy constructor that replaces the optional rows.
@@ -161,7 +126,6 @@ class table {
         : header_fields_{other_table.header_fields_},
           name{other_table.name},
           column_name_index_map{other_table.column_name_index_map},
-          column_name_to_type_map{other_table.column_name_to_type_map},
           rows_{rows_subset ? *rows_subset : other_table.rows_} {}
 
     /// @brief Move constructor.
@@ -170,8 +134,7 @@ class table {
         : header_fields_{std::move(other.header_fields_)},
           rows_{std::move(other.rows_)},
           name{std::move(other.name)},
-          column_name_index_map{std::move(other.column_name_index_map)},
-          column_name_to_type_map{std::move(other.column_name_to_type_map)} {}
+          column_name_index_map{std::move(other.column_name_index_map)} {}
 
     /// @brief Special move constructor that replaces the rows.
     /// @param other_table
@@ -180,8 +143,6 @@ class table {
         : header_fields_{std::move(other_table.header_fields_)},
           name{std::move(other_table.name)},
           column_name_index_map{std::move(other_table.column_name_index_map)},
-          column_name_to_type_map{
-              std::move(other_table.column_name_to_type_map)},
           rows_{std::move(rows_subset)} {}
 
     /// @brief Special move constructor that replaces the optional rows.
@@ -191,21 +152,20 @@ class table {
         : header_fields_{other_table.header_fields_},
           name{other_table.name},
           column_name_index_map{other_table.column_name_index_map},
-          column_name_to_type_map{other_table.column_name_to_type_map},
           rows_{rows_subset ? std::move(*rows_subset)
                             : std::move(other_table.rows_)} {}
 
     /// @brief Static factory function for tables from files.
     /// @param filename
     /// @return
-    static expected<table, table::error> make_table_from_file(
+    static expected<table, parser::error> make_table_from_file(
         const string& filename) {
         std::filesystem::path fp{filename};
         auto afp = std::filesystem::absolute(fp);
         std::ifstream ifs{afp};
         auto parsed_lines = parse_lines(ifs);
         if (!parsed_lines) {
-            return unexpected(table::error::file_parse_error);
+            return unexpected(parser::error::file_parse_error);
         }
         table result{*parsed_lines};
         const string table_name = path_to_string(afp);
@@ -220,7 +180,6 @@ class table {
         swap(rows_, other.rows_);
         swap(name, other.name);
         swap(column_name_index_map, other.column_name_index_map);
-        swap(column_name_to_type_map, other.column_name_to_type_map);
     }
 
     /// @brief Copy assignment.
@@ -241,12 +200,8 @@ class table {
         return *this;
     }
 
-    const auto header_at_index(const size_t idx) const {
+    const auto& header_field_at_index(const size_t idx) const {
         return header_fields_[idx];
-    }
-
-    const auto column_name_at_index(const size_t idx) const {
-        return header_fields_[idx].text;
     }
 
     const std::expected<size_t, jt::runtime_error> index_for_column_name(
@@ -266,51 +221,55 @@ class table {
     bool is_undetermined(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
-        return header_at_index(*idx).data_type ==
+        return header_field_at_index(*idx).data_type ==
                e_cell_data_type::undetermined;
     }
 
     bool is_invalid(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
-        return header_at_index(*idx).data_type == e_cell_data_type::invalid;
+        return header_field_at_index(*idx).data_type ==
+               e_cell_data_type::invalid;
     }
 
     bool is_boolean(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
-        return header_at_index(*idx).data_type == e_cell_data_type::boolean;
+        return header_field_at_index(*idx).data_type ==
+               e_cell_data_type::boolean;
     }
 
     bool is_floating(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
-        return header_at_index(*idx).data_type == e_cell_data_type::floating;
+        return header_field_at_index(*idx).data_type ==
+               e_cell_data_type::floating;
     }
 
     bool is_integer(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
-        return header_at_index(*idx).data_type == e_cell_data_type::integer;
+        return header_field_at_index(*idx).data_type ==
+               e_cell_data_type::integer;
     }
 
     bool is_text(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
-        return header_at_index(*idx).data_type == e_cell_data_type::text;
+        return header_field_at_index(*idx).data_type == e_cell_data_type::text;
     }
 
     bool is_geo_coordinate(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
-        return header_at_index(*idx).data_type ==
+        return header_field_at_index(*idx).data_type ==
                e_cell_data_type::geo_coordinate;
     }
 
     bool is_tags(const std::string& col_name) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
-        return header_at_index(*idx).data_type == e_cell_data_type::tags;
+        return header_field_at_index(*idx).data_type == e_cell_data_type::tags;
     }
 
     e_cell_data_type column_type(const std::string& col_name) const {
@@ -341,20 +300,6 @@ class table {
             return ecdt::tags;
         }
         return ecdt::undetermined;
-    }
-
-    const row& get_data_row(size_t row_idx) const { return rows_[row_idx]; }
-
-    row& get_data_row(size_t row_idx) { return rows_[row_idx]; }
-
-    e_cell_data_type get_column_data_type(size_t column_idx) {
-        return header_at_index(column_idx).data_type;
-    }
-
-    e_cell_data_type get_column_data_type(const string& column_name) {
-        auto expected_idx = index_for_column_name(column_name);
-        if (!expected_idx) return e_cell_data_type::undetermined;
-        return get_column_data_type(*expected_idx);
     }
 
     rows string_match(const string& col_name, const string& query_value,
