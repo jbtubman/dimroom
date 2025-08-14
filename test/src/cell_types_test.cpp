@@ -8,10 +8,10 @@
 #include <type_traits>
 #include <vector>
 
+#include "../include/general_fixture.hpp"
+#include "CppUnitTestFramework.hpp"
 #include "jt_concepts.hpp"
 #include "utility.hpp"
-#include "CppUnitTestFramework.hpp"
-#include "general_fixture.hpp"
 
 namespace {
 using std::string;
@@ -20,6 +20,15 @@ using namespace jt;
 namespace ranges = std::ranges;
 namespace views = std::views;
 
+/// @brief Returns a vector of all cell data types.
+/// @return vector<e_cell_data_type>
+inline constexpr vector<e_cell_data_type> all_e_cell_data_types() {
+    return {e_cell_data_type::undetermined,   e_cell_data_type::invalid,
+            e_cell_data_type::floating,       e_cell_data_type::boolean,
+            e_cell_data_type::integer,        e_cell_data_type::text,
+            e_cell_data_type::geo_coordinate, e_cell_data_type::tags,
+            e_cell_data_type::SENTINEL};
+}
 struct MyFixture : general_fixture {
     const vector<e_cell_data_type> ecdt_vec_1 = {
         e_cell_data_type::undetermined,   e_cell_data_type::invalid,
@@ -31,7 +40,8 @@ struct MyFixture : general_fixture {
     using ecdt_pair_t =
         cross_product_pair_t<e_cell_data_type, e_cell_data_type>;
 
-    static /* consteval */ cross_product_output_t<e_cell_data_type> all_cdt_combos() {
+    static /* consteval */ cross_product_output_t<e_cell_data_type>
+    all_cdt_combos() {
         auto v1 = all_e_cell_data_types();
         auto v2 = all_e_cell_data_types();
         return cross_product<e_cell_data_type>(v1, v2);
