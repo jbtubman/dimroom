@@ -27,7 +27,7 @@ using std::operator""sv;
 
 template <>
 struct std::formatter<jt::data_cell, char> {
-    bool long_format = false;
+    bool long_format{false};
 
     template <class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext& ctx) {
