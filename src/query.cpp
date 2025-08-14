@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <expected>
-#include <functional>
 #include <optional>
 #include <ranges>
 #include <regex>
@@ -23,10 +22,6 @@ namespace views = std::ranges::views;
 using std::string;
 using std::operator""s;
 using std::operator""sv;
-
-/// @brief Type of a function that allows comparison between two things.
-template <typename T>
-using comparison_fn_t = std::function<bool(T, T)>;
 
 /// @brief Error reporting function.
 /// @param col_name

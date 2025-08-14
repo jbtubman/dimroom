@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <expected>
 #include <filesystem>
+#include <functional>
 #include <iterator>
 #include <memory>
 #include <ranges>
@@ -19,6 +20,10 @@
 #include "jt_concepts.hpp"
 
 namespace jt {
+
+/// @brief Type of a function that allows comparison between two things.
+template <typename T, typename U = T>
+using comparison_fn_t = std::function<bool(T, U)>;
 
 /// @brief Describes things that can go wrong whilst converting strings to their
 /// deduced data types.
