@@ -9,7 +9,7 @@ file(GLOB TEST_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 
 add_executable(test_dimroom
   ${TEST_SOURCES}
-  ${PROJECT_SOURCE_DIR}/../src/command_interpreter.cpp
+  ${PROJECT_SOURCE_DIR}/../src/command_line.cpp
   ${PROJECT_SOURCE_DIR}/../src/query.cpp)
 
 target_include_directories(

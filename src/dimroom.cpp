@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "cell_types.hpp"
-#include "command_interpreter.hpp"
+#include "command_line.hpp"
 #include "contains.hpp"
 #include "coordinates.hpp"
 #include "table.hpp"
