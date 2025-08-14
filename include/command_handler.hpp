@@ -11,7 +11,6 @@
 
 #include "coordinates.hpp"
 #include "parser.hpp"
-// #include "query.hpp"
 #include "table.hpp"
 
 // Class to implement handling commands from the user interface.
@@ -23,17 +22,14 @@ using std::vector;
 
 namespace filesystem = std::filesystem;
 
-// Assumes both tags and values are strings.
-struct tag_value {
-    string tag;
-    string value;
-};
-
-struct query;
-
 class command_handler {
    public:
+    /// @brief Attempts to read in the CSV file indicated by the filename.
+    /// @param filename
+    /// @return A jt::table if there is such a file and it can be read and
+    /// parsed; otherwise an error.
     expected<table, parser::error> read_csv_file(const string& filename) {
+        // Error checking is done in this scope.
         {
             filesystem::path fpath_{filename};
             auto fpath = filesystem::absolute(fpath_);
@@ -58,9 +54,5 @@ class command_handler {
 
         return *result_ex;
     }
-
-    bool write_csv_file(const string& filname, table) { return false; }
-
-    void exit_app() {};
 };
 }  // namespace jt

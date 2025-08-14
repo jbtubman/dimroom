@@ -157,7 +157,7 @@ class table {
 
     /// @brief Static factory function for tables from files.
     /// @param filename
-    /// @return
+    /// @return A table if the file is parsed successfully; otherwise an error.
     static expected<table, parser::error> make_table_from_file(
         const string& filename) {
         std::filesystem::path fp{filename};
