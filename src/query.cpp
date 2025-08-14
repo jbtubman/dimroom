@@ -28,6 +28,11 @@ using std::operator""sv;
 template <typename T>
 using comparison_fn_t = std::function<bool(T, T)>;
 
+/// @brief Error reporting function.
+/// @param col_name
+/// @param bad_input
+/// @param expected_type
+/// @return Empty vector of table::rows.
 table::rows error_report(const string& col_name, const string& bad_input,
                          e_cell_data_type expected_type) {
     println(stderr, "Error: input {} for column {} was not of type {}",
@@ -450,7 +455,6 @@ table::rows query::tags_match(const string& tags_string,
     auto dequoter = [](auto&& s) { return dequote(s); };
     const auto tags =
         split_tags | views::transform(dequoter) | ranges::to<vector<string>>();
-    // TODO: figure out how to chain the split to the transform in one line.
     return tags_match(tags, rows_to_query);
 }
 

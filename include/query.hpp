@@ -40,6 +40,7 @@ namespace views = std::ranges::views;
 /// @brief Query interface.
 class query {
    public:
+    /// @brief The kinds of comparison operators that can be used.
     enum class comparison : unsigned int {
         invalid,
         equal_to,
@@ -51,15 +52,32 @@ class query {
         inside,
         tags
     };
+
+    /// @brief Reference to the table being queried.
     table& t;
+
+    /// @brief The column being queried within the table.
     string column_name{};
+
+    /// @brief The comparison operator used for the comparison. Defaults to
+    /// equality.
     comparison comp{comparison::equal_to};
 
-    query(table& tb, const string& c_name,
+    /// @brief Constructor that uses a table, column name, and comparison
+    /// operator.
+    /// @param tb Table to query.
+    /// @param col_name Column to query.
+    /// @param comp_ Comparison operator. Defaults to equality.
+    query(table& tb, const string& col_name,
           comparison comp_ = comparison::equal_to)
-        : t{tb}, column_name{c_name}, comp{comp_} {}
+        : t{tb}, column_name{col_name}, comp{comp_} {}
 
+    /// @brief Perform the query that was entered on the command line.
+    /// @param query_value_s
+    /// @return Rows of data that match the query.
     table::rows execute(const string& query_value_s);
+
+    // The following functions are public so that they can be tested.
 
     table::rows string_match(const string& query_value,
                              table::opt_rows rows_to_query = table::opt_rows{});
@@ -103,6 +121,9 @@ class query {
         table::opt_rows rows_to_query = table::opt_rows{});
 
    private:
+    // functions that begin with "vw_" return views of filtered rows that match
+    // the search criteria.
+
     auto vw_string_match(const string& query_value,
                          ranges::ref_view<table::rows> targets);
 

@@ -5,9 +5,9 @@
 #include <string>
 #include <type_traits>
 
+#include "../include/general_fixture.hpp"
 #include "CppUnitTestFramework.hpp"
 #include "coordinates.hpp"
-#include "general_fixture.hpp"
 #include "query.hpp"
 #include "table.hpp"
 
