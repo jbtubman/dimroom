@@ -12,7 +12,6 @@ configure_file(${PROJECT_SOURCE_DIR}/include/dimroomConfig.h.in ${PROJECT_SOURCE
 
 add_executable(dimroom
   ${PROJECT_SOURCE_DIR}/src/dimroom.cpp
-  ${PROJECT_SOURCE_DIR}/src/command_handler.cpp
   ${PROJECT_SOURCE_DIR}/src/command_interpreter.cpp
   ${PROJECT_SOURCE_DIR}/src/query.cpp
 )
