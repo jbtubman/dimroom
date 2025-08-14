@@ -1,7 +1,5 @@
 #pragma once
 
-// holds the column and row information.
-
 #include <algorithm>
 #include <expected>
 #include <filesystem>
@@ -33,10 +31,19 @@ using std::operator""s;
 /// @brief Holds the column names and data types, and the rows of data.
 class table {
    public:
+    /// @brief Rows in a table.
     using rows = vector<row>;
+
+    /// @brief Optional rows in a table.
     using opt_rows = std::optional<rows>;
+
+    /// @brief Used determine the column number for a column name.
     using column_name_index_map_t = map<string, size_t>;
+
+    /// @brief The set of column names for a table.
     using type_column_name_set = set<string>;
+
+    /// @brief Maps column names to their data types.
     using column_name_to_type_map_t =
         map<type_column_name_set, e_cell_data_type>;
 
@@ -53,20 +60,29 @@ class table {
     /// @brief Maps a column name to its index in the vector of headers.
     column_name_index_map_t column_name_index_map{};
 
+    /// @brief Column names with undetermined data types.
     type_column_name_set undetermined_fields{};
-    type_column_name_set invalid_fields{};
-    type_column_name_set floating_fields{};
-    type_column_name_set boolean_fields{};
-    type_column_name_set integer_fields{};
-    type_column_name_set text_fields{};
-    type_column_name_set geo_coordinate_fields{};
-    type_column_name_set tags_fields{};
 
-    vector<type_column_name_set> all_type_column_name_sets() {
-        return {undetermined_fields,   invalid_fields, floating_fields,
-                boolean_fields,        integer_fields, text_fields,
-                geo_coordinate_fields, tags_fields};
-    }
+    /// @brief Column names with invalid data types.
+    type_column_name_set invalid_fields{};
+
+    /// @brief Column names with floating point data type.
+    type_column_name_set floating_fields{};
+
+    /// @brief Column names with bool data type.
+    type_column_name_set boolean_fields{};
+
+    /// @brief Column names with integer data type.
+    type_column_name_set integer_fields{};
+
+    /// @brief Column names with string data type.
+    type_column_name_set text_fields{};
+
+    /// @brief Column names with geographic coordinate data type.
+    type_column_name_set geo_coordinate_fields{};
+
+    /// @brief Column names with tags data type.
+    type_column_name_set tags_fields{};
 
     /// @brief Creates a map of column names to header index values.
     /// @param hfs
@@ -200,10 +216,18 @@ class table {
         return *this;
     }
 
+    /// @brief Returns information about the table's header field for the given
+    /// column index.
+    /// @param idx
+    /// @return const reference to a header_field.
     const parser::header_field& header_field_at_index(const size_t idx) const {
         return header_fields_[idx];
     }
 
+    /// @brief Determines the column index for the given column name.
+    /// @param col_name
+    /// @return The column index, or an error.
+    /// @note This assumes that all the column names are different.
     const std::expected<size_t, jt::runtime_error> index_for_column_name(
         const string& col_name) const {
         using map_t = column_name_index_map_t;
@@ -218,60 +242,51 @@ class table {
         return result;
     }
 
-    bool is_undetermined(const std::string& col_name) const {
+    // Functions to check the data type of a given column name.
+
+   private:
+    bool _is_of_type(const std::string& col_name, e_cell_data_type ecdt) const {
         const auto idx = index_for_column_name(col_name);
         if (!idx) return false;
-        return header_field_at_index(*idx).data_type ==
-               e_cell_data_type::undetermined;
+        return header_field_at_index(*idx).data_type == ecdt;
+    }
+
+   public:
+    bool is_undetermined(const std::string& col_name) const {
+        return _is_of_type(col_name, e_cell_data_type::undetermined);
     }
 
     bool is_invalid(const std::string& col_name) const {
-        const auto idx = index_for_column_name(col_name);
-        if (!idx) return false;
-        return header_field_at_index(*idx).data_type ==
-               e_cell_data_type::invalid;
+        return _is_of_type(col_name, e_cell_data_type::invalid);
     }
 
     bool is_boolean(const std::string& col_name) const {
-        const auto idx = index_for_column_name(col_name);
-        if (!idx) return false;
-        return header_field_at_index(*idx).data_type ==
-               e_cell_data_type::boolean;
+        return _is_of_type(col_name, e_cell_data_type::boolean);
     }
 
     bool is_floating(const std::string& col_name) const {
-        const auto idx = index_for_column_name(col_name);
-        if (!idx) return false;
-        return header_field_at_index(*idx).data_type ==
-               e_cell_data_type::floating;
+        return _is_of_type(col_name, e_cell_data_type::floating);
     }
 
     bool is_integer(const std::string& col_name) const {
-        const auto idx = index_for_column_name(col_name);
-        if (!idx) return false;
-        return header_field_at_index(*idx).data_type ==
-               e_cell_data_type::integer;
+        return _is_of_type(col_name, e_cell_data_type::integer);
     }
 
     bool is_text(const std::string& col_name) const {
-        const auto idx = index_for_column_name(col_name);
-        if (!idx) return false;
-        return header_field_at_index(*idx).data_type == e_cell_data_type::text;
+        return _is_of_type(col_name, e_cell_data_type::text);
     }
 
     bool is_geo_coordinate(const std::string& col_name) const {
-        const auto idx = index_for_column_name(col_name);
-        if (!idx) return false;
-        return header_field_at_index(*idx).data_type ==
-               e_cell_data_type::geo_coordinate;
+        return _is_of_type(col_name, e_cell_data_type::geo_coordinate);
     }
 
     bool is_tags(const std::string& col_name) const {
-        const auto idx = index_for_column_name(col_name);
-        if (!idx) return false;
-        return header_field_at_index(*idx).data_type == e_cell_data_type::tags;
+        return _is_of_type(col_name, e_cell_data_type::tags);
     }
 
+    /// @brief Determine the data type for the given column name.
+    /// @param col_name
+    /// @return e_cell_data_type
     e_cell_data_type column_type(const std::string& col_name) const {
         using ecdt = e_cell_data_type;
 
