@@ -1,10 +1,10 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.16.
+This summarizes the state of things as of Version 2.17.
 
 ## Things Completed
 
-As of August 8, 2025:
+As of August 14, 2025:
 
 * Reads in CSV file.
 * Parses the header and data rows.
