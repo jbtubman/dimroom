@@ -20,6 +20,8 @@
 
 namespace jt {
 
+/// @brief Describes things that can go wrong whilst converting strings to their
+/// deduced data types.
 enum class convert_error {
     boolean_convert_error,
     integer_convert_error,
@@ -29,17 +31,22 @@ enum class convert_error {
     tags_convert_error
 };
 
-enum class runtime_error { file_not_found, column_name_not_found };
-
 using std::pair;
 using std::vector;
 namespace ranges = std::ranges;
 namespace views = std::ranges::views;
 
+/// @brief Generates an infinite series of integers.
+/// @return All the positive integers there ever were.
 inline static auto infinite_ints_vw() {
     std::size_t zero{0};
     return views::iota(zero);
 }
+
+/// @brief Determines an epsilon value for comparing floating point numbers for
+/// near-equality.
+/// @tparam T
+/// @return The smallest value useful for comparing floating point numbers.
 template <std::floating_point T>
 consteval T epsilon();
 
@@ -77,9 +84,17 @@ constexpr bool is_close(T1 lhs, T2 rhs) {
     return (std::abs(clhs - crhs) <= epsilon<CommonT>());
 }
 
+/// @brief Used to define cross-products of arbitrary types.
+/// @tparam T1
+/// @tparam T2
 template <typename T1, typename T2 = T1>
 using cross_product_pair_t = std::pair<T1, T2>;
 
+/// @brief Date type for cross-products of arbitrary types.
+/// @tparam T1
+/// @tparam T2
+/// @tparam ProductPairT
+/// @tparam OutputCollection
 template <typename T1, typename T2 = T1,
           typename ProductPairT = cross_product_pair_t<T1, T2>,
           class OutputCollection = vector<ProductPairT>>
@@ -89,11 +104,27 @@ struct cross_product_output {
     using second_type = T2;
 };
 
+/// @brief Data type for cross-product outputs, which can be iterated over.
+/// @tparam T1
+/// @tparam T2
+/// @tparam ProductPairT
+/// @tparam OutputCollection
 template <typename T1, typename T2 = T1,
           typename ProductPairT = cross_product_pair_t<T1, T2>,
           HasForwardIterator OutputCollection = vector<ProductPairT>>
 using cross_product_output_t = OutputCollection;
 
+/// @brief Computes the cross-product of two collections that can be iterated
+/// over.
+/// @tparam T1
+/// @tparam T2
+/// @tparam ProductPairT
+/// @tparam Collection1
+/// @tparam Collection2
+/// @tparam OutputCollection
+/// @param v1
+/// @param v2
+/// @return
 template <typename T1, typename T2 = T1, HasForwardIterator Collection1,
           HasForwardIterator Collection2,
           typename ProductPairT = cross_product_pair_t<T1, T2>,
@@ -122,11 +153,15 @@ constexpr OutputCollection cross_product(Collection1 v1, Collection2 v2) {
     return result;
 }
 
-// TODO: adjacent_find_transform range function.
-
 #if !defined(__cpp_lib_ranges_zip)
 
 // Taken from https://en.cppreference.com/w/cpp/algorithm/adjacent_find.html
+
+/// @brief Finds the first of two elements in a collection which are equal.
+/// @tparam ForwardIt
+/// @param first
+/// @param last
+/// @return Iterator to first of the equal elements, or the end of the collection.
 template <class ForwardIt>
 ForwardIt adjacent_find(ForwardIt first, ForwardIt last) {
     if (first == last) return last;
@@ -141,6 +176,14 @@ ForwardIt adjacent_find(ForwardIt first, ForwardIt last) {
 }
 
 // Taken from https://en.cppreference.com/w/cpp/algorithm/adjacent_find.html
+
+/// @brief Finds the first of two elements in a collection which satisfy the predicate.
+/// @tparam ForwardIt
+/// @tparam BinaryPred
+/// @param first
+/// @param last
+/// @param p
+/// @return Iterator to first of the equal elements, or the end of the collection.
 template <class ForwardIt, class BinaryPred>
 ForwardIt adjacent_find(ForwardIt first, ForwardIt last, BinaryPred p) {
     if (first == last) return last;
@@ -219,6 +262,7 @@ namespace {
     return _dequote(string{sv});
 }
 }  // namespace
+
 /// @brief Gets rid of opening and closing double quotes.
 /// @param s
 /// @return A copy of s without the quotes.
@@ -234,6 +278,9 @@ inline void dequote(string& s) {
     s = dequote(ss);
 }
 
+/// @brief Converts a string to a bool, or returns and error.
+/// @param s
+/// @return
 inline std::expected<bool, convert_error> s_to_boolean(const string& s) {
     string ss{s};
     std::transform(ss.begin(), ss.end(), ss.begin(), ::tolower);
@@ -242,6 +289,9 @@ inline std::expected<bool, convert_error> s_to_boolean(const string& s) {
     return std::unexpected(convert_error::boolean_convert_error);
 }
 
+/// @brief Converts a string to a float, or returns an error.
+/// @param s
+/// @return
 inline std::expected<float, convert_error> s_to_floating(const string& s) {
     float f;
     try {
@@ -252,6 +302,9 @@ inline std::expected<float, convert_error> s_to_floating(const string& s) {
     return f;
 }
 
+/// @brief Converts a string to an int, or returns an error.
+/// @param s
+/// @return
 inline std::expected<int, convert_error> s_to_integer(const string& s) {
     int i;
     try {
@@ -262,12 +315,18 @@ inline std::expected<int, convert_error> s_to_integer(const string& s) {
     return i;
 }
 
+/// @brief Converts a string to lowercase.
+/// @param s
 inline void to_lower(string& s) {
     ranges::transform(
         s.begin(), s.end(), s.begin(),
         [](unsigned char c) -> unsigned char { return std::tolower(c); });
 }
 
+/// @brief Returns a copy of a string that was converted to lowercase.
+/// @tparam String
+/// @param s
+/// @return
 template <class String>
 [[nodiscard]] inline string to_lower(String&& s) {
     string tmp{std::forward<String>(s)};

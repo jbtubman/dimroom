@@ -46,7 +46,8 @@ class parser {
         file_exist_error,
         file_read_error,
         file_empty_error,
-        file_parse_error
+        file_parse_error,
+        column_name_not_found_error
     };
 
    private:

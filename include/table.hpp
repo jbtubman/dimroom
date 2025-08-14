@@ -228,7 +228,7 @@ class table {
     /// @param col_name
     /// @return The column index, or an error.
     /// @note This assumes that all the column names are different.
-    const std::expected<size_t, jt::runtime_error> index_for_column_name(
+    const std::expected<size_t, parser::error> index_for_column_name(
         const string& col_name) const {
         using map_t = column_name_index_map_t;
         using value_t = column_name_index_map_t::value_type;
@@ -236,7 +236,7 @@ class table {
             column_name_index_map.begin(), column_name_index_map.end(),
             [&col_name](const value_t& v) { return v.first == col_name; });
         if (res == column_name_index_map.end()) {
-            return std::unexpected(runtime_error::column_name_not_found);
+            return std::unexpected(parser::error::column_name_not_found_error);
         }
         auto result = res->second;
         return result;
