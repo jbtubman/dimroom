@@ -41,8 +41,11 @@ using std::regex;
 using std::regex_match;
 namespace ranges = std::ranges;
 namespace views = std::ranges::views;
+
+/// @brief Returns a polygon_t if parsing was successful, otherwise returns an error.
 using expected_polygon_t = std::expected<polygon_t, convert_error>;
 
+/// @brief Parses and interprets the command line.
 class command_line {
    public:
     // This is intended to extract the name of the input CSV file from the
@@ -56,6 +59,7 @@ class command_line {
         return filename;
     }
 
+   private:
     const vector<string> help_strings{
         "\"describe\" - describe the table",
         "\"query (\"column name\" operator value)\" - do a regular query",
@@ -63,7 +67,8 @@ class command_line {
         "\"query (\"column name\" inside (coordinate) (coordinate) "
         "(coordinate)...)\" "
         "- look for coordinates inside a polygon of at least 3 points ",
-        "\"query (\"column name\" tags \"tag1\", \"tag2\", ...)\" - look for tags "
+        "\"query (\"column name\" tags \"tag1\", \"tag2\", ...)\" - look for "
+        "tags "
         "in a column",
         "\"exit\" - end program",
         "\"quit\" - end program",
@@ -73,13 +78,6 @@ class command_line {
     const regex help_cmd_rx{R"(^\s*help\b.*)", regex::icase};
     const regex describe_cmd_rx{R"(^\s*describe\b.*)", regex::icase};
     const regex query_cmd_rx{R"(^\s*query\b\s+\(.*)", regex::icase};
-
-    string read_command(/* should have a stream or handle here. */) {
-        return "TBD"s;
-    };
-    string evaluate_command(const string& command_string) { return "TBD"s; };
-
-    void print_result(const string& result) const { cout << result << endl; };
 
     void print_help() const {
         ranges::for_each(help_strings,
@@ -93,11 +91,13 @@ class command_line {
         });
     }
 
+   public:
     /// @brief Experimental attempt to parse ANDed queries.
     /// @param t
     /// @param query_line
     void do_query(table& t, const string& query_line);
 
+  private:
     table _do_one_query(const table& t, const string& query_clause);
 
     table _do_one_query(table&& t, const string& query_clause);
@@ -113,6 +113,7 @@ class command_line {
         return _do_one_query(std::forward<TABLE>(t), query_clause);
     }
 
+  public:
     int read_eval_print(table& table_to_use) {
         println(stderr, "Welcome to DimRoom");
         println(stderr, "Enter the command \"help\" for help.");
@@ -147,11 +148,16 @@ class command_line {
         return EXIT_SUCCESS;
     }
 
+    /// @brief Parses a query that does not involve geo-coordinates
+    /// @param t The table to query.
+    /// @param query_line
+    /// @return table::rows
     jt::table::rows parse_non_poly_query(table& t, const string& query_line);
-
-    jt::table::rows parse_queries(table& t, const vector<string>& query_lines);
 };
 
+/// @brief Parses geo-coordinate points in a query
+/// @param query_line
+/// @return A polygon or an error.
 expected_polygon_t parse_points_in_query(const string& query_line);
 
 }  // namespace jt
