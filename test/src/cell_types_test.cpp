@@ -26,8 +26,7 @@ inline constexpr vector<e_cell_data_type> all_e_cell_data_types() {
     return {e_cell_data_type::undetermined,   e_cell_data_type::invalid,
             e_cell_data_type::floating,       e_cell_data_type::boolean,
             e_cell_data_type::integer,        e_cell_data_type::text,
-            e_cell_data_type::geo_coordinate, e_cell_data_type::tags,
-            e_cell_data_type::SENTINEL};
+            e_cell_data_type::geo_coordinate, e_cell_data_type::tags};
 }
 struct MyFixture : general_fixture {
     const vector<e_cell_data_type> ecdt_vec_1 = {

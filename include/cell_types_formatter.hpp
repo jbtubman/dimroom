@@ -73,10 +73,6 @@ struct std::formatter<jt::e_cell_data_type, char> {
                 out << "tags"s;
                 break;
 
-            case jt::e_cell_data_type::SENTINEL:
-                out << "SENTINEL"s;
-                break;
-
             default:
                 // This should not happen but it keeps the compiler happy.
                 out << "**UNKNOWNN**"s;

@@ -166,9 +166,6 @@ class data_cell {
                 return cell_value_type{bct};
             }
 
-            case e_cell_data_type::SENTINEL:
-                return cell_value_type{};
-
             default:
                 return cell_value_type{};
         }

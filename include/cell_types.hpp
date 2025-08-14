@@ -39,8 +39,7 @@ enum class e_cell_data_type : size_t {
     integer,
     text,
     geo_coordinate,
-    tags,
-    SENTINEL
+    tags
 };
 
 /**
