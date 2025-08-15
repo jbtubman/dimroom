@@ -146,7 +146,6 @@ constexpr OutputCollection cross_product(Collection1 v1, Collection2 v2) {
     auto outer_fold_fn = [&v2, &inner_fold_fn](OutputCollection outer_acc,
                                                T1 dt1) {
         inner_accumulator_t inner_acc{dt1, outer_acc};
-        // auto ig = ranges::fold_left(v2, inner_acc, inner_fold_fn);
         auto ignore = ranges::fold_left(v2, inner_acc, inner_fold_fn);
         return inner_acc.second;
     };
@@ -167,6 +166,7 @@ constexpr OutputCollection cross_product(Collection1 v1, Collection2 v2) {
 /// @param first
 /// @param last
 /// @return Iterator to first of the equal elements, or the end of the collection.
+/// @see https://en.cppreference.com/w/cpp/algorithm/adjacent_find.html
 template <class ForwardIt>
 ForwardIt adjacent_find(ForwardIt first, ForwardIt last) {
     if (first == last) return last;
@@ -189,6 +189,7 @@ ForwardIt adjacent_find(ForwardIt first, ForwardIt last) {
 /// @param last
 /// @param p
 /// @return Iterator to first of the equal elements, or the end of the collection.
+/// @see https://en.cppreference.com/w/cpp/algorithm/adjacent_find.html
 template <class ForwardIt, class BinaryPred>
 ForwardIt adjacent_find(ForwardIt first, ForwardIt last, BinaryPred p) {
     if (first == last) return last;
