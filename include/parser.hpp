@@ -65,34 +65,34 @@ class parser {
             return tie(data_type, text) == tie(other.data_type, other.text);
         }
 
-        _csv_field() {}
+        constexpr _csv_field() noexcept {}
 
-        _csv_field(const string& nm, e_cell_data_type e)
+        constexpr _csv_field(const string& nm, e_cell_data_type e) noexcept
             : text{nm}, data_type{e} {}
 
-        _csv_field(string&& nm, e_cell_data_type e)
+        constexpr _csv_field(string&& nm, e_cell_data_type e) noexcept
             : text{std::move(nm)}, data_type{e} {}
 
-        _csv_field(const derived_type& other)
+        constexpr _csv_field(const derived_type& other) noexcept
             : text{other.text}, data_type{other.data_type} {}
 
-        _csv_field(derived_type&& other)
+        constexpr _csv_field(derived_type&& other) noexcept
             : text{std::move(other.text)},
               data_type{std::move(other.data_type)} {}
 
-        void swap(derived_type& other) {
+        void swap(derived_type& other) noexcept {
             using std::swap;
             swap(text, other.text);
             swap(data_type, other.data_type);
         }
 
-        derived_type& operator=(const derived_type& other) {
+        derived_type& operator=(const derived_type& other) noexcept {
             derived_type tmp{other};
             swap(tmp);
             return *this;
         }
 
-        derived_type& operator=(derived_type&& other) {
+        derived_type& operator=(derived_type&& other) noexcept {
             derived_type tmp{std::move(other)};
             swap(tmp);
             return *this;
@@ -105,7 +105,7 @@ class parser {
     /// is deduced later after the data rows are parsed.
     class header_field : public _csv_field<header_field> {
        public:
-        header_field(const string& nm, e_cell_data_type e)
+        constexpr header_field(const string& nm, e_cell_data_type e) noexcept
             : _csv_field(nm, e) {}
     };
 
@@ -117,7 +117,7 @@ class parser {
     /// file. The text member is the string found between the delimiting commas.
     class data_field : public _csv_field<data_field> {
        public:
-        data_field(const string& s, e_cell_data_type ecdt)
+        constexpr data_field(const string& s, e_cell_data_type ecdt) noexcept
             : _csv_field(s, ecdt) {}
     };
 
@@ -133,19 +133,21 @@ class parser {
         header_fields_t header_fields{};
         all_data_fields_t all_data_fields{};
 
-        header_and_data() {}
+        constexpr header_and_data() noexcept {}
 
-        header_and_data(const header_fields_t& hfs) : header_fields{hfs} {}
+        constexpr header_and_data(const header_fields_t& hfs) noexcept
+            : header_fields{hfs} {}
 
-        header_and_data(header_fields_t&& hfs)
+        constexpr header_and_data(header_fields_t&& hfs) noexcept
             : header_fields{std::move(hfs)} {}
 
         template <class HeaderFields, class AllDataFields>
-        header_and_data(HeaderFields&& hfs, AllDataFields&& adfs)
+        constexpr header_and_data(HeaderFields&& hfs,
+                                  AllDataFields&& adfs) noexcept
             : header_fields{std::forward<HeaderFields>(hfs)},
               all_data_fields{std::forward<AllDataFields>(adfs)} {}
 
-        void swap(header_and_data& other) {
+        void swap(header_and_data& other) noexcept {
             using std::swap;
             swap(header_fields, other.header_fields);
             swap(all_data_fields, other.all_data_fields);
@@ -160,7 +162,7 @@ class parser {
     /// @param const parser::data_fields& dfs
     /// @return pair<vector<e_cell_data_type>, size_t>
     static pair<vector<e_cell_data_type>, size_t> get_row_data_types_and_counts(
-        const parser::data_fields_t& dfs) {
+        const parser::data_fields_t& dfs) noexcept {
         auto fold_fn = [](vector<e_cell_data_type> acc,
                           const parser::data_field& df) {
             acc.push_back(df.data_type);

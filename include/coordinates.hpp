@@ -49,6 +49,7 @@ const string deg_min_long_end_s(R"-(\s\d{1,3}° \d{1,2}' [EW]\))-");
 const regex deg_min_long_end_rx{deg_min_long_end_s};
 
 const string csv_deg_min_long_end_s(R"-(\s\d{1,3}° \d{1,2}' [EW]")-");
+// " Double quote in comment fixes wonky highlighting in VS Code.
 const regex csv_deg_min_long_end_rx{csv_deg_min_long_end_s};
 
 // A complete coordinate has parentheses around it.
@@ -75,13 +76,13 @@ constexpr size_t long_dm_sign_match_index{8};
 // contains the subexpression for that part of the degree/minute coordinate.
 // (They are magic numbers that were determined empirically for degree/minute
 // coordinates.)
-const int lat_deg{2};
-const int lat_min{3};
-const int lat_dir{4};
+constexpr int lat_deg{2};
+constexpr int lat_min{3};
+constexpr int lat_dir{4};
 
-const int long_deg{6};
-const int long_min{7};
-const int long_dir{8};
+constexpr int long_deg{6};
+constexpr int long_min{7};
+constexpr int long_dir{8};
 
 // decimal coordinates regexps.
 
@@ -121,8 +122,8 @@ constexpr size_t long_decimal_match_index{4};
 // contains the subexpression for that part of the decimal coordinate.
 // (They are magic numbers that were determined empirically for decimal
 // coordinates.)
-const int lat_decimal{1};
-const int long_decimal{2};
+constexpr int lat_decimal{1};
+constexpr int long_decimal{2};
 
 inline bool is_deg_min_coordinate(const string& s) {
     return regex_match(s, deg_min_cooordinate_rx) ||
@@ -158,13 +159,13 @@ class coordinate {
     float longitude{0};
 
     // Constructor that takes values for all the fields.
-    coordinate(format fmt, float lat_f, float long_f)
+    constexpr coordinate(format fmt, float lat_f, float long_f) noexcept
         : coordinate_format{fmt}, latitude{lat_f}, longitude{long_f} {};
 
     // Use default constructors and assignment for the other fields.
-    coordinate() = default;
-    coordinate(const coordinate&) = default;
-    coordinate(coordinate&&) = default;
+    constexpr coordinate() noexcept = default;
+    constexpr coordinate(const coordinate&) noexcept = default;
+    constexpr coordinate(coordinate&&) noexcept = default;
 
     void swap(coordinate& other) noexcept {
         using std::swap;
@@ -192,18 +193,18 @@ class coordinate {
     }
 
     // Should this be a free function?
-    constexpr static bool is_valid(float lat_f, float long_f) {
+    constexpr static bool is_valid(float lat_f, float long_f) noexcept {
         if (lat_f > 90.0 || lat_f < -90.0) return false;
         if (long_f > 180.0 || long_f < -180.0) return false;
         return true;
     }
 
-    constexpr bool is_valid() const {
+    constexpr bool is_valid() const noexcept {
         return coordinate::is_valid(latitude, longitude);
     }
 
     // Should this be a free function?
-    constexpr static bool is_valid(const coordinate& coord) {
+    constexpr static bool is_valid(const coordinate& coord) noexcept {
         return coord.is_valid();
     }
 };

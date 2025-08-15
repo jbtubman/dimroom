@@ -64,6 +64,9 @@ concept HasSize = requires(Collection c) { c.size(); };
 template <typename Collection, typename Iterator = Collection::iterator>
 concept HasRandomAccessIterator = std::random_access_iterator<Iterator>;
 
+template <typename T>
+concept IsRandomAccess = std::ranges::random_access_range<T>;
+
 namespace {
 template <typename T>
 struct _is_vector : std::false_type {};

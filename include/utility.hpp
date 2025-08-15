@@ -41,9 +41,31 @@ using std::vector;
 namespace ranges = std::ranges;
 namespace views = std::ranges::views;
 
+/// @brief string class that can be used as a constexpr value.
+/// @see https://youtu.be/PJwd4JLYJJY?si=MyCvBznETCp5EYGZ&t=400
+struct static_string {
+    std::size_t m_size{0};
+    const char* m_data{nullptr};
+
+    template <std::size_t N>
+    constexpr static_string(const char (&str)[N])
+        : m_size(N - 1), m_data(&str[0]) {}
+
+    /// @brief constructor for substrings of string literals.
+    /// @param str
+    /// @param s
+    constexpr static_string(const char* str, std::size_t s)
+        : m_size(s), m_data(str) {}
+
+    constexpr static_string() = default;
+
+    constexpr size_t size() const { return m_size; }
+    constexpr const char* c_str() const { return m_data; }
+};
+
 /// @brief Generates an infinite series of integers.
 /// @return All the positive integers there ever were.
-inline static auto infinite_ints_vw() {
+constexpr auto infinite_ints_vw() {
     std::size_t zero{0};
     return views::iota(zero);
 }
@@ -343,28 +365,28 @@ template <class String>
 // Comparisons for bool. Assume false < true;
 // This implies that nothing is less than false or greater than true.
 
-inline constexpr bool bool_equal_to(bool lhs, bool rhs) { return lhs == rhs; }
+constexpr bool bool_equal_to(bool lhs, bool rhs) noexcept { return lhs == rhs; }
 
-inline constexpr bool bool_not_equal_to(bool lhs, bool rhs) {
+constexpr bool bool_not_equal_to(bool lhs, bool rhs) noexcept {
     return lhs != rhs;
 }
 
-inline constexpr bool bool_less(bool lhs, bool rhs) {
+constexpr bool bool_less(bool lhs, bool rhs) noexcept {
     if (lhs == false && rhs == true) {
         return true;
     }
     return false;
 }
 
-inline constexpr bool bool_less_equal(bool lhs, bool rhs) {
+constexpr bool bool_less_equal(bool lhs, bool rhs) noexcept {
     return bool_less(lhs, rhs) || bool_equal_to(lhs, rhs);
 }
 
-inline constexpr bool bool_greater(bool lhs, bool rhs) {
+constexpr bool bool_greater(bool lhs, bool rhs) noexcept {
     return !bool_less_equal(lhs, rhs);
 }
 
-inline constexpr bool bool_greater_equal(bool lhs, bool rhs) {
+constexpr bool bool_greater_equal(bool lhs, bool rhs) noexcept {
     return !bool_less(lhs, rhs);
 }
 

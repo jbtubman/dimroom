@@ -41,33 +41,34 @@ class data_cell {
 
     /// @brief Constructor that uses a data_field to get the values.
     /// @param df
-    data_cell(const parser::data_field& df)
+    data_cell(const parser::data_field& df) noexcept
         : data_type{df.data_type},
           value{make_cell_value_type(df.text, df.data_type)} {
         const e_cell_data_type df_e_type = df.data_type;
     }
 
-    data_cell(e_cell_data_type ecdt, const cell_value_type& cdt)
+    constexpr data_cell(e_cell_data_type ecdt,
+                        const cell_value_type& cdt) noexcept
         : data_type{ecdt}, value{cdt} {}
 
-    data_cell(e_cell_data_type ecdt, cell_value_type&& cdt)
+    constexpr data_cell(e_cell_data_type ecdt, cell_value_type&& cdt) noexcept
         : data_type{ecdt}, value{std::move(cdt)} {}
 
     /// @brief Copy constructor
     /// @param other
-    data_cell(const data_cell& other)
+    constexpr data_cell(const data_cell& other) noexcept
         : data_type{other.data_type}, value{other.value} {}
 
     /// @brief Move constructor
     /// @param other
-    data_cell(data_cell&& other)
+    constexpr data_cell(data_cell&& other) noexcept
         : data_type{std::move(other.data_type)},
           value{std::move(other.value)} {}
 
     /// @brief Copy assignment
     /// @param other
     /// @return
-    data_cell& operator=(const data_cell& other) {
+    data_cell& operator=(const data_cell& other) noexcept {
         data_cell tmp{other};
         swap(tmp);
         return *this;
@@ -76,7 +77,7 @@ class data_cell {
     /// @brief Move assignment
     /// @param other
     /// @return
-    data_cell& operator=(data_cell&& other) {
+    data_cell& operator=(data_cell&& other) noexcept {
         data_cell tmp{std::move(other)};
         swap(tmp);
         return *this;
@@ -84,7 +85,7 @@ class data_cell {
 
     /// @brief The swap function.
     /// @param other
-    void swap(data_cell& other) {
+    void swap(data_cell& other) noexcept {
         using std::swap;
         swap(data_type, other.data_type);
         swap(value, other.value);
@@ -178,14 +179,14 @@ class data_cell {
     /// @brief Make a single data cell from a const ref to a data_field.
     /// @param df
     /// @return data_cell
-    static data_cell make_data_cell(const parser::data_field& df) {
+    static data_cell make_data_cell(const parser::data_field& df) noexcept {
         return data_cell{df.data_type, make_cell_value_type(df)};
     }
 
     /// @brief Make a single data cell from an rvalue data_field.
     /// @param df
     /// @return data_cell
-    static data_cell make_data_cell(parser::data_field&& df) {
+    static data_cell make_data_cell(parser::data_field&& df) noexcept {
         const parser::data_field df_{std::move(df)};
         return data_cell{df_.data_type, make_cell_value_type(df_)};
     }
@@ -195,7 +196,7 @@ class data_cell {
     /// @param dfs
     /// @return vector<data_cell>
     static vector<data_cell> make_data_cells(
-        const vector<parser::data_field>& dfs) {
+        const vector<parser::data_field>& dfs) noexcept {
         return dfs | std::views::transform([](auto&& df) {
                    return make_data_cell(std::move(df));
                }) |
@@ -206,7 +207,8 @@ class data_cell {
     /// data_fields.
     /// @param dfs
     /// @return vector<data_cell>
-    static vector<data_cell> make_data_cells(vector<parser::data_field>&& dfs) {
+    static vector<data_cell> make_data_cells(
+        vector<parser::data_field>&& dfs) noexcept {
         const vector<parser::data_field> dfs_{std::move(dfs)};
         return dfs_ | views::transform([](auto&& df) {
                    return make_data_cell(std::move(df));
@@ -219,7 +221,7 @@ class data_cell {
     /// @param dfs_vec
     /// @return vector<vector<data_cell>>
     static vector<vector<data_cell>> make_all_data_cells(
-        const vector<vector<parser::data_field>>& dfs_vec) {
+        const vector<vector<parser::data_field>>& dfs_vec) noexcept {
         return dfs_vec | views::transform([](auto&& dfs) {
                    return make_data_cells(std::move(dfs));
                }) |
@@ -231,7 +233,7 @@ class data_cell {
     /// @param dfs_vec
     /// @return vector<vector<data_cell>>
     static vector<vector<data_cell>> make_all_data_cells(
-        vector<vector<parser::data_field>>&& dfs_vec) {
+        vector<vector<parser::data_field>>&& dfs_vec) noexcept {
         return std::move(dfs_vec) | views::transform([](auto&& dfs) {
                    return make_data_cells(std::move(dfs));
                }) |

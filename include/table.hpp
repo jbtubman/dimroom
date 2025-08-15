@@ -88,7 +88,7 @@ class table {
     /// @param hfs
     /// @return
     static column_name_index_map_t headers_to_column_name_index_map(
-        parser::header_fields_t hfs) {
+        parser::header_fields_t hfs) noexcept {
         auto hf_names = hfs | views::transform([](parser::header_field hf) {
                             return hf.text;
                         });
@@ -98,14 +98,14 @@ class table {
 
    public:
     /// @brief Default constructor.
-    table() {};
+    constexpr table() noexcept {};
 
     /// @brief Constructor taking headers, rows, and a name.
     /// @param hfs
     /// @param rws
     /// @param name
-    table(const parser::header_fields_t& hfs, const rows& rws,
-          string name = "unnamed"s)
+    constexpr table(const parser::header_fields_t& hfs, const rows& rws,
+                    string name = "unnamed"s) noexcept
         : header_fields_{hfs},
           rows_{rws},
           name{name},
@@ -114,13 +114,13 @@ class table {
 
     /// @brief Constructor taking headers and data.
     /// @param h_and_d
-    table(const parser::header_and_data& h_and_d)
+    constexpr table(const parser::header_and_data& h_and_d) noexcept
         : table(h_and_d.header_fields,
                 data_cell::make_all_data_cells(h_and_d.all_data_fields)) {}
 
     /// @brief Copy constructor.
     /// @param other
-    table(const table& other)
+    table(const table& other) noexcept
         : header_fields_{other.header_fields_},
           rows_{other.rows_},
           name{other.name},
@@ -146,7 +146,7 @@ class table {
 
     /// @brief Move constructor.
     /// @param other
-    table(table&& other)
+    table(table&& other) noexcept
         : header_fields_{std::move(other.header_fields_)},
           rows_{std::move(other.rows_)},
           name{std::move(other.name)},
@@ -190,7 +190,7 @@ class table {
         return result;
     }
 
-    void swap(table& other) {
+    void swap(table& other) noexcept {
         using std::swap;
         swap(header_fields_, other.header_fields_);
         swap(rows_, other.rows_);
@@ -201,7 +201,7 @@ class table {
     /// @brief Copy assignment.
     /// @param other
     /// @return
-    table& operator=(const table& other) {
+    table& operator=(const table& other) noexcept {
         table tmp{other};
         swap(tmp);
         return *this;
@@ -210,7 +210,7 @@ class table {
     /// @brief Move assignment.
     /// @param other
     /// @return
-    table& operator=(table&& other) {
+    table& operator=(table&& other) noexcept {
         table tmp{std::move(other)};
         swap(tmp);
         return *this;

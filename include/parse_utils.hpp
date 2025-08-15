@@ -180,33 +180,6 @@ inline e_cell_data_type determine_data_field_e_cell_data_type(
     return e_cell_data_type::text;
 }
 
-/// @brief Type to hold intermediate parsing results.
-struct string_cvt_pos {
-    string str;
-    e_cell_data_type cvt;
-    std::size_t pos;
-};
-
-/// @brief Intermediate parsing results produced by zip functions.
-using string_cvt_pos_tuple = std::tuple<string, e_cell_data_type, std::size_t>;
-
-// Turn a CSV data line into a vector of tuples that represent
-// type, position, and value.
-inline vector<string_cvt_pos_tuple> parse_row(const string& row_s) {
-    std::size_t starting_value{0};
-    auto infinite_ints_vw = views::iota(starting_value);
-    auto split_fields = fix_quoted_fields(row_s);
-    vector<e_cell_data_type> cell_types_vec =
-        split_fields | views::transform([](string s) {
-            return determine_data_field_e_cell_data_type(s);
-        }) |
-        ranges::to<vector<e_cell_data_type>>();
-
-    auto result = views::zip(split_fields, cell_types_vec, infinite_ints_vw) |
-                  ranges::to<vector<string_cvt_pos_tuple>>();
-
-    return result;
-}
 }  // namespace jt
 
 // turn off cassert.

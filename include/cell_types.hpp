@@ -49,8 +49,8 @@ enum class e_cell_data_type : size_t {
  * If one type is undetermined and the other is any type but invalid, return the
  * other type. Otherwise, if the types are different, return invalid.
  */
-constexpr inline e_cell_data_type operator||(e_cell_data_type lhs,
-                                             e_cell_data_type rhs) {
+constexpr e_cell_data_type operator||(e_cell_data_type lhs,
+                                      e_cell_data_type rhs) noexcept {
     if (lhs == rhs) {
         return lhs;
     }
@@ -128,7 +128,8 @@ using cell_value_type = std::optional<cell_value_types>;
 /// @param lhs
 /// @param rhs
 /// @return bool
-inline bool operator==(const cell_value_type& lhs, const cell_value_type& rhs) {
+inline bool operator==(const cell_value_type& lhs,
+                       const cell_value_type& rhs) noexcept {
     const bool lhs_has_value = lhs.has_value();
     const bool rhs_has_value = rhs.has_value();
 
@@ -145,7 +146,8 @@ inline bool operator==(const cell_value_type& lhs, const cell_value_type& rhs) {
 }  // namespace jt
 
 namespace std {
-inline void swap(jt::e_cell_data_type& lhs, jt::e_cell_data_type& rhs) {
+inline void swap(jt::e_cell_data_type& lhs,
+                 jt::e_cell_data_type& rhs) noexcept {
     jt::e_cell_data_type tmp{lhs};
     lhs = rhs;
     rhs = tmp;
