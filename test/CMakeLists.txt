@@ -17,9 +17,16 @@ add_executable(test_dimroom
   ${PROJECT_SOURCE_DIR}/../src/command_line.cpp
   ${PROJECT_SOURCE_DIR}/../src/query.cpp)
 
+if(READLINE_FOUND)
 target_include_directories(
   test_dimroom
   PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
   PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
   ${Readline_INCLUDE_DIR})
 target_link_libraries(test_dimroom ${Readline_LIBRARY})
+else()
+target_include_directories(
+  test_dimroom
+  PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
+  PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+endif()

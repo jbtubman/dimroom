@@ -33,7 +33,11 @@ add_executable(dimroom
   ${PROJECT_SOURCE_DIR}/src/query.cpp
 )
 
+if(READLINE_FOUND)
 target_include_directories(dimroom PUBLIC ${PROJECT_SOURCE_DIR}/include ${Readline_INCLUDE_DIR})
 target_link_libraries(dimroom ${Readline_LIBRARY})
+else()
+target_include_directories(dimroom PUBLIC ${PROJECT_SOURCE_DIR}/include)
+endif()
 
 add_subdirectory(test)
