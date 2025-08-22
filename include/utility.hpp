@@ -9,6 +9,7 @@
 #include <functional>
 #include <iterator>
 #include <memory>
+#include <optional>
 #include <ranges>
 #include <regex>
 #include <string>
@@ -17,9 +18,37 @@
 #include <utility>
 #include <vector>
 
+#if !defined(_WIN64)
+#include <readline/readline.h>
+#include <readline/history.h>
+#endif
+
 #include "jt_concepts.hpp"
 
 namespace jt {
+
+using std::operator""s;
+
+inline std::optional<std::string> lineread(const std::string& prompt = ""s) {
+#if _WIN64
+    std::string input_line;
+    if (std::getline(std::cin, input_line)) {
+        return input_line;
+    } else {
+        return {};
+    }
+#else
+    using buf_up = std::unique_ptr<char[]>;
+    buf_up buf{readline(prompt.c_str())};
+    if (buf.get() == nullptr) {
+        return {};
+    } else {
+        std::string sbuf{buf.get()};
+        add_history(sbuf.c_str());
+        return sbuf;
+    }
+#endif
+}
 
 /// @brief Type of a function that allows comparison between two things.
 template <typename T, typename U = T>
@@ -36,6 +65,22 @@ enum class convert_error {
     tags_convert_error
 };
 
+constexpr bool has_cpp_modules =
+#if defined(__cpp_modules)
+    true;
+#else
+    false;
+#endif
+
+constexpr auto cpp_lib_modules_ver = __cpp_lib_modules;
+
+constexpr bool has_cpp_lib_modules =
+#if defined(__cpp_lib_modules)
+    true;
+#else
+    false;
+#endif
+
 using std::pair;
 using std::vector;
 namespace ranges = std::ranges;
@@ -48,19 +93,19 @@ struct static_string {
     const char* m_data{nullptr};
 
     template <std::size_t N>
-    constexpr static_string(const char (&str)[N])
+    constexpr static_string(const char (&str)[N]) noexcept
         : m_size(N - 1), m_data(&str[0]) {}
 
     /// @brief constructor for substrings of string literals.
     /// @param str
     /// @param s
-    constexpr static_string(const char* str, std::size_t s)
+    constexpr static_string(const char* str, std::size_t s) noexcept
         : m_size(s), m_data(str) {}
 
-    constexpr static_string() = default;
+    constexpr static_string() noexcept = default;
 
-    constexpr size_t size() const { return m_size; }
-    constexpr const char* c_str() const { return m_data; }
+    constexpr size_t size() const noexcept { return m_size; }
+    constexpr const char* c_str() const noexcept { return m_data; }
 };
 
 /// @brief Generates an infinite series of integers.
@@ -75,21 +120,21 @@ constexpr auto infinite_ints_vw() {
 /// @tparam T
 /// @return The smallest value useful for comparing floating point numbers.
 template <std::floating_point T>
-consteval T epsilon();
+consteval T epsilon() noexcept;
 
 template <>
-consteval float epsilon<float>() {
+consteval float epsilon<float>() noexcept {
     return (0.00002f - 0.00001f);
 }
 
 template <>
-consteval double epsilon<double>() {
+consteval double epsilon<double>() noexcept {
     // Had to adjust slightly for double.
     return (0.0000201 - 0.00001);
 }
 
 template <>
-consteval long double epsilon<long double>() {
+consteval long double epsilon<long double>() noexcept {
     // Had to adjust slightly for long double.
     return (0.0000201L - 0.00001L);
 }
@@ -104,7 +149,7 @@ consteval long double epsilon<long double>() {
 /// @return bool
 template <std::floating_point T1, std::floating_point T2,
           typename CommonT = std::common_type_t<T1, T2>>
-constexpr bool is_close(T1 lhs, T2 rhs) {
+constexpr bool is_close(T1 lhs, T2 rhs) noexcept {
     const CommonT clhs{lhs};
     const CommonT crhs{rhs};
 

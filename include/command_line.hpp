@@ -119,9 +119,11 @@ class command_line {
         println(stderr, "Enter the command \"help\" for help.");
         const string prompt_str = std::format(
             "dimroom-{}.{}> ", dimroom_VERSION_MAJOR, dimroom_VERSION_MINOR);
-        cout << prompt_str;
-        string input_line;
-        while (getline(cin, input_line)) {
+        // cout << prompt_str;
+        // string input_line;
+        while (auto line_input = lineread(prompt_str)) {
+        // while (getline(cin, input_line)) {
+            string input_line{*line_input};
             trim(input_line);
             if (regex_match(input_line, quit_cmd_rx)) {
                 println("Goodbye.");
