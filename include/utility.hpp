@@ -7,6 +7,9 @@
 #include <expected>
 #include <filesystem>
 #include <functional>
+#if defined(_WIN64)
+#include <iostream>
+#endif
 #include <iterator>
 #include <memory>
 #include <optional>
@@ -21,6 +24,9 @@
 #if !defined(_WIN64)
 #include <readline/readline.h>
 #include <readline/history.h>
+#define CONSTEXPR constexpr
+#else
+#define CONSTEXPR
 #endif
 
 #include "jt_concepts.hpp"
@@ -32,6 +38,7 @@ using std::operator""s;
 inline std::optional<std::string> lineread(const std::string& prompt = ""s) {
 #if _WIN64
     std::string input_line;
+    std::cout << prompt;
     if (std::getline(std::cin, input_line)) {
         return input_line;
     } else {

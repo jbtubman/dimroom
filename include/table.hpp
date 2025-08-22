@@ -98,13 +98,13 @@ class table {
 
    public:
     /// @brief Default constructor.
-    constexpr table() noexcept {};
+    CONSTEXPR table() noexcept {};
 
     /// @brief Constructor taking headers, rows, and a name.
     /// @param hfs
     /// @param rws
     /// @param name
-    constexpr table(const parser::header_fields_t& hfs, const rows& rws,
+    CONSTEXPR table(const parser::header_fields_t& hfs, const rows& rws,
                     string name = "unnamed"s) noexcept
         : header_fields_{hfs},
           rows_{rws},
@@ -114,7 +114,7 @@ class table {
 
     /// @brief Constructor taking headers and data.
     /// @param h_and_d
-    constexpr table(const parser::header_and_data& h_and_d) noexcept
+    CONSTEXPR table(const parser::header_and_data& h_and_d) noexcept
         : table(h_and_d.header_fields,
                 data_cell::make_all_data_cells(h_and_d.all_data_fields)) {}
 
