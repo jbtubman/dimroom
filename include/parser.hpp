@@ -260,6 +260,7 @@ class parser {
     /// @brief Splits the header row at the columns.
     /// @param header string (first line of CSV file).
     /// @return header fields, or an error.
+    /// @todo Fix error reading first column name on Windows.
     static expected<header_fields_t, parser::error> parse_header(
         const string& header) {
         using std::operator""sv;
