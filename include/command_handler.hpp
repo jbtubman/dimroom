@@ -24,6 +24,12 @@ namespace filesystem = std::filesystem;
 
 class command_handler {
    public:
+#if defined(_WIN64)
+    using IFSTREAM = std::wifstream;
+#else
+    using IFSTREAM = std::ifstream;
+#endif
+
     /// @brief Attempts to read in the CSV file indicated by the filename.
     /// @param filename
     /// @return A jt::table if there is such a file and it can be read and
@@ -38,7 +44,7 @@ class command_handler {
                 println(stderr, "file \"{}\" does not exist", filename);
                 return std::unexpected(parser::error::file_exist_error);
             }
-            std::ifstream instream(fpath);
+            IFSTREAM instream(fpath);
             if (!instream) {
                 println(stderr, "file \"{}\" could not be opened for input",
                         filename);
