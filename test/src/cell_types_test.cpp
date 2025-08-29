@@ -1,8 +1,11 @@
 #include "cell_types.hpp"
+#include "cell_types_formatter.hpp"
 
 #include <algorithm>
 #include <concepts>
+#include <format>
 #include <iterator>
+#include <print>
 #include <ranges>
 #include <string>
 #include <type_traits>
@@ -15,7 +18,9 @@
 
 namespace {
 using std::string;
+using std::format;
 using std::vector;
+using std::println;
 using namespace jt;
 namespace ranges = std::ranges;
 namespace views = std::views;
@@ -74,5 +79,50 @@ TEST_CASE(MyFixture, CellTypes) {
                     CHECK_TRUE(false);
                 }
             });
+    }
+}
+
+TEST_CASE(MyFixture, CellTypesFormatter) {
+    SECTION("undetermined") {
+        e_cell_data_type input{e_cell_data_type::undetermined};
+        string expected("\"undetermined\"");
+        auto result = format("{}", input);
+        CHECK_TRUE(result == expected);
+        if (result != expected) {
+            println("expected: \"{}\"", expected);
+            println("result:   \"{}\"", result);
+        }
+    }
+    SECTION("undetermined long") {
+        e_cell_data_type input{e_cell_data_type::undetermined};
+        string expected("\"jt::e_cell_data_type::undetermined\"");
+        // const auto lf = long_fmt.c_str();
+        auto result = format("{0:@}", input);
+        CHECK_TRUE(result == expected);
+        if (result != expected) {
+            println("expected: \"{}\"", expected);
+            println("result:   \"{}\"", result);
+        }
+    }
+
+    SECTION("invalid") {
+        e_cell_data_type input{e_cell_data_type::invalid};
+        string expected("\"invalid\"");
+        auto result = format("{}", input);
+        CHECK_TRUE(result == expected);
+        if (result != expected) {
+            println("expected: \"{}\"", expected);
+            println("result:   \"{}\"", result);
+        }
+    }
+    SECTION("invalid long") {
+        e_cell_data_type input{e_cell_data_type::invalid};
+        string expected("\"jt::e_cell_data_type::invalid\"");
+        auto result = format("{0:@}", input);
+        CHECK_TRUE(result == expected);
+        if (result != expected) {
+            println("expected: \"{}\"", expected);
+            println("result:   \"{}\"", result);
+        }
     }
 }
