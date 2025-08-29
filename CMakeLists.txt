@@ -10,6 +10,15 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 
 find_package(Readline)
 
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        v1.17.0 # Or a specific tag/commit
+)
+FetchContent_MakeAvailable(googletest)
+
+
 set(dimroom_VERSION_MAJOR 2)
 set(dimroom_VERSION_MINOR 17)
 
@@ -23,7 +32,7 @@ add_executable(dimroom
 
 if(READLINE_FOUND)
 target_include_directories(dimroom PUBLIC ${PROJECT_SOURCE_DIR}/include ${Readline_INCLUDE_DIR})
-target_link_libraries(dimroom ${Readline_LIBRARY})
+target_link_libraries(dimroom ${Readline_LIBRARY} gtest)
 else()
 target_include_directories(dimroom PUBLIC ${PROJECT_SOURCE_DIR}/include)
 endif()

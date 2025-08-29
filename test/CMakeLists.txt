@@ -23,7 +23,7 @@ target_include_directories(
   PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
   PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
   ${Readline_INCLUDE_DIR})
-target_link_libraries(test_dimroom ${Readline_LIBRARY})
+target_link_libraries(test_dimroom ${Readline_LIBRARY} gtest)
 else()
 target_include_directories(
   test_dimroom
