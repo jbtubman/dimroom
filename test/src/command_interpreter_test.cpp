@@ -11,7 +11,7 @@
 #include "CppUnitTestFramework.hpp"
 #include "contains.hpp"
 #include "coordinates.hpp"
-#include "general_fixture.hpp"
+#include "../include/general_fixture.hpp"
 
 namespace {
 using std::string;

@@ -9,7 +9,7 @@
 #include <type_traits>
 
 #include "CppUnitTestFramework.hpp"
-#include "general_fixture.hpp"
+#include "../include/general_fixture.hpp"
 
 namespace {
 using std::string;

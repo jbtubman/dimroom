@@ -10,7 +10,7 @@
 
 #include "CppUnitTestFramework.hpp"
 #include "cell_types.hpp"
-#include "general_fixture.hpp"
+#include "../include/general_fixture.hpp"
 #include "parser.hpp"
 
 namespace {
