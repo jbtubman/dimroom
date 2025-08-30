@@ -5,6 +5,7 @@
 #include "../include/cell_types_test.hpp"
 #include "../include/command_interpreter_test.hpp"
 #include "../include/coordinates_test.hpp"
+#include "../include/parse_utils_test.hpp"
 
 int main(int argc, char* argv[]) {
   testing::InitGoogleTest(&argc, argv);
