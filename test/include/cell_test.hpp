@@ -7,8 +7,6 @@
 #include <string_view>
 #include <vector>
 
-#include "../include/general_fixture.hpp"
-#include "CppUnitTestFramework.hpp"
 #include "cell.hpp"
 #include "cell_types.hpp"
 #include "google_test_fixture.hpp"

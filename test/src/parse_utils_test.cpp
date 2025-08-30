@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "CppUnitTestFramework.hpp"
-#include "general_fixture.hpp"
+#include "../include/general_fixture.hpp"
 using namespace std::string_literals;
 
 namespace {
