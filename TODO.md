@@ -23,6 +23,7 @@ As of September 2, 2025:
 * Implemented numeric comparisons for `=`, `!=`, `>`, `>=`, `<`, and `<=`.
 * Updated help text.
 * ANDed queries work.
+* Unit testing library changed to [Google Test](https://google.github.io/googletest/).
 * Byte-order mark bug on Windows fixed.
 
 ## Things Remaining

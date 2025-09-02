@@ -14,22 +14,23 @@ include(GoogleTest)
 file(GLOB TEST_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 add_executable(test_dimroom
-  ${TEST_SOURCES}
+  # ${TEST_SOURCES}
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/test_dimroom.cpp
   ${PROJECT_SOURCE_DIR}/../src/command_line.cpp
   ${PROJECT_SOURCE_DIR}/../src/query.cpp)
 
 if(READLINE_FOUND)
-target_include_directories(
-  test_dimroom
-  PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
-  PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
-  ${Readline_INCLUDE_DIR})
-target_link_libraries(test_dimroom ${Readline_LIBRARY} gtest)
+  target_include_directories(
+    test_dimroom
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    ${Readline_INCLUDE_DIR})
+  target_link_libraries(test_dimroom ${Readline_LIBRARY} gtest)
 else()
-target_include_directories(
-  test_dimroom
-  PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
-  PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+  target_include_directories(
+    test_dimroom
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
   target_link_libraries(test_dimroom gtest)
 endif()
 

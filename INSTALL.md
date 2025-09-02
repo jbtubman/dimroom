@@ -53,9 +53,12 @@ This will create the file `build\Makefile`. Then type
 This will build the executable file `dimroom` in the `build` directory
 and the executable file `test_dimroom` in the `build/test` directory.
 
+`dimroom` uses [Google Test](https://google.github.io/googletest/) as its testing library.
 To run the tests, in the `dimroom/build` directory, enter the command:
 
     $ test/test_dimroom
+
+The tests can also be run in the testing tool in VS Code.
 
 To run `dimroom`, in the `dimroom/build` directory, enter the command:
 
@@ -82,9 +85,12 @@ This will build the execuable file `dimroom.exe` in the `build\Debug` folder
 and the executable file `test_dimroom.exe` in the `build\test\Debug` folder.
 (You can also use `Release` instead of `Debug` if desired.)
 
+`dimroom` uses [Google Test](https://google.github.io/googletest/) as its testing library.
 To run the tests, in the `dimroom\build` folder, enter the command:
 
     C:\Users\asmithee\src\dimroom\build> .\test\Debug\test_dimroom.exe
+
+The tests can also be run in the testing tool in VS Code.
 
 To run `dimroom`, enter the command:
 
