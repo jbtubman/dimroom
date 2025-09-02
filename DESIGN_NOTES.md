@@ -1,7 +1,7 @@
 # DESIGN NOTES
 
 Jim Tubman
-August 2025
+September 2025
 
 ## Introduction
 

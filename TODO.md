@@ -23,11 +23,10 @@ As of September 2, 2025:
 * Implemented numeric comparisons for `=`, `!=`, `>`, `>=`, `<`, and `<=`.
 * Updated help text.
 * ANDed queries work.
+* Byte-order mark bug on Windows fixed.
 
 ## Things Remaining
 
-* Detect and remove Byte Order Mark (Unicode codepoint U+FEFF zero width no-break space)
-  (or EF BB BF for UTF-8) when parsing file.
-* Improve documentation.
-* Improve test coverage.
+* Continue improving documentation.
+* Continue improving test coverage.
 * Continue refactoring.

@@ -24,6 +24,9 @@
 #include <utility>
 #include <vector>
 
+// Windows and MacOS have different ideas about what things
+// can be constexpr.
+// Sometimes necessary to distinguish between functions and variables there.
 #if !defined(_WIN64)
 #include <readline/history.h>
 #include <readline/readline.h>
@@ -41,6 +44,7 @@ namespace jt {
 using std::operator""s;
 
 inline std::optional<std::string> lineread(const std::string& prompt = ""s) {
+    // Windows does not have Gnu Readline.
 #if _WIN64
     std::string input_line;
     std::cout << prompt;
