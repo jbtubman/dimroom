@@ -273,8 +273,10 @@ class parser {
                 header_sv | views::split(","sv) | ranges::to<vector<string>>();
 
             ranges::transform(
-                split_header, std::back_inserter(result), [](auto header_text) {
-                    return header_field{header_text,
+                split_header, std::back_inserter(result),
+                [](const string& header_text) {
+                    const string trimmed_header_text = trim(header_text);
+                    return header_field{trimmed_header_text,
                                         e_cell_data_type::undetermined};
                 });
 

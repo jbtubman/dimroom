@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <print>
 #include <ranges>
 #include <sstream>
 #include <string>
@@ -15,6 +16,7 @@
 
 namespace {
 using std::pair;
+using std::println;
 using std::string;
 using std::vector;
 using namespace jt;
@@ -36,6 +38,26 @@ struct utility_test_fixture : google_test_fixture {
     const string long_close_above{"-114.08530"};
     const string long_below_should_fail{"-114.08527"};
     const string long_above_should_fail{"-114.08531"};
+
+    const string utf8_bom{"\357\273\277"};
+    const string utf16_le_bom{"\377\376"};
+    const string utf16_be_bom{"\376\377"};
+
+    const string utf8_bom_hdr{
+        "\357\273\277Filename,Type,Image Size (MB),Image X,Image "
+        "Y,DPI,(Center) Coordinate,Favorite,Continent,Bit color,Alpha,Hockey "
+        "Team,User Tags"};
+    const string utf16_bom_be_hdr{
+        "\376\377Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) "
+        "Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User "
+        "Tags\010"};
+    const string utf16_bom_le_hdr{
+        "\377\376Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) "
+        "Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User "
+        "Tags\010"};
+    const string expected_trimmed_hdr{
+        "Filename,Type,Image Size (MB),Image X,Image Y,DPI,(Center) "
+        "Coordinate,Favorite,Continent,Bit color,Alpha,Hockey Team,User Tags"};
 };
 
 }  // namespace
@@ -210,4 +232,15 @@ TEST_F(utility_test_fixture, StringUtilsTrimWithNoSpaceInPlace) {
     const string expected = "foo";
     trim(input);
     EXPECT_TRUE(input == expected);
+}
+
+TEST_F(utility_test_fixture, StringUtilsRemoveUTF8ByteOrderMark) {
+    const string& input = utility_test_fixture::utf8_bom_hdr;
+    const string& expected = utility_test_fixture::expected_trimmed_hdr;
+    auto result = trim(input);
+    if (result != expected) {
+        println("expected: \"{}\"", expected);
+        println("result:   \"{}\"", result);
+    }
+    EXPECT_TRUE(result == expected);
 }

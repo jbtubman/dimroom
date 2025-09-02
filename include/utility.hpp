@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <concepts>
 #include <cstdlib>
@@ -13,8 +14,10 @@
 #include <iterator>
 #include <memory>
 #include <optional>
+#include <print>
 #include <ranges>
 #include <regex>
+#include <span>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -22,8 +25,8 @@
 #include <vector>
 
 #if !defined(_WIN64)
-#include <readline/readline.h>
 #include <readline/history.h>
+#include <readline/readline.h>
 #define CONSTEXPR constexpr
 #else
 #define CONSTEXPR
@@ -89,6 +92,7 @@ constexpr bool has_cpp_lib_modules =
 #endif
 
 using std::pair;
+using std::println;
 using std::vector;
 namespace ranges = std::ranges;
 namespace views = std::ranges::views;
@@ -239,7 +243,8 @@ constexpr OutputCollection cross_product(Collection1 v1, Collection2 v2) {
 /// @tparam ForwardIt
 /// @param first
 /// @param last
-/// @return Iterator to first of the equal elements, or the end of the collection.
+/// @return Iterator to first of the equal elements, or the end of the
+/// collection.
 /// @see https://en.cppreference.com/w/cpp/algorithm/adjacent_find.html
 template <class ForwardIt>
 ForwardIt adjacent_find(ForwardIt first, ForwardIt last) {
@@ -256,13 +261,15 @@ ForwardIt adjacent_find(ForwardIt first, ForwardIt last) {
 
 // Taken from https://en.cppreference.com/w/cpp/algorithm/adjacent_find.html
 
-/// @brief Finds the first of two elements in a collection which satisfy the predicate.
+/// @brief Finds the first of two elements in a collection which satisfy the
+/// predicate.
 /// @tparam ForwardIt
 /// @tparam BinaryPred
 /// @param first
 /// @param last
 /// @param p
-/// @return Iterator to first of the equal elements, or the end of the collection.
+/// @return Iterator to first of the equal elements, or the end of the
+/// collection.
 /// @see https://en.cppreference.com/w/cpp/algorithm/adjacent_find.html
 template <class ForwardIt, class BinaryPred>
 ForwardIt adjacent_find(ForwardIt first, ForwardIt last, BinaryPred p) {
@@ -292,6 +299,15 @@ auto shove_back(Container&& acc, T&& v) {
     return result;
 }
 
+/// @brief Byte-Order Mark for a UTF-8 text file.
+constexpr string utf8_bom{"\357\273\277"};
+
+/// @brief Byte-Order Mark for a UTF-16 (little-endian) text file.
+constexpr string utf16_le_bom{"\377\376"};
+
+/// @brief Byte-Order Mark for a UTF-16 (big-endian) text file.
+constexpr string utf16_be_bom{"\376\377"};
+
 /// @brief Returns a trimmed copy of the input string.
 /// @param const string& line
 /// @return string
@@ -299,6 +315,24 @@ auto shove_back(Container&& acc, T&& v) {
     string result{line};
     result.erase(std::remove(result.begin(), result.end(), '\n'), result.end());
     result.erase(std::remove(result.begin(), result.end(), '\r'), result.end());
+
+    // Remove byte order marks, if any.
+    // https://en.wikipedia.org/wiki/Byte_order_mark
+
+    if (result.starts_with(utf8_bom)) {
+        const auto offset = utf8_bom.length();
+        const auto offset_it = result.begin() + offset;
+        result.erase(result.begin(), offset_it);
+        return result;
+    }
+
+    if (result.starts_with(utf16_be_bom) || result.starts_with(utf16_le_bom)) {
+        const auto offset = utf16_be_bom.length();
+        const auto offset_it = result.begin() + offset;
+        result.erase(result.begin(), offset_it);
+        return result;
+    }
+
     return result;
 }
 

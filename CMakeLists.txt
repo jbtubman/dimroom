@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.0)
 
-project(dimroom VERSION 2.17)
+project(dimroom VERSION 2.18)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -22,7 +22,7 @@ FetchContent_MakeAvailable(googletest)
 find_package(googletest)
 
 set(dimroom_VERSION_MAJOR 2)
-set(dimroom_VERSION_MINOR 17)
+set(dimroom_VERSION_MINOR 18)
 
 configure_file(${PROJECT_SOURCE_DIR}/include/dimroomConfig.h.in ${PROJECT_SOURCE_DIR}/include/dimroomConfig.h)
 

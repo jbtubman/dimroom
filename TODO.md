@@ -1,10 +1,10 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.17.
+This summarizes the state of things as of Version 2.18.
 
 ## Things Completed
 
-As of August 14, 2025:
+As of September 2, 2025:
 
 * Reads in CSV file.
 * Parses the header and data rows.
@@ -26,6 +26,8 @@ As of August 14, 2025:
 
 ## Things Remaining
 
+* Detect and remove Byte Order Mark (Unicode codepoint U+FEFF zero width no-break space)
+  (or EF BB BF for UTF-8) when parsing file.
 * Improve documentation.
 * Improve test coverage.
 * Continue refactoring.
