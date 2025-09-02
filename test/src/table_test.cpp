@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "CppUnitTestFramework.hpp"
-#include "general_fixture.hpp"
+#include "../include/general_fixture.hpp"
 #include "parser.hpp"
 #include "query.hpp"
 
