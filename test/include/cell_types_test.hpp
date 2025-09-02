@@ -10,8 +10,6 @@
 #include <type_traits>
 #include <vector>
 
-#include "../include/general_fixture.hpp"
-#include "CppUnitTestFramework.hpp"
 #include "cell_types.hpp"
 #include "cell_types_formatter.hpp"
 #include "google_test_fixture.hpp"
