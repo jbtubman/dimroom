@@ -14,11 +14,11 @@
 #include "utility.hpp"
 
 namespace {
-using std::string;
-using std::vector;
-using namespace jt;
-namespace ranges = std::ranges;
-namespace views = std::ranges::views;
+    using std::string;
+    using std::vector;
+    using namespace jt;
+    namespace ranges = std::ranges;
+    namespace views = std::ranges::views;
 }  // namespace
 
 struct google_test_fixture : testing::Test {
@@ -100,5 +100,10 @@ struct google_test_fixture : testing::Test {
         R"(Calgary.tif,tiff,30.6,600,800,1200,"51.05011, -114.08529",Yes,,32,Y,Flames,"""Urban, Dusk""")",
         R"(Edmonton.jpg,jpeg,5.6,900,400,72,"53.55014, -113.46871",,,,,Oilers,)"};
 
+#if !defined(_WIN64)
     const string csv_input_file{"../../test/data/sample.csv"};
+#else
+    // Windows puts its executable one level deeper than MacOS.
+    const string csv_input_file{"../../../test/data/sample.csv"};
+#endif
 };

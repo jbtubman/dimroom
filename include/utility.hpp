@@ -28,8 +28,10 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 #define CONSTEXPR constexpr
+#define CONSTEXPRVAR constexpr
 #else
 #define CONSTEXPR
+#define CONSTEXPRVAR static const
 #endif
 
 #include "jt_concepts.hpp"
@@ -300,13 +302,13 @@ auto shove_back(Container&& acc, T&& v) {
 }
 
 /// @brief Byte-Order Mark for a UTF-8 text file.
-constexpr string utf8_bom{"\357\273\277"};
+CONSTEXPRVAR string utf8_bom{"\357\273\277"};
 
 /// @brief Byte-Order Mark for a UTF-16 (little-endian) text file.
-constexpr string utf16_le_bom{"\377\376"};
+CONSTEXPRVAR string utf16_le_bom{"\377\376"};
 
 /// @brief Byte-Order Mark for a UTF-16 (big-endian) text file.
-constexpr string utf16_be_bom{"\376\377"};
+CONSTEXPRVAR string utf16_be_bom{"\376\377"};
 
 /// @brief Returns a trimmed copy of the input string.
 /// @param const string& line
