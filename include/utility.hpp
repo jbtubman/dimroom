@@ -9,7 +9,9 @@
 #include <filesystem>
 #include <functional>
 #if defined(_WIN64)
+#include <windows.h>
 #include <iostream>
+#include <stringapiset.h>
 #endif
 #include <iterator>
 #include <memory>
@@ -43,6 +45,12 @@ namespace jt {
 
 using std::operator""s;
 
+#if defined(_WIN64)
+using out_string_t = std::wstring;
+#else
+using out_string_t = std::string;
+#endif
+
 inline std::optional<std::string> lineread(const std::string& prompt = ""s) {
     // Windows does not have Gnu Readline.
 #if _WIN64
@@ -63,6 +71,50 @@ inline std::optional<std::string> lineread(const std::string& prompt = ""s) {
         add_history(sbuf.c_str());
         return sbuf;
     }
+#endif
+}
+
+inline std::optional<out_string_t> fix_output_encoding(std::string output_str) {
+#if defined(_WIN64)
+    int requiredSize = MultiByteToWideChar(CP_UTF8, 0, output_str.c_str(), -1, NULL, 0);
+    if (requiredSize == 0) {
+        return {};
+    }
+
+    std::wstring utf16String(requiredSize, L'\0');
+    auto start = &(output_str[0]);
+    int convertedChars = MultiByteToWideChar(CP_UTF8, 0, output_str.c_str(), -1, &utf16String[0], requiredSize);
+
+    if (convertedChars <= 0) {
+        return {};
+    }
+        // Remove the extra null terminator if present from the initial sizing
+    utf16String.resize(convertedChars - 1); 
+
+    return utf16String;
+
+
+    // MultiByteToWideChar(CP_UTF8, 0, output_str.c_str(), -1, reinterpret_cast<LPWSTR>(start), requiredSize);
+
+    // std::wstring wideWhat;
+
+    // int convertResult = MultiByteToWideChar(CP_UTF8, 0, output_str.c_str(), (int)output_str.size(), NULL, 0);
+    // if (convertResult <= 0)
+    // {
+    //     return {};
+    // }
+    // else
+    // {
+    //     wideWhat.resize(convertResult + 10);
+    //     convertResult = MultiByteToWideChar(CP_UTF8, 0, output_str.c_str(), (int)output_str.size(), &wideWhat[0], (int)wideWhat.size());
+    //     if (convertResult <= 0)
+    //     {
+    //         return {};
+    //     }
+    // }
+    // return wideWhat;
+#else
+    return e;
 #endif
 }
 

@@ -173,6 +173,15 @@ void command_line::do_query(table& t, const string& query_line) {
         query_table = do_one_query(query_table, clause);
     }
 
+#if defined(_WIN64)
+    constexpr wchar_t _empty[] = {0};
+    const out_string_t empty{_empty};
+    auto& out_stream = std::wcout;
+#else
+    const out_string_t empty = ""s;
+    auto& out_stream = std::out;
+#endif
+
     // Print out the column names.
     bool first_field = true;
     string column_names_output{};
@@ -185,15 +194,19 @@ void command_line::do_query(table& t, const string& query_line) {
             first_field = false;
             column_names_output.append(hf.text);
         });
-    println("{}", column_names_output);
+    auto opt_cn_output = fix_output_encoding(column_names_output);
+    const auto cn_output = opt_cn_output ? *opt_cn_output : empty;
+    out_stream << cn_output << std::endl;
 
     const auto& results = query_table.rows_;
 
     // print the rows.
     bool first_row = true;
-    ranges::for_each(results, [](const row& rw) {
+    ranges::for_each(results, [&empty, &out_stream](const row& rw) {
         string row_str = row_to_string(rw);
-        println("{}", row_str);
+        auto opt_output_row_str = fix_output_encoding(row_str);
+        const auto output_row_str = opt_output_row_str ? *opt_output_row_str : empty;
+        out_stream << output_row_str << std::endl;
     });
     println("{} rows found", results.size());
 }
