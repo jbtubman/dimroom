@@ -28,6 +28,7 @@ As of September 2, 2025:
 
 ## Things Remaining
 
+* Fix bug in printing of degree signs on output in Windows.
 * Continue improving documentation.
 * Continue improving test coverage.
 * Continue refactoring.

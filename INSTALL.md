@@ -95,3 +95,6 @@ The tests can also be run in the testing tool in VS Code.
 To run `dimroom`, enter the command:
 
     C:\Users\asmithee\src\dimroom\build> .\Debug\dimroom.exe ..\test\data\sample.csv
+
+Note: On Windows, certain special characters (such as the degree symbol) do not display
+properly when printed. This will be fixed in the next update.
