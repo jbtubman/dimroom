@@ -112,11 +112,26 @@ TEST_F(parser_test_fixture, ParseFileParseLines) {
 TEST_F(parser_test_fixture, ParseFileParseLinesFromIfstream) {
     const string filename = parser_test_fixture::csv_input_file;
     EXPECT_TRUE(std::filesystem::exists(filename));
+    size_t input_line_count{0};
+    {
+        std::ifstream input{filename};
+        if (input.is_open()) {
+            string line;
+            while(std::getline(input, line)) {
+                ++input_line_count;
+            }
+        }
+    }
     auto fp = std::filesystem::relative(filename);
     auto cp = std::filesystem::current_path();
     std::ifstream ifs(fp);
     EXPECT_TRUE(ifs.good());
     std::filesystem::path dotp(".");
+    auto result_ = parse_lines(ifs);
+    EXPECT_TRUE(result_.has_value());
+    parser::header_and_data result = *result_;
+    EXPECT_TRUE(!result.header_fields.empty());
+    EXPECT_TRUE(result.all_data_fields.size() == (input_line_count - 1));
 }
 
 TEST_F(parser_test_fixture, GetDataTypeForAllColumns) {
