@@ -92,6 +92,35 @@ To run the tests, in the `dimroom\build` folder, enter the command:
 
 The tests can also be run in the testing tool in VS Code.
 
+#### Configuring Windows For the UTF-8 Character Encoding
+
+`dimroom` is designed to work in a command-line terminal, with the UTF-8 character
+encoding system. By default, Windows is configured to use UTF-16 character encoding.
+It is necessary to make some changes to properly display UTF-8 characters.
+
+Begin by opening the Windows Control Panel. Click on `Region` (circled in red below).
+
+![Control Panel](./Control_Panel.PNG)
+
+When the Region dialog comes up, click on the `Administrative` tab (circled in red below).
+
+![Region Dialog](./Region_Formats.PNG)
+
+On the `Administrative` tab, click on the `Change system locale...` button (circled in
+red below).
+
+![Administrative Tab](./Region_Administrative.PNG)
+
+In the `Region Settings` dialog, make sure that `Beta: Use Unicode UTF-8 for
+worldwide language support` is checked (circled in red below).
+
+![Region Settings](./Region_Settings_Unicode.PNG)
+
+Close the dialogs by clicking the `OK` button, and restart Windows. The machine
+will now correctly display UTF-8 text in command-line windows.
+
+#### Running Dimroom
+
 To run `dimroom`, enter the command:
 
     C:\Users\asmithee\src\dimroom\build> .\Debug\dimroom.exe ..\test\data\sample.csv
