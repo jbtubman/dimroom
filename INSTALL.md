@@ -124,6 +124,3 @@ will now correctly display UTF-8 text in command-line windows.
 To run `dimroom`, enter the command:
 
     C:\Users\asmithee\src\dimroom\build> .\Debug\dimroom.exe ..\test\data\sample.csv
-
-Note: On Windows, certain special characters (such as the degree symbol) do not display
-properly when printed. This will be fixed in the next update.

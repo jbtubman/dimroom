@@ -1,10 +1,10 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.18.
+This summarizes the state of things as of Version 2.19.
 
 ## Things Completed
 
-As of September 2, 2025:
+As of September 22, 2025:
 
 * Reads in CSV file.
 * Parses the header and data rows.
@@ -25,10 +25,10 @@ As of September 2, 2025:
 * ANDed queries work.
 * Unit testing library changed to [Google Test](https://google.github.io/googletest/).
 * Byte-order mark bug on Windows fixed.
+* UTF-8 printing in Windows has been solved.
 
 ## Things Remaining
 
-* Fix bug in printing of degree signs on output in Windows.
 * Continue improving documentation.
 * Continue improving test coverage.
 * Continue refactoring.
