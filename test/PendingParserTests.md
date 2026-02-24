@@ -2,6 +2,10 @@
 
 List created by Claude Code, February 24, 2026.
 
+Prompt was:
+
+`Give a complete list of the unit tests required to test all public functions defined in the file @include/parser.hpp`
+
 ## `parser::parse_header(const string& header)`
 
 | Test Name | Scenario | Status |
