@@ -45,7 +45,7 @@ using std::operator""s;
 
 inline std::optional<std::string> lineread(const std::string& prompt = ""s) {
     // Windows does not have Gnu Readline.
-#if _WIN64
+#if defined(_WIN64)
     std::string input_line;
     std::cout << prompt;
     if (std::getline(std::cin, input_line)) {
@@ -483,7 +483,7 @@ constexpr bool bool_greater_equal(bool lhs, bool rhs) noexcept {
 }
 
 inline string path_to_string(const std::filesystem::path& fsp) {
-#if _WIN64
+#if defined(_WIN64)
     // Calculating the length of the multibyte string
     const size_t len = wcstombs(nullptr, fsp.c_str(), 0) + 1;
     // Creating a buffer to hold the multibyte string
