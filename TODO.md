@@ -27,11 +27,10 @@ As of February 25, 2026:
 * Byte-order mark bug on Windows fixed.
 * UTF-8 printing in Windows has been solved.
 * Running `test_dimroom` from the command line works correctly in any
-  directory on Mac and Android Linux.
+  directory on Mac, Windows, and Android Linux.
 
 ## Things Remaining
 
 * Continue improving documentation.
 * Continue improving test coverage.
 * Continue refactoring.
-* Test running `test_dimroom` from the command line on Windows.
