@@ -1,10 +1,10 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.19.
+This summarizes the state of things as of Version 2.20.
 
 ## Things Completed
 
-As of September 22, 2025:
+As of February 25, 2026:
 
 * Reads in CSV file.
 * Parses the header and data rows.
@@ -26,9 +26,12 @@ As of September 22, 2025:
 * Unit testing library changed to [Google Test](https://google.github.io/googletest/).
 * Byte-order mark bug on Windows fixed.
 * UTF-8 printing in Windows has been solved.
+* Running `test_dimroom` from the command line works correctly in any
+  directory on Mac and Android Linux.
 
 ## Things Remaining
 
 * Continue improving documentation.
 * Continue improving test coverage.
 * Continue refactoring.
+* Test running `test_dimroom` from the command line on Windows.
