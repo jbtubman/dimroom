@@ -1,16 +1,36 @@
 # DIMROOM (V2.19)
 
 Jim Tubman
-September 2025
+February 2026
 
 _A read-only command-line version of Lightroom._
 
+## Introduction
+
+### Problem Statement
+
 The problem statement for the code is in [ProblemStatement.md](./ProblemStatement.md).
+
+### Use of AI
+
+All versions of this code, up to and including version 2.19, were written without
+any AI assistance.
+
+In future, all files created or modified with AI will be listed in this section of this
+document, as well as being recorded in comments in the relevant files themselves.
+
+I am beginning to explore using Claude Code; I had it explain what the code in one
+of my header files does (which it did, accurately), and I asked it to come up with
+a list of unit tests required for the public functions defined in the file
+[`parser.hpp`](./include/parser.hpp). That list is found in the file [`PendingParserTests.md`](./test/PendingParserTests.md).
 
 ## Installation (Now Uses CMAKE)
 
 Installation instructions are available in the file [INSTALL.md](./INSTALL.md).
 Dimroom can be build and run on Mac OS and on 64-bit Windows.
+(It also builds and runs on a Samsung Galaxy Tab S9 Android tablet
+running Linux 5.15.178-android13-8, but that is not covered in the
+instructions in this project.)
 
 ## Running Dimroom (Mac OS)
 

@@ -14,6 +14,9 @@ C++ compiler and VSCode. It does compile without error in that environment.
 It has also been tested on 64-bit Windows, using version 19.44.35214 of the Microsoft C++
 compiler for VSCode.
 
+It also builds and runs on a Samsung Galaxy Tab S9 Android tablet running
+Linux 5.15.178-android13-8, but that is not covered in this document.
+
 ### Obtaining the Source Code
 
 The source code is available on GitHub.
