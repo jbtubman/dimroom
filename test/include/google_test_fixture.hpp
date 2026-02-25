@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
+#include "dimroomConfig.h"
 #include "utility.hpp"
 
 namespace {
@@ -101,9 +102,10 @@ struct google_test_fixture : testing::Test {
         R"(Edmonton.jpg,jpeg,5.6,900,400,72,"53.55014, -113.46871",,,,,Oilers,)"};
 
 #if !defined(_WIN64)
-    const string csv_input_file{"../../test/data/sample.csv"};
+    const string csv_input_file{dimroom_PROJECT_HOME "/test/data/sample.csv"};
 #else
     // Windows puts its executable one level deeper than MacOS.
-    const string csv_input_file{"../../../test/data/sample.csv"};
+    // const string csv_input_file{"../../../test/data/sample.csv"};
+    const string csv_input_file{dimroom_PROJECT_HOME "/test/data/sample.csv"};
 #endif
 };

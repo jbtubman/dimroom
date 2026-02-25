@@ -1,2 +1,3 @@
 #define dimroom_VERSION_MAJOR @dimroom_VERSION_MAJOR@
 #define dimroom_VERSION_MINOR @dimroom_VERSION_MINOR@
+#define dimroom_PROJECT_HOME "@dimroom_PROJECT_HOME@"
