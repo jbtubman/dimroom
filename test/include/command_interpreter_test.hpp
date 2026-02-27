@@ -1,18 +1,13 @@
 #pragma once
 
-#include <algorithm>
 #include <array>
 #include <memory>
 #include <string>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
 #include "command_line.hpp"
-#include "contains.hpp"
-#include "coordinates.hpp"
 #include "google_test_fixture.hpp"
-#include "utility.hpp"
 
 namespace {
 using std::string;

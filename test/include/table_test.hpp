@@ -1,13 +1,9 @@
 #pragma once
 
-#include <algorithm>
 #include <filesystem>
 #include <string>
-#include <vector>
 
 #include "google_test_fixture.hpp"
-#include "parser.hpp"
-#include "query.hpp"
 #include "table.hpp"
 
 namespace {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <print>
-#include <ranges>
 #include <regex>
 #include <string>
 #include <vector>
@@ -17,8 +16,6 @@ using std::sregex_iterator;
 using std::string;
 using std::vector;
 using namespace jt;
-namespace ranges = std::ranges;
-namespace views = std::views;
 
 struct parse_utils_test_fixture : google_test_fixture {
     // values for testing determine_data_field_e_cell_data_type.

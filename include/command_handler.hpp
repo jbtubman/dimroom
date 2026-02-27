@@ -2,11 +2,9 @@
 
 #include <expected>
 #include <filesystem>
-#include <format>
 #include <fstream>
 #include <ios>
 #include <string>
-#include <system_error>
 #include <vector>
 
 #include "coordinates.hpp"

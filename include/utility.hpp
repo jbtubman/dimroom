@@ -1,7 +1,12 @@
 #pragma once
 
+/*
+ * Some of the code in this file is experimental.
+ * I am learning some new C++ features that are not incorporated
+ * into the current working code.
+ */
+
 #include <algorithm>
-#include <array>
 #include <cctype>
 #include <concepts>
 #include <cstdlib>
@@ -11,13 +16,11 @@
 #if defined(_WIN64)
 #include <iostream>
 #endif
-#include <iterator>
 #include <memory>
 #include <optional>
 #include <print>
 #include <ranges>
 #include <regex>
-#include <span>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -81,6 +84,9 @@ enum class convert_error {
     tags_convert_error
 };
 
+// Some constexpr definitions to help see whether the compiler
+// supports certain features yet.
+
 constexpr bool has_cpp_modules =
 #if defined(__cpp_modules)
     true;
@@ -104,6 +110,7 @@ namespace ranges = std::ranges;
 namespace views = std::ranges::views;
 
 /// @brief string class that can be used as a constexpr value.
+/// Not used yet.
 /// @see https://youtu.be/PJwd4JLYJJY?si=MyCvBznETCp5EYGZ&t=400
 struct static_string {
     std::size_t m_size{0};
@@ -293,6 +300,7 @@ ForwardIt adjacent_find(ForwardIt first, ForwardIt last, BinaryPred p) {
 #endif
 
 /// @brief  Like push_back but returns a reference to the accumulator.
+/// Not used yet.
 /// @tparam T
 /// @tparam Container
 /// @param acc

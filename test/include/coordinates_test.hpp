@@ -1,12 +1,8 @@
 #pragma once
 
-#include <cmath>
-#include <concepts>
 #include <iostream>
 #include <print>
-#include <ranges>
 #include <string>
-#include <type_traits>
 
 #include "coordinates.hpp"
 #include "google_test_fixture.hpp"
@@ -14,7 +10,6 @@
 namespace {
 using std::string;
 using namespace jt;
-namespace ranges = std::ranges;
 
 struct coordinates_test_fixture : google_test_fixture {
     // ...

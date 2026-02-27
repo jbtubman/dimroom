@@ -1,14 +1,10 @@
 #include "query.hpp"
 
-#include <algorithm>
 #include <expected>
-#include <optional>
 #include <ranges>
 #include <regex>
 #include <string>
 #include <string_view>
-#include <type_traits>
-#include <variant>
 
 #include "contains.hpp"
 #include "table.hpp"
@@ -20,7 +16,6 @@ namespace ranges = std::ranges;
 namespace views = std::ranges::views;
 
 using std::string;
-using std::operator""s;
 using std::operator""sv;
 
 /// @brief Error reporting function.

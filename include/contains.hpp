@@ -3,18 +3,10 @@
 // Code to determine whether a point is inside a polygon or not.
 
 #include <algorithm>
-#include <concepts>
-#include <format>
-#include <iomanip>
-#include <iostream>
-#include <iterator>
 #include <print>
 #include <ranges>
-#include <sstream>
-#include <string_view>
 #include <tuple>
 #include <utility>
-#include <vector>
 
 #include "coordinates.hpp"
 

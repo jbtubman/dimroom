@@ -1,19 +1,14 @@
 #pragma once
 
 #include <algorithm>
-#include <concepts>
 #include <format>
-#include <iterator>
 #include <print>
-#include <ranges>
 #include <string>
-#include <type_traits>
 #include <vector>
 
 #include "cell_types.hpp"
 #include "cell_types_formatter.hpp"
 #include "google_test_fixture.hpp"
-#include "jt_concepts.hpp"
 #include "utility.hpp"
 
 namespace {
@@ -22,8 +17,6 @@ using std::println;
 using std::string;
 using std::vector;
 using namespace jt;
-namespace ranges = std::ranges;
-namespace views = std::views;
 
 /// @brief Returns a vector of all cell data types.
 /// @return vector<e_cell_data_type>
@@ -64,7 +57,6 @@ using std::vector;
 using std::println;
 using namespace jt;
 namespace ranges = std::ranges;
-namespace views = std::views;
 }  // namespace
 
 TEST_F(cell_types_fixture, CellTypesOperatorOr) {

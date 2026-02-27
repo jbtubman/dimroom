@@ -1,10 +1,7 @@
 #pragma once
 
-#include <algorithm>
-#include <concepts>
 #include <cstdlib>
 #include <expected>
-#include <format>
 #include <iostream>
 #include <print>
 #include <ranges>
@@ -35,7 +32,6 @@ using std::println;
 using std::regex;
 using std::regex_match;
 namespace ranges = std::ranges;
-namespace views = std::ranges::views;
 
 /// @brief Query interface.
 class query {

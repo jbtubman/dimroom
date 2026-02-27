@@ -1,13 +1,7 @@
 #pragma once
 
-#include <algorithm>
 #include <print>
-#include <ranges>
-#include <sstream>
 #include <string>
-#include <string_view>
-#include <tuple>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -20,8 +14,6 @@ using std::println;
 using std::string;
 using std::vector;
 using namespace jt;
-namespace ranges = std::ranges;
-namespace views = std::views;
 using std::operator""s;
 
 struct utility_test_fixture : google_test_fixture {

@@ -5,14 +5,11 @@
 // They have a positon and a value, which is optional.
 
 #include <algorithm>
-#include <iterator>
 #include <print>
 #include <ranges>
 #include <regex>
 #include <string>
 #include <string_view>
-#include <type_traits>
-#include <variant>
 #include <vector>
 
 #include "cell_types.hpp"

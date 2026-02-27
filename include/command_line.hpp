@@ -9,7 +9,6 @@
 #include <iostream>
 #include <optional>
 #include <print>
-#include <ranges>
 #include <regex>
 #include <string>
 #include <utility>
@@ -40,7 +39,6 @@ using std::println;
 using std::regex;
 using std::regex_match;
 namespace ranges = std::ranges;
-namespace views = std::ranges::views;
 
 /// @brief Returns a polygon_t if parsing was successful, otherwise returns an error.
 using expected_polygon_t = std::expected<polygon_t, convert_error>;
@@ -64,6 +62,7 @@ class command_line {
         "\"describe\" - describe the table",
         "\"query (\"column name\" operator value)\" - do a regular query",
         "\tavailable operators are = != > >= < <=",
+        // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
         "\"query (\"column name\" inside (coordinate) (coordinate) "
         "(coordinate)...)\" "
         "- look for coordinates inside a polygon of at least 3 points ",

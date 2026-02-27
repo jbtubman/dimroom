@@ -5,20 +5,16 @@
  */
 
 #include <cfloat>
-#include <concepts>
 #include <ranges>
 #include <string>
 #include <vector>
 
 #include "gtest/gtest.h"
 #include "dimroomConfig.h"
-#include "utility.hpp"
 
 namespace {
     using std::string;
     using std::vector;
-    using namespace jt;
-    namespace ranges = std::ranges;
     namespace views = std::ranges::views;
 }  // namespace
 

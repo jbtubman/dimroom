@@ -1,5 +1,6 @@
 // Test driver.
 #include "gtest/gtest.h"
+// NOLINTBEGIN(unused-includes)
 #include "../include/google_test_fixture.hpp"
 #include "../include/cell_test.hpp"
 #include "../include/cell_types_test.hpp"
@@ -10,6 +11,7 @@
 #include "../include/query_test.hpp"
 #include "../include/table_test.hpp"
 #include "../include/utility_test.hpp"
+// NOLINTEND(unused-includes)
 
 int main(int argc, char* argv[]) {
   testing::InitGoogleTest(&argc, argv);

@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <expected>
-#include <iostream>
 #include <ranges>
 #include <regex>
 #include <sstream>
@@ -10,15 +9,12 @@
 #include <vector>
 
 #include "cell_types.hpp"
-#include "contains.hpp"
 #include "coordinates.hpp"
 #include "query.hpp"
 #include "table.hpp"
 #include "utility.hpp"
 
 namespace jt {
-using std::cerr;
-using std::endl;
 using std::expected;
 using std::regex;
 using std::regex_match;
@@ -31,7 +27,6 @@ using std::vector;
 namespace ranges = std::ranges;
 namespace views = std::ranges::views;
 using ecdt = e_cell_data_type;
-using std::pair;
 
 enum class query_error { bad_format };
 

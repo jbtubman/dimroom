@@ -1,11 +1,7 @@
 #pragma once
 
-#include <cmath>
-#include <concepts>
 #include <string>
-#include <type_traits>
 
-#include "coordinates.hpp"
 #include "google_test_fixture.hpp"
 #include "query.hpp"
 #include "table.hpp"
@@ -13,7 +9,6 @@
 namespace {
 using std::string;
 using namespace jt;
-namespace filesystem = std::filesystem;
 using namespace std::string_literals;
 using std::operator""s;
 
