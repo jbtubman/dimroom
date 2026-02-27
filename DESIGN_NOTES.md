@@ -1,9 +1,11 @@
 # DESIGN NOTES
 
 Jim Tubman
-September 2025
+February 2025
 
 ## Introduction
+
+_AI has not yet been used to produce any code in this project._
 
 I had a lot of fun doing this. It gave me an opportunity to learn a lot
 about the many powerful features that have been incorporated into the
@@ -27,7 +29,7 @@ This implementation goes beyond the original requirements by adding the
 ability to deduce the data type of each column. Deducing the data types of the
 columns was an interesting challenge. I used a combination of regular expressions
 and attempted type conversions inside `try` blocks to do it. I'm proud of the
-`operator||` implementation I devised to help with that process.
+`operator||` implementation for cell data types that I devised to help with that process.
 
 ## Things I Would Do Differently
 
@@ -44,3 +46,9 @@ A commercial product would need a far more extensive test suite.
 
 For commercial use, I would have used third party libraries for things like
 parsing.
+
+## Future Considerations
+
+AI coding assistance is something that I will be experimenting with in the
+very near future. It would be interesting to compare an AI-produced solution
+with what I have done manually.
