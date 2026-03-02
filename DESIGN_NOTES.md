@@ -1,11 +1,13 @@
 # DESIGN NOTES
 
 Jim Tubman
-February 2025
+March 2025
 
 ## Introduction
 
-_AI has not yet been used to produce any code in this project._
+_AI has not yet been used to produce any C++code in this project._
+
+_AI has been used to improve the CMake input files._
 
 I had a lot of fun doing this. It gave me an opportunity to learn a lot
 about the many powerful features that have been incorporated into the

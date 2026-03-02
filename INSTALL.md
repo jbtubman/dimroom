@@ -59,7 +59,7 @@ and the executable file `test_dimroom` in the `build/test` directory.
 `dimroom` uses [Google Test](https://google.github.io/googletest/) as its testing library.
 To run the tests, in the `dimroom/build` directory, enter the command:
 
-    $ test/test_dimroom
+    $ make test
 
 The tests can also be run in the testing tool in VS Code.
 

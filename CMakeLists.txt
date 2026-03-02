@@ -1,6 +1,11 @@
-cmake_minimum_required(VERSION 4.0)
+cmake_minimum_required(VERSION 4.2)
 
-project(dimroom VERSION 2.21)
+project(
+  dimroom
+  DESCRIPTION "Parser and query engine for photo metadata"
+  LANGUAGES CXX
+  VERSION 2.22
+)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -19,10 +24,11 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-find_package(googletest)
+# find_package(googletest)
 
 set(dimroom_VERSION_MAJOR 2)
-set(dimroom_VERSION_MINOR 21)
+set(dimroom_VERSION_MINOR 22)
+set(dimroom_VERSION 2.22)
 set(dimroom_PROJECT_HOME "${PROJECT_SOURCE_DIR}")
 
 configure_file(${PROJECT_SOURCE_DIR}/include/dimroomConfig.h.in ${PROJECT_SOURCE_DIR}/include/dimroomConfig.h)
@@ -33,12 +39,15 @@ add_executable(dimroom
   ${PROJECT_SOURCE_DIR}/src/query.cpp
 )
 
+# Windows does not appear to have Readline,
+# but Linux and MacOS do.
 if(READLINE_FOUND)
   target_include_directories(dimroom PUBLIC ${PROJECT_SOURCE_DIR}/include
     ${Readline_INCLUDE_DIR})
-  target_link_libraries(dimroom ${Readline_LIBRARY} gtest)
+  target_link_libraries(dimroom ${Readline_LIBRARY})
 else()
   target_include_directories(dimroom PUBLIC ${PROJECT_SOURCE_DIR}/include)
 endif()
 
+enable_testing()
 add_subdirectory(test)

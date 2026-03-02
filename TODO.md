@@ -1,10 +1,10 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.20.
+This summarizes the state of things as of Version 2.22.
 
 ## Things Completed
 
-As of February 25, 2026:
+As of March 2, 2026:
 
 * Reads in CSV file.
 * Parses the header and data rows.
@@ -28,6 +28,7 @@ As of February 25, 2026:
 * UTF-8 printing in Windows has been solved.
 * Running `test_dimroom` from the command line works correctly in any
   directory on Mac, Windows, and Android Linux.
+* Tests can now be run in the `build` directory using the command `make test`.
 
 ## Things Remaining
 
