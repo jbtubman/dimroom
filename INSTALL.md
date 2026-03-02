@@ -6,7 +6,7 @@ Installing and running this package requires:
 
 * a C++ compiler;
 * the [Git](https://git-scm.com/downloads) version control system; and
-* the [CMake](https://cmake.org/download/) build tool.
+* the [CMake](https://cmake.org/download/) version 4.2 build tool.
 
 Dimroom was originally built and tested on a Mac Studio (MacOS 15.5), using the Clang 17.0.0
 C++ compiler and VSCode. It does compile without error in that environment.
