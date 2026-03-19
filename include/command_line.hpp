@@ -83,7 +83,7 @@ class command_line {
                          [](const string& s) { cerr << s << endl; });
     }
 
-    void describe_table(table& t) {
+    void describe_table(const table& t) {
         ranges::for_each(t.header_fields_, [](const parser::header_field& hf) {
             println("Column Name: \"{}\"; Column Type : {}", hf.text,
                     hf.data_type);
