@@ -18,12 +18,14 @@ make test       # run all tests
 ```
 
 Run the program:
+
 ```bash
 cd build
 ./dimroom ../test/data/sample.csv
 ```
 
 Run a specific test binary directly (for verbose output):
+
 ```bash
 cd build
 ./test/test_dimroom --gtest_filter=SomeTestSuite.SomeTest
