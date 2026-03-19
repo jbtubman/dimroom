@@ -69,6 +69,68 @@ TEST_F(parser_test_fixture, ParseHeaderParseSampleHeader) {
     }));
 }
 
+TEST_F(parser_test_fixture, ParseHeaderEmptyString) {
+    // An empty string has no commas, so split yields one empty element.
+    const string input = "";
+    const auto result = parser::parse_header(input);
+    EXPECT_FALSE(result.has_value());
+    EXPECT_EQ(result->size(), 1u);
+    EXPECT_EQ((*result)[0].text, "");
+    EXPECT_EQ((*result)[0].data_type, e_cell_data_type::undetermined);
+}
+
+TEST_F(parser_test_fixture, ParseHeaderSingleColumn) {
+    const string input = "Filename";
+    const auto result = parser::parse_header(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 1u);
+    EXPECT_EQ((*result)[0].text, "Filename");
+    EXPECT_EQ((*result)[0].data_type, e_cell_data_type::undetermined);
+}
+
+TEST_F(parser_test_fixture, ParseHeaderTwoColumns) {
+    const string input = "Name,Value";
+    const auto result = parser::parse_header(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 2u);
+    EXPECT_EQ((*result)[0].text, "Name");
+    EXPECT_EQ((*result)[1].text, "Value");
+    EXPECT_TRUE(ranges::all_of(*result, [](const auto& f) {
+        return f.data_type == e_cell_data_type::undetermined;
+    }));
+}
+
+TEST_F(parser_test_fixture, ParseHeaderWindowsCRLFStrippedFromLastField) {
+    // Windows-style line endings: trim() removes \r and \n from all fields.
+    const string input = "Col1,Col2\r\n";
+    const auto result = parser::parse_header(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 2u);
+    EXPECT_EQ((*result)[0].text, "Col1");
+    EXPECT_EQ((*result)[1].text, "Col2");
+}
+
+TEST_F(parser_test_fixture, ParseHeaderUTF8BOMStrippedFromFirstField) {
+    // trim() strips a leading UTF-8 BOM (\xEF\xBB\xBF) from any field.
+    const string input = "\357\273\277Filename,Type";
+    const auto result = parser::parse_header(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 2u);
+    EXPECT_EQ((*result)[0].text, "Filename");
+    EXPECT_EQ((*result)[1].text, "Type");
+}
+
+TEST_F(parser_test_fixture, ParseHeaderAllDataTypesUndetermined) {
+    // Every header field must have data type undetermined regardless of name.
+    const string input = "42,true,1.5,text,empty";
+    const auto result = parser::parse_header(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 5u);
+    EXPECT_TRUE(ranges::all_of(*result, [](const auto& f) {
+        return f.data_type == e_cell_data_type::undetermined;
+    }));
+}
+
 TEST_F(parser_test_fixture, ParseRowParseDataRow) {
     using str_cell_pair = std::pair<string, e_cell_data_type>;
     const string input = parser_test_fixture::sample_row_0;
