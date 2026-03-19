@@ -1,7 +1,7 @@
 # DIMROOM (V2.22)
 
 Jim Tubman
-February 2026
+March 2026
 
 _A read-only command-line version of Lightroom._
 
@@ -14,7 +14,7 @@ The problem statement for the code is in [ProblemStatement.md](./ProblemStatemen
 ### Use of AI
 
 All versions of this code, up to and including version 2.22, were written without
-any AI assistance.
+any AI assistance. AI has been used after this; all AI usage is marked as such.
 
 In future, all files created or modified with AI will be listed in this section of this
 document, as well as being recorded in comments in the relevant files themselves.
@@ -40,6 +40,15 @@ suggest how the CMake files @CMakeLists.txt and @test/CMakeLists.txt could be im
 The changes simplified both CMakeLists.txt files, and also made it easier to test the
 code from the command line. Now the tests can be run from the `build` directory simply
 by typing `make test` at the command prompt.
+
+#### Using AI to Improve Unit Tests
+
+_March 19, 2026_
+
+Claude code was used to create 6 new unit tests in the file [`test/include/parser_test.hpp`](./test/include/parser_test.hpp).
+The test `ParseHeaderEmptyString` initially failed. The function `parser::parse_header` was
+modified to return a new error type when given an empty or blank string as argument,
+and the test was modified to test for that behaviour.
 
 ## Installation (Now Uses CMAKE)
 

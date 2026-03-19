@@ -1,11 +1,11 @@
 # DESIGN NOTES
 
 Jim Tubman
-March 2025
+March 2026
 
 ## Introduction
 
-_AI has not yet been used to produce any C++code in this project._
+_AI has been used to produce some C++code for unit tests in this project._
 
 _AI has been used to improve the CMake input files._
 
@@ -51,6 +51,5 @@ parsing.
 
 ## Future Considerations
 
-AI coding assistance is something that I will be experimenting with in the
-very near future. It would be interesting to compare an AI-produced solution
-with what I have done manually.
+AI coding assistance is something that I am experimenting with. It would be interesting
+to compare an AI-produced solution with what I have done manually.

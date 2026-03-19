@@ -69,6 +69,7 @@ TEST_F(parser_test_fixture, ParseHeaderParseSampleHeader) {
     }));
 }
 
+// Added by Claude. Fixed by JBT.
 TEST_F(parser_test_fixture, ParseHeaderEmptyString) {
     // An empty string is an invalid header.
     const string input = "";
@@ -77,6 +78,7 @@ TEST_F(parser_test_fixture, ParseHeaderEmptyString) {
     EXPECT_EQ(result.error(), parser::error::header_empty_error);
 }
 
+// Added by Claude.
 TEST_F(parser_test_fixture, ParseHeaderSingleColumn) {
     const string input = "Filename";
     const auto result = parser::parse_header(input);
@@ -86,6 +88,7 @@ TEST_F(parser_test_fixture, ParseHeaderSingleColumn) {
     EXPECT_EQ((*result)[0].data_type, e_cell_data_type::undetermined);
 }
 
+// Added by Claude.
 TEST_F(parser_test_fixture, ParseHeaderTwoColumns) {
     const string input = "Name,Value";
     const auto result = parser::parse_header(input);
@@ -98,6 +101,7 @@ TEST_F(parser_test_fixture, ParseHeaderTwoColumns) {
     }));
 }
 
+// Added by Claude.
 TEST_F(parser_test_fixture, ParseHeaderWindowsCRLFStrippedFromLastField) {
     // Windows-style line endings: trim() removes \r and \n from all fields.
     const string input = "Col1,Col2\r\n";
@@ -108,8 +112,10 @@ TEST_F(parser_test_fixture, ParseHeaderWindowsCRLFStrippedFromLastField) {
     EXPECT_EQ((*result)[1].text, "Col2");
 }
 
+// Added by Claude. Clarifying comment by JBT.
 TEST_F(parser_test_fixture, ParseHeaderUTF8BOMStrippedFromFirstField) {
     // trim() strips a leading UTF-8 BOM (\xEF\xBB\xBF) from any field.
+    // Octal equivalent is \357\273\277.
     const string input = "\357\273\277Filename,Type";
     const auto result = parser::parse_header(input);
     EXPECT_TRUE(result.has_value());
@@ -118,6 +124,7 @@ TEST_F(parser_test_fixture, ParseHeaderUTF8BOMStrippedFromFirstField) {
     EXPECT_EQ((*result)[1].text, "Type");
 }
 
+// Added by Claude.
 TEST_F(parser_test_fixture, ParseHeaderAllDataTypesUndetermined) {
     // Every header field must have data type undetermined regardless of name.
     const string input = "42,true,1.5,text,empty";
