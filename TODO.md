@@ -1,10 +1,10 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.22.
+This summarizes the state of things as of Version 2.23.
 
 ## Things Completed
 
-As of March 2, 2026:
+As of March 19, 2026:
 
 * Reads in CSV file.
 * Parses the header and data rows.
@@ -29,6 +29,8 @@ As of March 2, 2026:
 * Running `test_dimroom` from the command line works correctly in any
   directory on Mac, Windows, and Android Linux.
 * Tests can now be run in the `build` directory using the command `make test`.
+* Several AI-generated unit tests were added for the function `parser::parse_header`.
+  These are noted in the source.
 
 ## Things Remaining
 
