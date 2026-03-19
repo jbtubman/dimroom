@@ -46,7 +46,9 @@ class parser {
         file_read_error,
         file_empty_error,
         file_parse_error,
-        column_name_not_found_error
+        column_name_not_found_error,
+        header_empty_error,
+        header_invalid_error
     };
 
    private:
@@ -259,7 +261,7 @@ class parser {
     /// @brief Splits the header row at the columns.
     /// @param header string (first line of CSV file).
     /// @return header fields, or an error.
-    /// @todo Fix error reading first column name on Windows.
+    /// @note An empty or all blank header string is considered an error.
     static expected<header_fields_t, parser::error> parse_header(
         const string& header) {
         using std::operator""sv;
@@ -278,12 +280,15 @@ class parser {
                     return header_field{trimmed_header_text,
                                         e_cell_data_type::undetermined};
                 });
-
+            if (result.empty()) {
+                return unexpected(parser::error::header_empty_error);
+            }
             return result;
         } catch (const std::exception& e) {
             println(stderr, "error while parsing header row: {}", e.what());
         }
-        return unexpected(parser::error::file_parse_error);
+        // Header was not empty but invalid in some other way.
+        return unexpected(parser::error::header_invalid_error);
     }
 
     /// @brief Parses data row

@@ -70,13 +70,11 @@ TEST_F(parser_test_fixture, ParseHeaderParseSampleHeader) {
 }
 
 TEST_F(parser_test_fixture, ParseHeaderEmptyString) {
-    // An empty string has no commas, so split yields one empty element.
+    // An empty string is an invalid header.
     const string input = "";
     const auto result = parser::parse_header(input);
     EXPECT_FALSE(result.has_value());
-    EXPECT_EQ(result->size(), 1u);
-    EXPECT_EQ((*result)[0].text, "");
-    EXPECT_EQ((*result)[0].data_type, e_cell_data_type::undetermined);
+    EXPECT_EQ(result.error(), parser::error::header_empty_error);
 }
 
 TEST_F(parser_test_fixture, ParseHeaderSingleColumn) {
