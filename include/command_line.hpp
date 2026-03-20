@@ -40,7 +40,8 @@ using std::regex;
 using std::regex_match;
 namespace ranges = std::ranges;
 
-/// @brief Returns a polygon_t if parsing was successful, otherwise returns an error.
+/// @brief Returns a polygon_t if parsing was successful, otherwise returns an
+/// error.
 using expected_polygon_t = std::expected<polygon_t, convert_error>;
 
 /// @brief Parses and interprets the command line.
@@ -85,7 +86,7 @@ class command_line {
 
     void describe_table(const table& t) {
         ranges::for_each(t.header_fields_, [](const parser::header_field& hf) {
-            println("Column Name: \"{}\"; Column Type : {}", hf.text,
+            println("Column Name: \"{}\"; Column Type: {}", hf.text,
                     hf.data_type);
         });
     }
@@ -96,7 +97,7 @@ class command_line {
     /// @param query_line
     void do_query(table& t, const string& query_line);
 
-  private:
+   private:
     table _do_one_query(const table& t, const string& query_clause);
 
     table _do_one_query(table&& t, const string& query_clause);
@@ -112,7 +113,7 @@ class command_line {
         return _do_one_query(std::forward<TABLE>(t), query_clause);
     }
 
-  public:
+   public:
     int read_eval_print(table& table_to_use) {
         println(stderr, "Welcome to DimRoom");
         println(stderr, "Enter the command \"help\" for help.");
