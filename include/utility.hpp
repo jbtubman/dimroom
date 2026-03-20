@@ -452,46 +452,23 @@ inline void trim(string& line) {
     line = trim(ss);
 }
 
-namespace {
 /// @brief Gets rid of opening and closing double quotes.
 /// @param s const string&
 /// @return A copy of s without the quotes.
-[[nodiscard]] inline string _dequote(const string& s) {
+[[nodiscard]] inline string dequote(const string& s) {
     std::regex quoted_rx{R"-(^"([^"]*)"$)-"};
     std::smatch m;
     return std::regex_match(s, m, quoted_rx) ? m[1].str() : string{s};
 }
 
 /// @brief Gets rid of opening and closing double quotes.
-/// @param s string&&
-/// @return A copy of s without the quotes.
-[[nodiscard]] inline string _dequote(string&& s) {
-    std::regex quoted_rx{R"-(^"([^"]*)"$)-"};
-    std::smatch m;
-    return std::regex_match(s, m, quoted_rx) ? m[1].str() : s;
-}
-
-/// @brief Gets rid of opening and closing double quotes.
-/// @param cs Array of characters.
-/// @return A copy of cs without the quotes.
-[[nodiscard]] inline string _dequote(const char* cs) {
-    return _dequote(string{cs});
-}
-
-/// @brief Gets rid of opening and closing double quotes.
-/// @param sv string_view
-/// @return A string copy of sv without the quotes.
-[[nodiscard]] inline string _dequote(std::string_view sv) {
-    return _dequote(string{sv});
-}
-}  // namespace
-
-/// @brief Gets rid of opening and closing double quotes.
+/// @tparam STRING
 /// @param s
 /// @return A copy of s without the quotes.
 template <class STRING>
 [[nodiscard]] inline string dequote(STRING&& s) {
-    return _dequote(std::forward<STRING>(s));
+    const string input{std::forward<STRING>(s)};
+    return dequote(input);
 }
 
 /// @brief Alters a string to remove opening and closing quotes.
