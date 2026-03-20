@@ -291,6 +291,18 @@ class parser {
         return unexpected(parser::error::header_invalid_error);
     }
 
+    /// @brief Splits the header row at the columns.
+    /// @tparam STRING
+    /// @param header string-like object (first line of CSV file).
+    /// @return header fields, or an error.
+    /// @note An empty or all blank header string is considered an error.
+    template <class STRING>
+    static expected<header_fields_t, parser::error> parse_header(
+        STRING&& header) {
+        const string input{std::forward<STRING>(header)};
+        return parse_header(input);
+    }
+
     /// @brief Parses data row
     /// @param data_row string.
     /// @return The data fields for the row, or an error.

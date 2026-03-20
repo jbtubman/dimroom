@@ -323,10 +323,11 @@ CONSTEXPRVAR string utf16_le_bom{"\377\376"};
 /// @brief Byte-Order Mark for a UTF-16 (big-endian) text file.
 CONSTEXPRVAR string utf16_be_bom{"\376\377"};
 
+namespace {
 /// @brief Remove leading and trailing whitespace from a string. Modifies the
 /// argument.
 /// @param line
-inline void trim_whitespace(string& line) {
+inline void _trim_whitespace(string& line) {
     setlocale(LC_ALL, "");
     const auto locale_str = setlocale(LC_ALL, nullptr);
     const std::locale locale_canada(locale_str);
@@ -353,20 +354,48 @@ inline void trim_whitespace(string& line) {
     line.erase(line.begin(), first_nonspace);
 }
 
-/// @brief Remove leading and trailing whitespace from a string.
-/// @param line
-/// @return A string with no leading or trailing whitespace (may be empty).
-[[nodiscard]] inline string trim_whitespace(const string& line) {
+[[nodiscard]] inline string _trim_whitespace(const char* line) {
     string result{line};
-    trim_whitespace(result);
+    _trim_whitespace(result);
     return result;
 }
 
+/// @brief Remove leading and trailing whitespace from a string.
+/// @param line
+/// @return A string with no leading or trailing whitespace (may be empty).
+[[nodiscard]] inline string _trim_whitespace(const string& line) {
+    string result{line};
+    _trim_whitespace(result);
+    return result;
+}
+
+[[nodiscard]] inline string _trim_whitespace(string&& line) {
+    auto result{line};
+    _trim_whitespace(result);
+    return result;
+}
+
+[[nodiscard]] inline string _trim_whitespace(std::string_view sv) {
+    return _trim_whitespace(string{sv});
+}
+}  // namespace
+
+template <class STRING>
+[[nodiscard]] inline string trim_whitespace(STRING&& line) {
+    return _trim_whitespace(std::forward<STRING>(line));
+}
+
+inline void trim_whitespace(string& s) {
+    const string& ss = s;
+    s = trim_whitespace(ss);
+}
+
+namespace {
 /// @brief Trims the string given as argument. Input argument is modified.
 /// @param line
 /// @note Removes byte order marks, if any, and all leading and trailing
 /// whitespace.
-inline void trim(string& line) {
+inline void _trim(string& line) {
     size_t offset = 0;
 
     // Remove byte order marks, if any.
@@ -388,10 +417,39 @@ inline void trim(string& line) {
 /// @return string
 /// @note Removes byte order marks, if any, and all leading and trailing
 /// whitespace.
-[[nodiscard]] inline string trim(const string& line) {
+[[nodiscard]] inline string _trim(const string& line) {
     string result{line};
-    trim(result);
+    _trim(result);
     return result;
+}
+
+[[nodiscard]] inline string _trim(std::string_view line) {
+    return _trim(string{line});
+}
+
+[[nodiscard]] inline string _trim(const char* line) {
+    string result{line};
+    _trim(result);
+    return result;
+}
+}  // namespace
+
+/// @brief Returns a trimmed copy of the input string-like argument.
+/// @tparam STRING
+/// @param line
+/// @return String with byte order marks and leading and trailing whitespace
+/// removed.
+template <class STRING>
+[[nodiscard]] inline string trim(STRING&& line) {
+    return _trim(std::forward<STRING>(line));
+}
+
+/// @brief Modifies the argument to remove byte order marks and leading and
+/// trailing whitespace.
+/// @param line
+inline void trim(string& line) {
+    const string& ss = line;
+    line = trim(ss);
 }
 
 namespace {

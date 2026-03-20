@@ -278,3 +278,16 @@ TEST_F(utility_test_fixture, StringUtilsRemoveUTF8ByteOrderMark) {
     }
     EXPECT_TRUE(result == expected);
 }
+
+TEST_F(utility_test_fixture, StringUtilsWSTrimCharacterArray) {
+    char input[] = " \n\t\rfoo \n\t\r";
+    const string expected = "foo";
+    auto result = trim_whitespace(input);
+    EXPECT_TRUE(result == expected);
+}
+
+TEST_F(utility_test_fixture, StringUtilsWSTrimRValueString) {
+    const string expected = "foo";
+    auto result = trim_whitespace(string{" \n\t\rfoo \n\t\r"});
+    EXPECT_TRUE(result == expected);
+}

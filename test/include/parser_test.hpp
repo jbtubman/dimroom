@@ -91,6 +91,31 @@ TEST_F(parser_test_fixture, ParseHeaderTrimsWhitespace) {
     EXPECT_EQ((*result)[3].text, "Four");
 }
 
+TEST_F(parser_test_fixture, ParseHeaderTrimsWhitespaceOfRValue) {
+    // Column names with leading/trailing spaces.
+    const auto result = parser::parse_header(string{"One, Two,Three ,   Four  "});
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 4u);
+    EXPECT_EQ((*result)[0].text, "One");
+    EXPECT_EQ((*result)[1].text, "Two");
+    EXPECT_EQ((*result)[2].text, "Three");
+    EXPECT_EQ((*result)[3].text, "Four");
+}
+
+// Suggested by Claude. Implemented by JBT.
+TEST_F(parser_test_fixture, ParseHeaderTrimsWhitespaceOfStringView) {
+    // Column names with leading/trailing spaces.
+    const string s = "One, Two,Three ,   Four  ";
+    std::string_view input{s};
+    const auto result = parser::parse_header(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 4u);
+    EXPECT_EQ((*result)[0].text, "One");
+    EXPECT_EQ((*result)[1].text, "Two");
+    EXPECT_EQ((*result)[2].text, "Three");
+    EXPECT_EQ((*result)[3].text, "Four");
+}
+
 // Added by Claude.
 TEST_F(parser_test_fixture, ParseHeaderSingleColumn) {
     const string input = "Filename";
