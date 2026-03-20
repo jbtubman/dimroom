@@ -198,9 +198,51 @@ TEST_F(utility_test_fixture, StringUtilsDequoteUnquotedInPlace) {
     EXPECT_TRUE(input == expected);
 }
 
+TEST_F(utility_test_fixture, StringUtilsWSTrimEmptyString) {
+    string input = "";
+    const string expected = "";
+    trim_whitespace(input);
+    EXPECT_TRUE(input == expected);
+}
+
+TEST_F(utility_test_fixture, StringUtilsWSTrimWhitespaceString) {
+    string input = " \t\r\n";
+    const string expected = "";
+    trim_whitespace(input);
+    EXPECT_TRUE(input == expected);
+}
+
+TEST_F(utility_test_fixture, StringUtilsWSTrimNoSpace) {
+    string input = "foo";
+    const string expected = "foo";
+    trim_whitespace(input);
+    EXPECT_TRUE(input == expected);
+}
+
+TEST_F(utility_test_fixture, StringUtilsWSTrimLeadingSpace) {
+    string input = " \n\t\rfoo";
+    const string expected = "foo";
+    trim_whitespace(input);
+    EXPECT_TRUE(input == expected);
+}
+
+TEST_F(utility_test_fixture, StringUtilsWSTrimTrailingSpace) {
+    string input = "foo \n\t\r";
+    const string expected = "foo";
+    trim_whitespace(input);
+    EXPECT_TRUE(input == expected);
+}
+
+TEST_F(utility_test_fixture, StringUtilsWSTrimLeadingTrailingSpace) {
+    string input = " \n\t\rfoo \n\t\r";
+    const string expected = "foo";
+    trim_whitespace(input);
+    EXPECT_TRUE(input == expected);
+}
+
 TEST_F(utility_test_fixture, StringUtilsTrimWithSpace) {
     const string input = "  foo\r\n";
-    const string expected = "  foo";
+    const string expected = "foo";
     const string result = trim(input);
     EXPECT_TRUE(result == expected);
 }
@@ -214,7 +256,7 @@ TEST_F(utility_test_fixture, StringUtilsTrimWithNoSpace) {
 
 TEST_F(utility_test_fixture, StringUtilsTrimWithSpaceInPlace) {
     string input = "  foo\r\n";
-    const string expected = "  foo";
+    const string expected = "foo";
     trim(input);
     EXPECT_TRUE(input == expected);
 }

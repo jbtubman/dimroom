@@ -11,10 +11,17 @@ Prompt was:
 | Test Name | Scenario | Status |
 |---|---|---|
 | `ParseHeaderParseSampleHeader` | Multi-column header, all fields trimmed, all types `undetermined` | **EXISTS** |
-| `ParseHeaderSingleColumn` | Input with only one column name | Missing |
+| `ParseHeaderEmptyString` | Empty string input → returns `unexpected(file_parse_error)` | **EXISTS** |
 | `ParseHeaderTrimsWhitespace` | Column names with leading/trailing spaces | Missing |
-| `ParseHeaderEmptyString` | Empty string input → returns `unexpected(file_parse_error)` | Missing |
+| `ParseHeaderSingleColumn` | Input with only one column name | **EXISTS** |
+| `ParseHeaderTwoColumns` | Input with two column names | **EXISTS** |
 | `ParseHeaderWhitespaceOnly` | Input is only spaces/commas → graceful result or error | Missing |
+| `ParseHeaderWindowsCRLFStrippedFromLastField` | Windows-style line endings: trim() removes \r and \n from all fields | **EXISTS** |
+| `ParseHeaderUTF8BOMStrippedFromFirstField` | strips a leading UTF-8 BOM (\xEF\xBB\xBF) from any field | **EXISTS** |
+| `ParseHeaderAllDataTypesUndetermined` | Every header field must have data type undetermined regardless of name | **EXISTS** |
+| `StringUtilsRemoveUTF8ByteOrderMarkAndTrimWhiteSpace` | Make sure white space trimming works if there is a UTF-8 byte order mark | **EXISTS** |
+| `StringUtilsRemoveUTF16BEByteOrderMarkAndTrimWhiteSpace` | Make sure white space trimming works if there is a big-endian UTF-16 byte order mark | **EXISTS** |
+| `StringUtilsRemoveUTF16LEByteOrderMarkAndTrimWhiteSpace` | Make sure white space trimming works if there is a little-endian UTF-16 byte order mark | **EXISTS** |
 
 ---
 

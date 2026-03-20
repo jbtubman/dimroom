@@ -78,6 +78,19 @@ TEST_F(parser_test_fixture, ParseHeaderEmptyString) {
     EXPECT_EQ(result.error(), parser::error::header_empty_error);
 }
 
+// Suggested by Claude. Implemented by JBT.
+TEST_F(parser_test_fixture, ParseHeaderTrimsWhitespace) {
+    // Column names with leading/trailing spaces.
+    const string input = "One, Two,Three ,   Four  ";
+    const auto result = parser::parse_header(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 4u);
+    EXPECT_EQ((*result)[0].text, "One");
+    EXPECT_EQ((*result)[1].text, "Two");
+    EXPECT_EQ((*result)[2].text, "Three");
+    EXPECT_EQ((*result)[3].text, "Four");
+}
+
 // Added by Claude.
 TEST_F(parser_test_fixture, ParseHeaderSingleColumn) {
     const string input = "Filename";
@@ -134,6 +147,45 @@ TEST_F(parser_test_fixture, ParseHeaderAllDataTypesUndetermined) {
     EXPECT_TRUE(ranges::all_of(*result, [](const auto& f) {
         return f.data_type == e_cell_data_type::undetermined;
     }));
+}
+
+TEST_F(parser_test_fixture, StringUtilsRemoveUTF8ByteOrderMarkAndTrimWhiteSpace) {
+    // Make sure white space trimming works if there is a UTF-8 byte order mark.
+    string input{utf8_bom};
+    input.append("One, Two,Three\t ,   Four  \r\n");
+    const auto result = parser::parse_header(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 4u);
+    EXPECT_EQ((*result)[0].text, "One");
+    EXPECT_EQ((*result)[1].text, "Two");
+    EXPECT_EQ((*result)[2].text, "Three");
+    EXPECT_EQ((*result)[3].text, "Four");
+}
+
+TEST_F(parser_test_fixture, StringUtilsRemoveUTF16BEByteOrderMarkAndTrimWhiteSpace) {
+    // Make sure white space trimming works if there is a big-endian UTF-16 byte order mark.
+    string input{utf16_be_bom};
+    input.append("One, Two,Three\t ,   Four  \r\n");
+    const auto result = parser::parse_header(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 4u);
+    EXPECT_EQ((*result)[0].text, "One");
+    EXPECT_EQ((*result)[1].text, "Two");
+    EXPECT_EQ((*result)[2].text, "Three");
+    EXPECT_EQ((*result)[3].text, "Four");
+}
+
+TEST_F(parser_test_fixture, StringUtilsRemoveUTF16LEByteOrderMarkAndTrimWhiteSpace) {
+    // Make sure white space trimming works if there is a little-endian UTF-16 byte order mark.
+    string input{utf16_le_bom};
+    input.append("One, Two,Three\t ,   Four  \r\n");
+    const auto result = parser::parse_header(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 4u);
+    EXPECT_EQ((*result)[0].text, "One");
+    EXPECT_EQ((*result)[1].text, "Two");
+    EXPECT_EQ((*result)[2].text, "Three");
+    EXPECT_EQ((*result)[3].text, "Four");
 }
 
 TEST_F(parser_test_fixture, ParseRowParseDataRow) {

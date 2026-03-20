@@ -16,6 +16,7 @@
 #if defined(_WIN64)
 #include <iostream>
 #endif
+#include <locale>
 #include <memory>
 #include <optional>
 #include <print>
@@ -322,39 +323,75 @@ CONSTEXPRVAR string utf16_le_bom{"\377\376"};
 /// @brief Byte-Order Mark for a UTF-16 (big-endian) text file.
 CONSTEXPRVAR string utf16_be_bom{"\376\377"};
 
-/// @brief Returns a trimmed copy of the input string.
-/// @param const string& line
-/// @return string
-[[nodiscard]] inline string trim(const string& line) {
+/// @brief Remove leading and trailing whitespace from a string. Modifies the
+/// argument.
+/// @param line
+inline void trim_whitespace(string& line) {
+    setlocale(LC_ALL, "");
+    const auto locale_str = setlocale(LC_ALL, nullptr);
+    const std::locale locale_canada(locale_str);
+    auto is_non_space_fn = [&locale_canada](auto c) {
+        return !std::isspace(c, locale_canada);
+    };
+    auto first_nonspace =
+        std::find_if(line.begin(), line.end(), is_non_space_fn);
+
+    auto last_nonspace = first_nonspace;
+    for (auto it = first_nonspace; it != line.end(); ++it) {
+        if (is_non_space_fn(*it)) {
+            last_nonspace = it;
+        }
+    }
+
+    // erase trailing spaces.
+    if (last_nonspace != line.end()) {
+        ++last_nonspace;
+        line.erase(last_nonspace, line.end());
+    }
+
+    // erase leading spaces.
+    line.erase(line.begin(), first_nonspace);
+}
+
+/// @brief Remove leading and trailing whitespace from a string.
+/// @param line
+/// @return A string with no leading or trailing whitespace (may be empty).
+[[nodiscard]] inline string trim_whitespace(const string& line) {
     string result{line};
-    result.erase(std::remove(result.begin(), result.end(), '\n'), result.end());
-    result.erase(std::remove(result.begin(), result.end(), '\r'), result.end());
+    trim_whitespace(result);
+    return result;
+}
+
+/// @brief Trims the string given as argument. Input argument is modified.
+/// @param line
+/// @note Removes byte order marks, if any, and all leading and trailing
+/// whitespace.
+inline void trim(string& line) {
+    size_t offset = 0;
 
     // Remove byte order marks, if any.
     // https://en.wikipedia.org/wiki/Byte_order_mark
 
-    if (result.starts_with(utf8_bom)) {
-        const auto offset = utf8_bom.length();
-        const auto offset_it = result.begin() + offset;
-        result.erase(result.begin(), offset_it);
-        return result;
+    if (line.starts_with(utf8_bom)) {
+        offset = utf8_bom.length();
+    } else if ((line.starts_with(utf16_be_bom)) ||
+               line.starts_with(utf16_le_bom)) {
+        offset = utf16_be_bom.length();
     }
-
-    if (result.starts_with(utf16_be_bom) || result.starts_with(utf16_le_bom)) {
-        const auto offset = utf16_be_bom.length();
-        const auto offset_it = result.begin() + offset;
-        result.erase(result.begin(), offset_it);
-        return result;
-    }
-
-    return result;
+    auto offset_it = line.begin() + offset;
+    line.erase(line.begin(), offset_it);
+    trim_whitespace(line);
 }
 
-/// @brief Trims the string given as argument.
-/// @param line
-inline void trim(string& line) {
-    line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
-    line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+/// @brief Returns a trimmed copy of the input string.
+/// @param const string& line
+/// @return string
+/// @note Removes byte order marks, if any, and all leading and trailing
+/// whitespace.
+[[nodiscard]] inline string trim(const string& line) {
+    string result{line};
+    trim(result);
+    return result;
 }
 
 namespace {
