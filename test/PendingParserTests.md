@@ -62,11 +62,11 @@ Prompt was:
 | Test Name | Scenario | Status |
 |---|---|---|
 | `ParseFileParseLines` | Happy path const lvalue ref → correct header and row count | **EXISTS** |
-| `ParseFileParseLinesRvalue` | Happy path rvalue (moved) vector → same result as lvalue | Missing |
-| `ParseFileParseLinesEmptyVector` | Empty vector → `unexpected(file_empty_error)` | Missing |
-| `ParseFileParseLinesHeaderOnly` | Vector with only the header row → header parsed, no data rows | Missing |
-| `ParseFileParseLinesColumnCountMismatch` | Data row has wrong column count → `unexpected(file_parse_error)` | Missing |
-| `ParseFileParseLinesUnparsableDataRow` | Unparseable data row → `unexpected(file_parse_error)` | Missing |
+| `ParseFileParseLinesRvalue` | Happy path rvalue (moved) vector → same result as lvalue | **EXISTS** |
+| `ParseFileParseLinesEmptyVector` | Empty vector → `unexpected(file_empty_error)` | **EXISTS** |
+| `ParseFileParseLinesHeaderOnly` | Vector with only the header row → header parsed, no data rows | **EXISTS** |
+| `ParseFileParseLinesColumnCountMismatch` | Data row has wrong column count → `unexpected(file_parse_error)` | **EXISTS** |
+| `ParseFileParseLinesUnparsableDataRow` | Unparseable data row → `unexpected(file_parse_error)` | **EXISTS** |
 
 ---
 
@@ -86,10 +86,11 @@ Prompt was:
 
 | Status | Count |
 |---|---|
-| Already exist | 19 (one incomplete) |
-| Missing | 8 |
+| Already exist | 24 (one incomplete) |
+| Missing | 3 |
 | **Total required** | **27** |
 
-The most critical gaps are: error path tests for all three `parse_lines` overloads, the
-column-count mismatch and invalid-type error paths in `deduce_data_types_for_all_columns`,
+The remaining gaps are: error path tests for the `parse_lines(std::ifstream&)` overload
+(`ParseFileParseLinesIfstreamCorrectResult`, `ParseFileParseLinesIfstreamBadStream`,
+`ParseFileParseLinesIfstreamHeaderOnly`, `ParseFileParseLinesIfstreamColumnMismatch`),
 and completing `ParseFileParseLinesFromIfstream` to actually verify the parsed result.

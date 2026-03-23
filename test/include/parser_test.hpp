@@ -561,3 +561,64 @@ TEST_F(parser_test_fixture, DeduceTypesInvalidColumnReportedDoNotCheckAllDataRow
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ((*result)[1], e_cell_data_type::text);
 }
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseFileParseLinesRvalue) {
+    // Happy path: rvalue (moved) vector produces the same result as an lvalue.
+    vector<string> input = parser_test_fixture::sample_csv_rows;
+    const size_t expected_data_row_count = input.size() - 1;
+    auto result_ = parse_lines(std::move(input));
+    EXPECT_TRUE(result_.has_value());
+    const parser::header_and_data result = *result_;
+    EXPECT_FALSE(result.header_fields.empty());
+    EXPECT_EQ(result.header_fields.size(), parser_test_fixture::sample_header_fields.size());
+    EXPECT_EQ(result.all_data_fields.size(), expected_data_row_count);
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseFileParseLinesEmptyVector) {
+    // An empty vector returns unexpected(file_empty_error).
+    const vector<string> input{};
+    const auto result_ = parse_lines(input);
+    EXPECT_FALSE(result_.has_value());
+    EXPECT_EQ(result_.error(), parser::error::file_empty_error);
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseFileParseLinesHeaderOnly) {
+    // A vector containing only the header row parses the header successfully
+    // and leaves all_data_fields empty.
+    const vector<string> input{parser_test_fixture::sample_header};
+    const auto result_ = parse_lines(input);
+    EXPECT_TRUE(result_.has_value());
+    const parser::header_and_data result = *result_;
+    EXPECT_EQ(result.header_fields.size(), parser_test_fixture::sample_header_fields.size());
+    EXPECT_TRUE(result.all_data_fields.empty());
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseFileParseLinesColumnCountMismatch) {
+    // A data row with fewer columns than the header causes file_parse_error.
+    const vector<string> input{
+        "A,B,C",
+        "1,2"  // only 2 fields instead of 3
+    };
+    const auto result_ = parse_lines(input);
+    EXPECT_FALSE(result_.has_value());
+    EXPECT_EQ(result_.error(), parser::error::file_parse_error);
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseFileParseLinesUnparsableDataRow) {
+    // When the same column contains incompatible types in different rows
+    // (integer then text), deduce_data_types_for_all_columns returns
+    // file_parse_error, which parse_lines propagates.
+    const vector<string> input{
+        "A,B",
+        "1,hello",
+        "world,2"  // column A: integer then text → invalid type
+    };
+    const auto result_ = parse_lines(input);
+    EXPECT_FALSE(result_.has_value());
+    EXPECT_EQ(result_.error(), parser::error::file_parse_error);
+}
