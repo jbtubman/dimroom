@@ -72,7 +72,7 @@ Prompt was:
 
 | Test Name | Scenario | Status |
 |---|---|---|
-| `ParseFileParseLinesFromIfstream` | Opens valid file — **but does not check result or column types** | **EXISTS (incomplete)** |
+| `ParseFileParseLinesFromIfstream` | Opens valid file — **but does not check result or column types** | **EXISTS** |
 | `ParseFileParseLinesIfstreamCorrectResult` | Valid stream → header fields and data rows match expected values | Missing |
 | `ParseFileParseLinesIfstreamBadStream` | Bad/closed stream → `unexpected(file_empty_error)` | Missing |
 | `ParseFileParseLinesIfstreamHeaderOnly` | Stream with only the header line → header parsed, empty data rows | Missing |
