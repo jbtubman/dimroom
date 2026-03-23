@@ -1,10 +1,12 @@
-# Pending Unit Tests for `parser.hpp`
+# Unit Tests for `parser.hpp`
 
 List created by Claude Code, February 24, 2026.
 
 Prompt was:
 
 `Give a complete list of the unit tests required to test all public functions defined in the file @include/parser.hpp`
+
+All of them have been implemented. Some were done by hand, and some were done by Claude Code.
 
 ## `parser::parse_header(const string& header)`
 
@@ -86,9 +88,9 @@ Prompt was:
 
 | Status | Count |
 |---|---|
-| Already exist | 28 (one incomplete) |
+| Already exist | 28 |
 | Missing | 0 |
-| **Total required** | **27** |
+| **Total required** | **28** |
 
 All required tests exist.
 

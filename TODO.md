@@ -1,6 +1,6 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.24.
+This summarizes the state of things as of Version 2.25.
 
 ## Things Completed
 
@@ -33,6 +33,7 @@ As of March 23, 2026:
   These are noted in the source.
 * Some parsing functions had templated overloads added to allow them to accept
   "string-like" arguments like string views.
+* All unit tests suggested for the file `parser.hpp` have been implemented.
 
 ## Things Remaining
 
