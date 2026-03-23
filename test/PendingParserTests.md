@@ -46,12 +46,14 @@ Prompt was:
 | Test Name | Scenario | Status |
 |---|---|---|
 | `GetDataTypeForAllColumns` | Full sample CSV → all 13 columns correctly typed | **EXISTS** |
-| `DeduceTypesNoDataRows` | `all_data_fields` is empty → all columns remain `undetermined` | Missing |
-| `DeduceTypesEarlyExit` | All types resolved on first data row → returns early | Missing |
-| `DeduceTypesResolvedOnLaterRow` | First rows have empty fields, type resolved by a later row | Missing |
-| `DeduceTypesWrongColumnCount` | A data row has fewer/more columns than the header → `unexpected(file_parse_error)` | Missing |
-| `DeduceTypesInvalidMixedTypes` | Same column has both integer and text values → `unexpected(file_parse_error)` | Missing |
-| `DeduceTypesInvalidColumnReported` | Checks that the correct column number is reported in stderr on invalid type | Missing |
+| `DeduceTypesNoDataRows` | `all_data_fields` is empty → all columns remain `undetermined` | **EXISTS** |
+| `DeduceTypesEarlyExit` | All types resolved on first data row → returns early | **EXISTS** |
+| `DeduceTypesResolvedOnLaterRow` | First rows have empty fields, type resolved by a later row | **EXISTS** |
+| `DeduceTypesWrongColumnCount` | A data row has fewer/more columns than the header → `unexpected(file_parse_error)` | **EXISTS** |
+| `DeduceTypesInvalidMixedTypesCheckAllDataRows` | Same column has both integer and text values → `unexpected(file_parse_error)` | **EXISTS** |
+| `DeduceTypesInvalidMixedTypesDoNotCheckAllDataRows` | Same column has both integer and text values but validity check is short-circuited → `e_cell_data_type::integer` | **EXISTS** |
+| `DeduceTypesInvalidColumnReportedCheckAllDataRows` | Checks that the correct column number is reported in stderr on invalid type | **EXISTS** |
+| `DeduceTypesInvalidColumnReportedDoNotCheckAllDataRows` | Ignores later incorrect data type because validity check is short-circuited. | **EXISTS** |
 
 ---
 
@@ -84,8 +86,8 @@ Prompt was:
 
 | Status | Count |
 |---|---|
-| Already exist | 13 (one incomplete) |
-| Missing | 14 |
+| Already exist | 19 (one incomplete) |
+| Missing | 8 |
 | **Total required** | **27** |
 
 The most critical gaps are: error path tests for all three `parse_lines` overloads, the

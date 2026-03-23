@@ -64,6 +64,20 @@ the file @test/include/parser_test.hpp.
 The unit test `ParseFileParseLinesFromIfstream` was found by Claude code
 to be incomplete. It was updated to fix this problem.
 
+Then the following prompt was used:
+
+```
+Examine the files @include/parser.hpp and @test/PendingParserTests.md;
+implement the missing unit tests for the function
+parser::deduce_data_types_for_all_columns(const parser::header_and_data&) and add them to the
+end of the file @test/include/parser_test.hpp; before each test, add a one line comment
+saying "Test created by Claude Code."
+```
+
+These tests uncovered an inconsistency in detection of inconsistent
+data types in the `parser::deduce_data_types_for_all_columns` function.
+This was fixed and the tests revised.
+
 ## Installation (Now Uses CMAKE)
 
 Installation instructions are available in the file [INSTALL.md](./INSTALL.md).

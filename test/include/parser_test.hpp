@@ -399,3 +399,165 @@ TEST_F(parser_test_fixture, ParseRowSingleField) {
     EXPECT_EQ((*result)[0].text, "Hello");
     EXPECT_EQ((*result)[0].data_type, e_cell_data_type::text);
 }
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, DeduceTypesNoDataRows) {
+    // When all_data_fields is empty, all column types remain undetermined.
+    parser::header_and_data h_and_d;
+    h_and_d.header_fields = {
+        parser::header_field{"A", e_cell_data_type::undetermined},
+        parser::header_field{"B", e_cell_data_type::undetermined}
+    };
+    const auto result = parser::deduce_data_types_for_all_columns(h_and_d);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 2u);
+    EXPECT_TRUE(ranges::all_of(*result, [](const auto& t) {
+        return t == e_cell_data_type::undetermined;
+    }));
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, DeduceTypesEarlyExit) {
+    // When all column types are resolved on the first data row, the function
+    // returns successfully with the fully-determined type vector.
+    parser::header_and_data h_and_d;
+    h_and_d.header_fields = {
+        parser::header_field{"Num", e_cell_data_type::undetermined},
+        parser::header_field{"Name", e_cell_data_type::undetermined}
+    };
+    h_and_d.all_data_fields = {
+        {parser::data_field{"42", e_cell_data_type::integer},
+         parser::data_field{"Alice", e_cell_data_type::text}},
+        {parser::data_field{"99", e_cell_data_type::integer},
+         parser::data_field{"Bob", e_cell_data_type::text}}
+    };
+    const auto result = parser::deduce_data_types_for_all_columns(h_and_d);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 2u);
+    EXPECT_EQ((*result)[0], e_cell_data_type::integer);
+    EXPECT_EQ((*result)[1], e_cell_data_type::text);
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, DeduceTypesResolvedOnLaterRow) {
+    // When the first row contains only empty fields, the column types are
+    // resolved from a subsequent row.
+    parser::header_and_data h_and_d;
+    h_and_d.header_fields = {
+        parser::header_field{"A", e_cell_data_type::undetermined},
+        parser::header_field{"B", e_cell_data_type::undetermined}
+    };
+    h_and_d.all_data_fields = {
+        {parser::data_field{"", e_cell_data_type::undetermined},
+         parser::data_field{"", e_cell_data_type::undetermined}},
+        {parser::data_field{"7", e_cell_data_type::integer},
+         parser::data_field{"Yes", e_cell_data_type::boolean}}
+    };
+    const auto result = parser::deduce_data_types_for_all_columns(h_and_d);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 2u);
+    EXPECT_EQ((*result)[0], e_cell_data_type::integer);
+    EXPECT_EQ((*result)[1], e_cell_data_type::boolean);
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, DeduceTypesWrongColumnCount) {
+    // A data row with fewer columns than the header returns file_parse_error.
+    parser::header_and_data h_and_d;
+    h_and_d.header_fields = {
+        parser::header_field{"A", e_cell_data_type::undetermined},
+        parser::header_field{"B", e_cell_data_type::undetermined},
+        parser::header_field{"C", e_cell_data_type::undetermined}
+    };
+    h_and_d.all_data_fields = {
+        {parser::data_field{"1", e_cell_data_type::integer},
+         parser::data_field{"2", e_cell_data_type::integer}}
+    };
+    const auto result = parser::deduce_data_types_for_all_columns(h_and_d);
+    EXPECT_FALSE(result.has_value());
+    EXPECT_EQ(result.error(), parser::error::file_parse_error);
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, DeduceTypesInvalidMixedTypesCheckAllDataRows) {
+    // A column whose values are integer in one row and text in another
+    // produces an invalid type, which causes file_parse_error.
+    parser::header_and_data h_and_d;
+    h_and_d.header_fields = {
+        parser::header_field{"A", e_cell_data_type::undetermined}
+    };
+    h_and_d.all_data_fields = {
+        {parser::data_field{"42", e_cell_data_type::integer}},
+        {parser::data_field{"hello", e_cell_data_type::text}}
+    };
+    const auto result = parser::deduce_data_types_for_all_columns(h_and_d, true);
+    EXPECT_FALSE(result.has_value());
+    EXPECT_EQ(result.error(), parser::error::file_parse_error);
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, DeduceTypesInvalidMixedTypesDoNotCheckAllDataRows) {
+    // A column whose values are integer in one row and text in another
+    // produces an invalid type, which causes file_parse_error.
+    parser::header_and_data h_and_d;
+    h_and_d.header_fields = {
+        parser::header_field{"A", e_cell_data_type::undetermined}
+    };
+    h_and_d.all_data_fields = {
+        {parser::data_field{"42", e_cell_data_type::integer}},
+        {parser::data_field{"hello", e_cell_data_type::text}}
+    };
+    const auto result = parser::deduce_data_types_for_all_columns(h_and_d, false);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result.value()[0], e_cell_data_type::integer);
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, DeduceTypesInvalidColumnReportedCheckAllDataRows) {
+    // When a type conflict occurs, the 1-based column number is written to
+    // stderr. Here column 2 (index 1) is given text on row 1 and integer on
+    // row 2, producing an invalid type.
+    parser::header_and_data h_and_d;
+    h_and_d.header_fields = {
+        parser::header_field{"A", e_cell_data_type::undetermined},
+        parser::header_field{"B", e_cell_data_type::undetermined},
+        parser::header_field{"C", e_cell_data_type::undetermined}
+    };
+    h_and_d.all_data_fields = {
+        {parser::data_field{"1", e_cell_data_type::integer},
+         parser::data_field{"hello", e_cell_data_type::text},
+         parser::data_field{"3", e_cell_data_type::integer}},
+        {parser::data_field{"2", e_cell_data_type::integer},
+         parser::data_field{"42", e_cell_data_type::integer},
+         parser::data_field{"4", e_cell_data_type::integer}}
+    };
+    testing::internal::CaptureStderr();
+    const auto result = parser::deduce_data_types_for_all_columns(h_and_d, true);
+    const string stderr_output = testing::internal::GetCapturedStderr();
+    EXPECT_FALSE(result.has_value());
+    EXPECT_NE(stderr_output.find("column 2"), string::npos);
+}
+
+// Test created by JBT, based on the previous test.
+TEST_F(parser_test_fixture, DeduceTypesInvalidColumnReportedDoNotCheckAllDataRows) {
+    // Similar to the previous test, but because the validity check is short-circuited,
+    // the invalid data row is not detected.
+    parser::header_and_data h_and_d;
+    h_and_d.header_fields = {
+        parser::header_field{"A", e_cell_data_type::undetermined},
+        parser::header_field{"B", e_cell_data_type::undetermined},
+        parser::header_field{"C", e_cell_data_type::undetermined}
+    };
+    h_and_d.all_data_fields = {
+        {parser::data_field{"1", e_cell_data_type::integer},
+         parser::data_field{"hello", e_cell_data_type::text},
+         parser::data_field{"3", e_cell_data_type::integer}},
+        {parser::data_field{"2", e_cell_data_type::integer},
+         parser::data_field{"42", e_cell_data_type::integer},
+         parser::data_field{"4", e_cell_data_type::integer}}
+    };
+    testing::internal::CaptureStderr();
+    const auto result = parser::deduce_data_types_for_all_columns(h_and_d, false);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ((*result)[1], e_cell_data_type::text);
+}

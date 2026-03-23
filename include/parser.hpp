@@ -32,6 +32,19 @@ namespace ranges = std::ranges;
 namespace views = std::views;
 using namespace std::string_literals;
 
+namespace {
+// There's a better way to do this.
+#ifndef RELEASE
+/// This can be used to run optional (presumably expensive) validity checks by
+/// default.
+constexpr bool default_validity_checks{true};
+#else
+/// This can be used to prevent running optional (presumably expensive) validity
+/// checks by default.
+constexpr bool default_validity_checks{false};
+#endif
+}  // namespace
+
 /// @brief Parses the CSV files. The parser has no internal state; it is used
 /// via static functions.
 class parser {
@@ -179,9 +192,12 @@ class parser {
    public:
     /// @brief determine the cell data types for all the columns.
     /// @param all_df vector of vector of data_field objects.
+    /// @param check_all_rows if true, check all rows for data type consistency.
     /// @return expected vector of e_cell_data_type values, or parser error.
     static expected<vector<e_cell_data_type>, parser::error>
-    deduce_data_types_for_all_columns(const parser::header_and_data& h_and_d) {
+    deduce_data_types_for_all_columns(
+        const parser::header_and_data& h_and_d,
+        bool check_all_rows_valid = default_validity_checks) {
         const size_t header_column_count = h_and_d.header_fields.size();
         // Initialize the result to have all undetermined cell types.
         vector<e_cell_data_type> data_types_for_all_columns(
@@ -198,9 +214,6 @@ class parser {
 
         // TODO: turn this loop into a fold.
         for (const auto& row_data_fields : h_and_d.all_data_fields) {
-            const auto row_data_types_and_counts =
-                get_row_data_types_and_counts(row_data_fields);
-
             const auto [row_data_types, row_column_count] =
                 get_row_data_types_and_counts(row_data_fields);
 
@@ -241,20 +254,22 @@ class parser {
                 return unexpected(parser::error::file_parse_error);
             }
 
-            // If we have deduced the types for all the columns, we can quit
-            // now.
-            const auto deduced_column_count = ranges::count_if(
-                data_types_for_all_columns, [](const e_cell_data_type cdt) {
-                    return cdt != e_cell_data_type::undetermined;
-                });
-            if (deduced_column_count == header_column_count) {
-                return data_types_for_all_columns;
+            // If we have deduced the types for all the columns, and we don't
+            // care whether there might be inconsistent data rows further down,
+            // we can quit now.
+            if (!check_all_rows_valid) {
+                const auto deduced_column_count = ranges::count_if(
+                    data_types_for_all_columns, [](const e_cell_data_type cdt) {
+                        return cdt != e_cell_data_type::undetermined;
+                    });
+                if (deduced_column_count == header_column_count) {
+                    return data_types_for_all_columns;
+                }
             }
 
             // Otherwise we move on to the next row.
             ++data_row_line_idx;
         }
-
         return data_types_for_all_columns;
     }
 
