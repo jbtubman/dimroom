@@ -622,3 +622,63 @@ TEST_F(parser_test_fixture, ParseFileParseLinesUnparsableDataRow) {
     EXPECT_FALSE(result_.has_value());
     EXPECT_EQ(result_.error(), parser::error::file_parse_error);
 }
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseFileParseLinesIfstreamCorrectResult) {
+    // A valid ifstream over sample.csv produces the expected header fields,
+    // column types, and data row count.
+    using ecdt = e_cell_data_type;
+    const string filename{dimroom_PROJECT_HOME "/test/data/sample.csv"};
+    std::ifstream ifs{filename};
+    ASSERT_TRUE(ifs.good());
+    const auto result_ = parse_lines(ifs);
+    EXPECT_TRUE(result_.has_value());
+    const parser::header_and_data result = *result_;
+    EXPECT_EQ(result.header_fields.size(), sample_header_fields.size());
+    EXPECT_EQ(result.all_data_fields.size(), 5u);
+    const vector<ecdt> expected_types = {
+        ecdt::text, ecdt::text, ecdt::floating,
+        ecdt::integer, ecdt::integer, ecdt::integer,
+        ecdt::geo_coordinate, ecdt::boolean, ecdt::text,
+        ecdt::integer, ecdt::text, ecdt::text,
+        ecdt::tags};
+    for (size_t i = 0; i < result.header_fields.size(); ++i) {
+        EXPECT_EQ(result.header_fields[i].text, sample_header_fields[i]);
+        EXPECT_EQ(result.header_fields[i].data_type, expected_types[i]);
+    }
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseFileParseLinesIfstreamBadStream) {
+    // A default-constructed (not-open) ifstream returns unexpected(file_empty_error).
+    std::ifstream ifs;
+    const auto result_ = parse_lines(ifs);
+    EXPECT_FALSE(result_.has_value());
+    EXPECT_EQ(result_.error(), parser::error::file_empty_error);
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseFileParseLinesIfstreamHeaderOnly) {
+    // An ifstream over a header-only file parses the header and leaves
+    // all_data_fields empty.
+    const string filename{dimroom_PROJECT_HOME "/test/data/hsample.csv"};
+    std::ifstream ifs{filename};
+    ASSERT_TRUE(ifs.good());
+    const auto result_ = parse_lines(ifs);
+    EXPECT_TRUE(result_.has_value());
+    const parser::header_and_data result = *result_;
+    EXPECT_EQ(result.header_fields.size(), sample_header_fields.size());
+    EXPECT_TRUE(result.all_data_fields.empty());
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseFileParseLinesIfstreamColumnMismatch) {
+    // An ifstream over a file whose data row has fewer columns than the header
+    // returns unexpected(file_parse_error).
+    const string filename{dimroom_PROJECT_HOME "/test/data/column_mismatch.csv"};
+    std::ifstream ifs{filename};
+    ASSERT_TRUE(ifs.good());
+    const auto result_ = parse_lines(ifs);
+    EXPECT_FALSE(result_.has_value());
+    EXPECT_EQ(result_.error(), parser::error::file_parse_error);
+}

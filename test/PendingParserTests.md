@@ -75,10 +75,10 @@ Prompt was:
 | Test Name | Scenario | Status |
 |---|---|---|
 | `ParseFileParseLinesFromIfstream` | Opens valid file — **but does not check result or column types** | **EXISTS** |
-| `ParseFileParseLinesIfstreamCorrectResult` | Valid stream → header fields and data rows match expected values | Missing |
-| `ParseFileParseLinesIfstreamBadStream` | Bad/closed stream → `unexpected(file_empty_error)` | Missing |
-| `ParseFileParseLinesIfstreamHeaderOnly` | Stream with only the header line → header parsed, empty data rows | Missing |
-| `ParseFileParseLinesIfstreamColumnMismatch` | Data row has wrong column count → `unexpected(file_parse_error)` | Missing |
+| `ParseFileParseLinesIfstreamCorrectResult` | Valid stream → header fields and data rows match expected values | **EXISTS** |
+| `ParseFileParseLinesIfstreamBadStream` | Bad/closed stream → `unexpected(file_empty_error)` | **EXISTS** |
+| `ParseFileParseLinesIfstreamHeaderOnly` | Stream with only the header line → header parsed, empty data rows | **EXISTS** |
+| `ParseFileParseLinesIfstreamColumnMismatch` | Data row has wrong column count → `unexpected(file_parse_error)` | **EXISTS** |
 
 ---
 
@@ -86,11 +86,12 @@ Prompt was:
 
 | Status | Count |
 |---|---|
-| Already exist | 24 (one incomplete) |
-| Missing | 3 |
+| Already exist | 28 (one incomplete) |
+| Missing | 0 |
 | **Total required** | **27** |
 
-The remaining gaps are: error path tests for the `parse_lines(std::ifstream&)` overload
-(`ParseFileParseLinesIfstreamCorrectResult`, `ParseFileParseLinesIfstreamBadStream`,
-`ParseFileParseLinesIfstreamHeaderOnly`, `ParseFileParseLinesIfstreamColumnMismatch`),
-and completing `ParseFileParseLinesFromIfstream` to actually verify the parsed result.
+All required tests exist. `ParseFileParseLinesFromIfstream` still only does a partial check
+(it does not call `parse_lines` or verify the parsed result); it could be extended or
+replaced by `ParseFileParseLinesIfstreamCorrectResult`.
+
+New test data file added: `test/data/column_mismatch.csv` (used by `ParseFileParseLinesIfstreamColumnMismatch`).

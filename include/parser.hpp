@@ -434,7 +434,7 @@ static expected<parser::header_and_data, parser::error> parse_lines(
 /// @return header and data object, or an error.
 static inline expected<parser::header_and_data, parser::error> parse_lines(
     std::ifstream& instream) {
-    if (!instream) {
+    if (!instream || (!instream.is_open())) {
         return unexpected(parser::error::file_empty_error);
     }
 

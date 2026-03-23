@@ -33,7 +33,7 @@ CppCon 2025 video by Bret Brownabout using CMake, I saw that my `CMakeLists.txt`
 files could be improved. So I used Claude Code to suggest improvements to those files.
 The prompt was:
 
-```
+```text
 suggest how the CMake files @CMakeLists.txt and @test/CMakeLists.txt could be improved.
 ```
 
@@ -54,7 +54,7 @@ and the test was modified to test for that behaviour.
 
 New unit tests were created with the following prompt:
 
-```
+```text
 Examine the files @include/parser.hpp and @test/PendingParserTests.md;
 implement the missing unit tests for the function
 parser::parse_data_row(const string& data_row) and add them to the end of
@@ -66,7 +66,7 @@ to be incomplete. It was updated to fix this problem.
 
 Then the following prompt was used:
 
-```
+```text
 Examine the files @include/parser.hpp and @test/PendingParserTests.md;
 implement the missing unit tests for the function
 parser::deduce_data_types_for_all_columns(const parser::header_and_data&) and add them to the
@@ -80,13 +80,32 @@ This was fixed and the tests revised.
 
 Then the following prompt was used:
 
-```
+```text
 Examine the files @include/parser.hpp and @test/PendingParserTests.md;
 implement the missing unit tests for the functions
 parse_lines(const VectorString& input_lines) and parse_lines(VectorString&&),
 and add them to the end of the file @test/include/parser_test.hpp;
 before each test, add a one line comment saying "Test created by Claude Code."
 ```
+
+_Claude Code feedback_:
+
+Note on `ParseFileParseLinesUnparsableDataRow`: parse_data_row itself can't be made to fail with normal string
+inputs (it catches all exceptions), so the error is triggered via the type-conflict path in
+`deduce_data_types_for_all_columns`, which `parse_lines` propagates — the observable behaviour
+(returning unexpected(file_parse_error)) is still correct.
+
+Then the following prompt was used:
+
+```text
+Examine the files @include/parser.hpp and @test/PendingParserTests.md;
+implement the missing unit tests for the function parse_lines(std::ifstream& instream),
+and add them to the end of the file @test/include/parser_test.hpp; before each test,
+add a one line comment saying "Test created by Claude Code."
+```
+
+One of the new tests detected an error that occurred when the argument to the
+function was a stream that had not been opened. This was fixed in `parser.hpp`.
 
 ## Installation (Uses CMAKE)
 
