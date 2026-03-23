@@ -296,3 +296,103 @@ TEST_F(parser_test_fixture, GetDataTypeForAllColumns) {
         EXPECT_TRUE(result[i] == expected[i]);
     }
 }
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseRowIntegerFields) {
+    const string input = "1,2,3";
+    const auto result = parser::parse_data_row(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 3u);
+    EXPECT_TRUE(ranges::all_of(*result, [](const auto& f) {
+        return f.data_type == e_cell_data_type::integer;
+    }));
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseRowFloatingFields) {
+    const string input = "1.5,2.7,3.14";
+    const auto result = parser::parse_data_row(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 3u);
+    EXPECT_TRUE(ranges::all_of(*result, [](const auto& f) {
+        return f.data_type == e_cell_data_type::floating;
+    }));
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseRowBooleanFields) {
+    // The parser recognizes "Yes" and "No" as boolean values.
+    const string input = "Yes,No,Yes";
+    const auto result = parser::parse_data_row(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 3u);
+    EXPECT_TRUE(ranges::all_of(*result, [](const auto& f) {
+        return f.data_type == e_cell_data_type::boolean;
+    }));
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseRowDecimalGeoCoordinateField) {
+    // A CSV-quoted decimal coordinate is recognised as geo_coordinate.
+    const string input = R"("51.05011, -114.08529")";
+    const auto result = parser::parse_data_row(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 1u);
+    EXPECT_EQ((*result)[0].data_type, e_cell_data_type::geo_coordinate);
+}
+
+// Test created by JBT.
+TEST_F(parser_test_fixture, ParseRowDMGeoCoordinateField) {
+    // A CSV-quoted decimal coordinate is recognised as geo_coordinate.
+    const string input = R"("51° 03' N, 114° 05' W")";
+    const auto result = parser::parse_data_row(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 1u);
+    EXPECT_EQ((*result)[0].data_type, e_cell_data_type::geo_coordinate);
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseRowTagsField) {
+    // A triple-quoted tags field is recognised as tags.
+    const string input = R"("""Johnson, Volcano, Dusk""")";
+    const auto result = parser::parse_data_row(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 1u);
+    EXPECT_EQ((*result)[0].data_type, e_cell_data_type::tags);
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseRowQuotedFieldWithComma) {
+    // A tags field containing commas must be kept as a single field, so the
+    // total field count matches the number of top-level comma-separated values.
+    const string input = R"(foo,"""tag1, tag2""",bar)";
+    const auto result = parser::parse_data_row(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 3u);
+    EXPECT_EQ((*result)[0].data_type, e_cell_data_type::text);
+    EXPECT_EQ((*result)[1].data_type, e_cell_data_type::tags);
+    EXPECT_EQ((*result)[2].data_type, e_cell_data_type::text);
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseRowAllEmptyFields) {
+    // A row of all empty values produces undetermined-typed fields.
+    const string input = ",,";
+    const auto result = parser::parse_data_row(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 3u);
+    EXPECT_TRUE(ranges::all_of(*result, [](const auto& f) {
+        return f.data_type == e_cell_data_type::undetermined;
+    }));
+}
+
+// Test created by Claude Code.
+TEST_F(parser_test_fixture, ParseRowSingleField) {
+    // A row with exactly one field is parsed correctly.
+    const string input = "Hello";
+    const auto result = parser::parse_data_row(input);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 1u);
+    EXPECT_EQ((*result)[0].text, "Hello");
+    EXPECT_EQ((*result)[0].data_type, e_cell_data_type::text);
+}

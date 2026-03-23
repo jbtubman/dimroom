@@ -30,14 +30,14 @@ Prompt was:
 | Test Name | Scenario | Status |
 |---|---|---|
 | `ParseRowParseDataRow` | Mixed-type row (text, float, int, tags, empty fields) | **EXISTS** |
-| `ParseRowIntegerFields` | Row containing only integers → all typed `integer` | Missing |
-| `ParseRowFloatingFields` | Row containing only floats → all typed `floating` | Missing |
-| `ParseRowBooleanFields` | Row with boolean values → typed `boolean` | Missing |
-| `ParseRowGeoCoordinateField` | Row with a geo-coordinate value → typed `geo_coordinate` | Missing |
-| `ParseRowTagsField` | Row with a `"""tag1, tag2"""` value → typed `tags` | Missing |
-| `ParseRowQuotedFieldWithComma` | Quoted field containing a comma is kept as one field | Missing |
-| `ParseRowAllEmptyFields` | Row of all empty values → all typed `undetermined` | Missing |
-| `ParseRowSingleField` | Row with exactly one field | Missing |
+| `ParseRowIntegerFields` | Row containing only integers → all typed `integer` | **EXISTS** |
+| `ParseRowFloatingFields` | Row containing only floats → all typed `floating` | **EXISTS** |
+| `ParseRowBooleanFields` | Row with boolean values → typed `boolean` | **EXISTS** |
+| `ParseRowGeoCoordinateField` | Row with a geo-coordinate value → typed `geo_coordinate` | **EXISTS** |
+| `ParseRowTagsField` | Row with a `"""tag1, tag2"""` value → typed `tags` | **EXISTS** |
+| `ParseRowQuotedFieldWithComma` | Quoted field containing a comma is kept as one field | **EXISTS** |
+| `ParseRowAllEmptyFields` | Row of all empty values → all typed `undetermined` | **EXISTS** |
+| `ParseRowSingleField` | Row with exactly one field | **EXISTS** |
 
 ---
 
@@ -84,8 +84,8 @@ Prompt was:
 
 | Status | Count |
 |---|---|
-| Already exist | 5 (one incomplete) |
-| Missing | 22 |
+| Already exist | 13 (one incomplete) |
+| Missing | 14 |
 | **Total required** | **27** |
 
 The most critical gaps are: error path tests for all three `parse_lines` overloads, the
