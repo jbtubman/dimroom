@@ -292,8 +292,12 @@ class parser {
                 split_header, std::back_inserter(result),
                 [](const string& header_text) {
                     const string trimmed_header_text = trim(header_text);
-                    return header_field{trimmed_header_text,
-                                        e_cell_data_type::undetermined};
+                    // Empty header fields are invalid.
+                    const auto header_field_type =
+                        trimmed_header_text.empty()
+                            ? e_cell_data_type::invalid
+                            : e_cell_data_type::undetermined;
+                    return header_field{trimmed_header_text, header_field_type};
                 });
             if (result.empty()) {
                 return unexpected(parser::error::header_empty_error);

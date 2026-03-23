@@ -139,6 +139,17 @@ TEST_F(parser_test_fixture, ParseHeaderTwoColumns) {
     }));
 }
 
+// Suggested by Claude; implemented by JBT.
+TEST_F(parser_test_fixture, ParseHeaderWhitespaceOnly) {
+    const string input = "   ,\t";
+    const auto result = parser::parse_header(input);
+    EXPECT_TRUE(result.has_value());
+    auto rv = result.value();
+    auto rv0 = rv[0].data_type;
+    EXPECT_EQ((result.value())[0].data_type, e_cell_data_type::invalid);
+    EXPECT_EQ((result.value())[1].data_type, e_cell_data_type::invalid);
+}
+
 // Added by Claude.
 TEST_F(parser_test_fixture, ParseHeaderWindowsCRLFStrippedFromLastField) {
     // Windows-style line endings: trim() removes \r and \n from all fields.
@@ -253,10 +264,8 @@ TEST_F(parser_test_fixture, ParseFileParseLinesFromIfstream) {
     auto cp = std::filesystem::current_path();
     std::ifstream ifs(fp);
     EXPECT_TRUE(ifs.good());
-    std::filesystem::path dotp(".");
-    string input_line;
-    std::getline(ifs, input_line);
-    EXPECT_FALSE(input_line.empty());
+    auto result_ = parse_lines(ifs);
+    EXPECT_TRUE(result_.has_value());
 }
 
 TEST_F(parser_test_fixture, GetDataTypeForAllColumns) {

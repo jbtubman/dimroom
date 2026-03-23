@@ -74,7 +74,7 @@ Prompt was:
 
 | Test Name | Scenario | Status |
 |---|---|---|
-| `ParseFileParseLinesFromIfstream` | Opens valid file — **but does not check result or column types** | **EXISTS** |
+| `ParseFileParseLinesFromIfstream` | Opens valid file and parses it | **EXISTS** |
 | `ParseFileParseLinesIfstreamCorrectResult` | Valid stream → header fields and data rows match expected values | **EXISTS** |
 | `ParseFileParseLinesIfstreamBadStream` | Bad/closed stream → `unexpected(file_empty_error)` | **EXISTS** |
 | `ParseFileParseLinesIfstreamHeaderOnly` | Stream with only the header line → header parsed, empty data rows | **EXISTS** |
@@ -90,8 +90,6 @@ Prompt was:
 | Missing | 0 |
 | **Total required** | **27** |
 
-All required tests exist. `ParseFileParseLinesFromIfstream` still only does a partial check
-(it does not call `parse_lines` or verify the parsed result); it could be extended or
-replaced by `ParseFileParseLinesIfstreamCorrectResult`.
+All required tests exist.
 
 New test data file added: `test/data/column_mismatch.csv` (used by `ParseFileParseLinesIfstreamColumnMismatch`).
