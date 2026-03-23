@@ -1,10 +1,10 @@
 # Status and observations
 
-This summarizes the state of things as of Version 2.23.
+This summarizes the state of things as of Version 2.24.
 
 ## Things Completed
 
-As of March 19, 2026:
+As of March 23, 2026:
 
 * Reads in CSV file.
 * Parses the header and data rows.
@@ -31,6 +31,8 @@ As of March 19, 2026:
 * Tests can now be run in the `build` directory using the command `make test`.
 * Several AI-generated unit tests were added for the function `parser::parse_header`.
   These are noted in the source.
+* Some parsing functions had templated overloads added to allow them to accept
+  "string-like" arguments like string views.
 
 ## Things Remaining
 
