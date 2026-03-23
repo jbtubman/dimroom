@@ -43,12 +43,26 @@ by typing `make test` at the command prompt.
 
 #### Using AI to Improve Unit Tests
 
-_March 19, 2026_
+##### March 19, 2026
 
 Claude code was used to create 6 new unit tests in the file [`test/include/parser_test.hpp`](./test/include/parser_test.hpp).
 The test `ParseHeaderEmptyString` initially failed. The function `parser::parse_header` was
 modified to return a new error type when given an empty or blank string as argument,
 and the test was modified to test for that behaviour.
+
+##### March 23, 2026
+
+New unit tests were created with the following prompt:
+
+```
+Examine the files @include/parser.hpp and @test/PendingParserTests.md;
+implement the missing unit tests for the function
+parser::parse_data_row(const string& data_row) and add them to the end of
+the file @test/include/parser_test.hpp.
+```
+
+The unit test `ParseFileParseLinesFromIfstream` was found by Claude code
+to be incomplete. It was updated to fix this problem.
 
 ## Installation (Now Uses CMAKE)
 

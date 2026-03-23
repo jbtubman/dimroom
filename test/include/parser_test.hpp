@@ -254,6 +254,9 @@ TEST_F(parser_test_fixture, ParseFileParseLinesFromIfstream) {
     std::ifstream ifs(fp);
     EXPECT_TRUE(ifs.good());
     std::filesystem::path dotp(".");
+    string input_line;
+    std::getline(ifs, input_line);
+    EXPECT_FALSE(input_line.empty());
 }
 
 TEST_F(parser_test_fixture, GetDataTypeForAllColumns) {
