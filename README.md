@@ -109,6 +109,26 @@ function was a stream that had not been opened. This was fixed in `parser.hpp`.
 
 All the parser unit tests suggested by Claude Code have been implemented.
 
+##### March 24, 2026
+
+A list of required unit tests for the `query.hpp` file were created with the following prompt:
+
+```text
+`Give a complete list of the unit tests required to test all public functions defined in the file @include/query.hpp`
+```
+
+When that was complete, the following prompt was used:
+
+```text
+xamine the files @include/query.hpp and @test/QueryTests.md;
+implement the missing unit tests and add them to the end of the
+file @test/include/query_test.hpp; before each test, add a one line
+comment saying "Test created by Claude Code."
+```
+
+The unit tests were generated and all of them passed. (Which of course does not
+necessarily mean that they are right!)
+
 ## Installation (Uses CMAKE)
 
 Installation instructions are available in the file [INSTALL.md](./INSTALL.md).
