@@ -59,17 +59,17 @@ TEST_F(parser_test_fixture, ParseHeaderParseSampleHeader) {
 
     EXPECT_TRUE(result->size() == expected.size());
 
-    EXPECT_TRUE(ranges::all_of(ranges::zip_view(*result, expected),
-                              [](const pair_type& r_e_pair) {
-                                  return r_e_pair.first.text == r_e_pair.second;
-                              }));
+    EXPECT_TRUE(ranges::all_of(
+        ranges::zip_view(*result, expected), [](const pair_type& r_e_pair) {
+            return r_e_pair.first.text == r_e_pair.second;
+        }));
 
     EXPECT_TRUE(ranges::all_of(*result, [](auto h) {
         return h.data_type == e_cell_data_type::undetermined;
     }));
 }
 
-// Added by Claude. Fixed by JBT.
+// Test created by Claude Code. Fixed by JBT.
 TEST_F(parser_test_fixture, ParseHeaderEmptyString) {
     // An empty string is an invalid header.
     const string input = "";
@@ -93,7 +93,8 @@ TEST_F(parser_test_fixture, ParseHeaderTrimsWhitespace) {
 
 TEST_F(parser_test_fixture, ParseHeaderTrimsWhitespaceOfRValue) {
     // Column names with leading/trailing spaces.
-    const auto result = parser::parse_header(string{"One, Two,Three ,   Four  "});
+    const auto result =
+        parser::parse_header(string{"One, Two,Three ,   Four  "});
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->size(), 4u);
     EXPECT_EQ((*result)[0].text, "One");
@@ -116,7 +117,7 @@ TEST_F(parser_test_fixture, ParseHeaderTrimsWhitespaceOfStringView) {
     EXPECT_EQ((*result)[3].text, "Four");
 }
 
-// Added by Claude.
+// Test created by Claude Code.
 TEST_F(parser_test_fixture, ParseHeaderSingleColumn) {
     const string input = "Filename";
     const auto result = parser::parse_header(input);
@@ -126,7 +127,7 @@ TEST_F(parser_test_fixture, ParseHeaderSingleColumn) {
     EXPECT_EQ((*result)[0].data_type, e_cell_data_type::undetermined);
 }
 
-// Added by Claude.
+// Test created by Claude Code.
 TEST_F(parser_test_fixture, ParseHeaderTwoColumns) {
     const string input = "Name,Value";
     const auto result = parser::parse_header(input);
@@ -143,14 +144,18 @@ TEST_F(parser_test_fixture, ParseHeaderTwoColumns) {
 TEST_F(parser_test_fixture, ParseHeaderWhitespaceOnly) {
     const string input = "   ,\t";
     const auto result = parser::parse_header(input);
-    EXPECT_TRUE(result.has_value());
-    auto rv = result.value();
-    auto rv0 = rv[0].data_type;
-    EXPECT_EQ((result.value())[0].data_type, e_cell_data_type::invalid);
-    EXPECT_EQ((result.value())[1].data_type, e_cell_data_type::invalid);
+    EXPECT_FALSE(result.has_value());
+    EXPECT_EQ(result.error(), parser::error::header_invalid_error);
 }
 
-// Added by Claude.
+TEST_F(parser_test_fixture, ParseHeaderOneEmptyColumn) {
+    const string input{"Name, ,Value"};
+    const auto result = parser::parse_header(input);
+    EXPECT_FALSE(result.has_value());
+    EXPECT_EQ(result.error(), parser::error::header_invalid_error);
+}
+
+// Test created by Claude Code.
 TEST_F(parser_test_fixture, ParseHeaderWindowsCRLFStrippedFromLastField) {
     // Windows-style line endings: trim() removes \r and \n from all fields.
     const string input = "Col1,Col2\r\n";
@@ -161,7 +166,7 @@ TEST_F(parser_test_fixture, ParseHeaderWindowsCRLFStrippedFromLastField) {
     EXPECT_EQ((*result)[1].text, "Col2");
 }
 
-// Added by Claude. Clarifying comment by JBT.
+// Test created by Claude Code. Clarifying comment by JBT.
 TEST_F(parser_test_fixture, ParseHeaderUTF8BOMStrippedFromFirstField) {
     // trim() strips a leading UTF-8 BOM (\xEF\xBB\xBF) from any field.
     // Octal equivalent is \357\273\277.
@@ -173,7 +178,7 @@ TEST_F(parser_test_fixture, ParseHeaderUTF8BOMStrippedFromFirstField) {
     EXPECT_EQ((*result)[1].text, "Type");
 }
 
-// Added by Claude.
+// Test created by Claude Code.
 TEST_F(parser_test_fixture, ParseHeaderAllDataTypesUndetermined) {
     // Every header field must have data type undetermined regardless of name.
     const string input = "42,true,1.5,text,empty";
@@ -185,7 +190,8 @@ TEST_F(parser_test_fixture, ParseHeaderAllDataTypesUndetermined) {
     }));
 }
 
-TEST_F(parser_test_fixture, StringUtilsRemoveUTF8ByteOrderMarkAndTrimWhiteSpace) {
+TEST_F(parser_test_fixture,
+       StringUtilsRemoveUTF8ByteOrderMarkAndTrimWhiteSpace) {
     // Make sure white space trimming works if there is a UTF-8 byte order mark.
     string input{utf8_bom};
     input.append("One, Two,Three\t ,   Four  \r\n");
@@ -198,8 +204,10 @@ TEST_F(parser_test_fixture, StringUtilsRemoveUTF8ByteOrderMarkAndTrimWhiteSpace)
     EXPECT_EQ((*result)[3].text, "Four");
 }
 
-TEST_F(parser_test_fixture, StringUtilsRemoveUTF16BEByteOrderMarkAndTrimWhiteSpace) {
-    // Make sure white space trimming works if there is a big-endian UTF-16 byte order mark.
+TEST_F(parser_test_fixture,
+       StringUtilsRemoveUTF16BEByteOrderMarkAndTrimWhiteSpace) {
+    // Make sure white space trimming works if there is a big-endian UTF-16 byte
+    // order mark.
     string input{utf16_be_bom};
     input.append("One, Two,Three\t ,   Four  \r\n");
     const auto result = parser::parse_header(input);
@@ -211,8 +219,10 @@ TEST_F(parser_test_fixture, StringUtilsRemoveUTF16BEByteOrderMarkAndTrimWhiteSpa
     EXPECT_EQ((*result)[3].text, "Four");
 }
 
-TEST_F(parser_test_fixture, StringUtilsRemoveUTF16LEByteOrderMarkAndTrimWhiteSpace) {
-    // Make sure white space trimming works if there is a little-endian UTF-16 byte order mark.
+TEST_F(parser_test_fixture,
+       StringUtilsRemoveUTF16LEByteOrderMarkAndTrimWhiteSpace) {
+    // Make sure white space trimming works if there is a little-endian UTF-16
+    // byte order mark.
     string input{utf16_le_bom};
     input.append("One, Two,Three\t ,   Four  \r\n");
     const auto result = parser::parse_header(input);
@@ -318,6 +328,10 @@ TEST_F(parser_test_fixture, ParseRowIntegerFields) {
     EXPECT_TRUE(ranges::all_of(*result, [](const auto& f) {
         return f.data_type == e_cell_data_type::integer;
     }));
+    const auto& fields = *result;
+    EXPECT_EQ(fields[0].text, "1");
+    EXPECT_EQ(fields[1].text, "2");
+    EXPECT_EQ(fields[2].text, "3");
 }
 
 // Test created by Claude Code.
@@ -329,6 +343,10 @@ TEST_F(parser_test_fixture, ParseRowFloatingFields) {
     EXPECT_TRUE(ranges::all_of(*result, [](const auto& f) {
         return f.data_type == e_cell_data_type::floating;
     }));
+    const auto& fields = *result;
+    EXPECT_EQ(fields[0].text, "1.5");
+    EXPECT_EQ(fields[1].text, "2.7");
+    EXPECT_EQ(fields[2].text, "3.14");
 }
 
 // Test created by Claude Code.
@@ -341,6 +359,10 @@ TEST_F(parser_test_fixture, ParseRowBooleanFields) {
     EXPECT_TRUE(ranges::all_of(*result, [](const auto& f) {
         return f.data_type == e_cell_data_type::boolean;
     }));
+    const auto& fields = *result;
+    EXPECT_EQ(fields[0].text, "Yes");
+    EXPECT_EQ(fields[1].text, "No");
+    EXPECT_EQ(fields[2].text, "Yes");
 }
 
 // Test created by Claude Code.
@@ -351,6 +373,7 @@ TEST_F(parser_test_fixture, ParseRowDecimalGeoCoordinateField) {
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->size(), 1u);
     EXPECT_EQ((*result)[0].data_type, e_cell_data_type::geo_coordinate);
+    EXPECT_EQ((*result)[0].text, R"("51.05011, -114.08529")");
 }
 
 // Test created by JBT.
@@ -361,6 +384,7 @@ TEST_F(parser_test_fixture, ParseRowDMGeoCoordinateField) {
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->size(), 1u);
     EXPECT_EQ((*result)[0].data_type, e_cell_data_type::geo_coordinate);
+    EXPECT_EQ((*result)[0].text, R"("51° 03' N, 114° 05' W")");
 }
 
 // Test created by Claude Code.
@@ -371,6 +395,7 @@ TEST_F(parser_test_fixture, ParseRowTagsField) {
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->size(), 1u);
     EXPECT_EQ((*result)[0].data_type, e_cell_data_type::tags);
+    EXPECT_EQ((*result)[0].text, R"("""Johnson, Volcano, Dusk""")");
 }
 
 // Test created by Claude Code.
@@ -381,9 +406,12 @@ TEST_F(parser_test_fixture, ParseRowQuotedFieldWithComma) {
     const auto result = parser::parse_data_row(input);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->size(), 3u);
-    EXPECT_EQ((*result)[0].data_type, e_cell_data_type::text);
-    EXPECT_EQ((*result)[1].data_type, e_cell_data_type::tags);
-    EXPECT_EQ((*result)[2].data_type, e_cell_data_type::text);
+    vector<string> field_values(result->size());
+    std::transform(result->begin(), result->end(), field_values.begin(),
+                   [](const auto& df) { return df.text; });
+    EXPECT_EQ(field_values[0], "foo");
+    EXPECT_EQ(field_values[1], R"("""tag1, tag2""")");
+    EXPECT_EQ(field_values[2], "bar");
 }
 
 // Test created by Claude Code.
@@ -415,8 +443,7 @@ TEST_F(parser_test_fixture, DeduceTypesNoDataRows) {
     parser::header_and_data h_and_d;
     h_and_d.header_fields = {
         parser::header_field{"A", e_cell_data_type::undetermined},
-        parser::header_field{"B", e_cell_data_type::undetermined}
-    };
+        parser::header_field{"B", e_cell_data_type::undetermined}};
     const auto result = parser::deduce_data_types_for_all_columns(h_and_d);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->size(), 2u);
@@ -432,14 +459,12 @@ TEST_F(parser_test_fixture, DeduceTypesEarlyExit) {
     parser::header_and_data h_and_d;
     h_and_d.header_fields = {
         parser::header_field{"Num", e_cell_data_type::undetermined},
-        parser::header_field{"Name", e_cell_data_type::undetermined}
-    };
+        parser::header_field{"Name", e_cell_data_type::undetermined}};
     h_and_d.all_data_fields = {
         {parser::data_field{"42", e_cell_data_type::integer},
          parser::data_field{"Alice", e_cell_data_type::text}},
         {parser::data_field{"99", e_cell_data_type::integer},
-         parser::data_field{"Bob", e_cell_data_type::text}}
-    };
+         parser::data_field{"Bob", e_cell_data_type::text}}};
     const auto result = parser::deduce_data_types_for_all_columns(h_and_d);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->size(), 2u);
@@ -454,14 +479,12 @@ TEST_F(parser_test_fixture, DeduceTypesResolvedOnLaterRow) {
     parser::header_and_data h_and_d;
     h_and_d.header_fields = {
         parser::header_field{"A", e_cell_data_type::undetermined},
-        parser::header_field{"B", e_cell_data_type::undetermined}
-    };
+        parser::header_field{"B", e_cell_data_type::undetermined}};
     h_and_d.all_data_fields = {
         {parser::data_field{"", e_cell_data_type::undetermined},
          parser::data_field{"", e_cell_data_type::undetermined}},
         {parser::data_field{"7", e_cell_data_type::integer},
-         parser::data_field{"Yes", e_cell_data_type::boolean}}
-    };
+         parser::data_field{"Yes", e_cell_data_type::boolean}}};
     const auto result = parser::deduce_data_types_for_all_columns(h_and_d);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->size(), 2u);
@@ -476,12 +499,10 @@ TEST_F(parser_test_fixture, DeduceTypesWrongColumnCount) {
     h_and_d.header_fields = {
         parser::header_field{"A", e_cell_data_type::undetermined},
         parser::header_field{"B", e_cell_data_type::undetermined},
-        parser::header_field{"C", e_cell_data_type::undetermined}
-    };
+        parser::header_field{"C", e_cell_data_type::undetermined}};
     h_and_d.all_data_fields = {
         {parser::data_field{"1", e_cell_data_type::integer},
-         parser::data_field{"2", e_cell_data_type::integer}}
-    };
+         parser::data_field{"2", e_cell_data_type::integer}}};
     const auto result = parser::deduce_data_types_for_all_columns(h_and_d);
     EXPECT_FALSE(result.has_value());
     EXPECT_EQ(result.error(), parser::error::file_parse_error);
@@ -493,13 +514,12 @@ TEST_F(parser_test_fixture, DeduceTypesInvalidMixedTypesCheckAllDataRows) {
     // produces an invalid type, which causes file_parse_error.
     parser::header_and_data h_and_d;
     h_and_d.header_fields = {
-        parser::header_field{"A", e_cell_data_type::undetermined}
-    };
+        parser::header_field{"A", e_cell_data_type::undetermined}};
     h_and_d.all_data_fields = {
         {parser::data_field{"42", e_cell_data_type::integer}},
-        {parser::data_field{"hello", e_cell_data_type::text}}
-    };
-    const auto result = parser::deduce_data_types_for_all_columns(h_and_d, true);
+        {parser::data_field{"hello", e_cell_data_type::text}}};
+    const auto result =
+        parser::deduce_data_types_for_all_columns(h_and_d, true);
     EXPECT_FALSE(result.has_value());
     EXPECT_EQ(result.error(), parser::error::file_parse_error);
 }
@@ -510,14 +530,14 @@ TEST_F(parser_test_fixture, DeduceTypesInvalidMixedTypesDoNotCheckAllDataRows) {
     // produces an invalid type, which causes file_parse_error.
     parser::header_and_data h_and_d;
     h_and_d.header_fields = {
-        parser::header_field{"A", e_cell_data_type::undetermined}
-    };
+        parser::header_field{"A", e_cell_data_type::undetermined}};
     h_and_d.all_data_fields = {
         {parser::data_field{"42", e_cell_data_type::integer}},
-        {parser::data_field{"hello", e_cell_data_type::text}}
-    };
-    const auto result = parser::deduce_data_types_for_all_columns(h_and_d, false);
+        {parser::data_field{"hello", e_cell_data_type::text}}};
+    const auto result =
+        parser::deduce_data_types_for_all_columns(h_and_d, false);
     EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 1);
     EXPECT_EQ(result.value()[0], e_cell_data_type::integer);
 }
 
@@ -530,43 +550,43 @@ TEST_F(parser_test_fixture, DeduceTypesInvalidColumnReportedCheckAllDataRows) {
     h_and_d.header_fields = {
         parser::header_field{"A", e_cell_data_type::undetermined},
         parser::header_field{"B", e_cell_data_type::undetermined},
-        parser::header_field{"C", e_cell_data_type::undetermined}
-    };
+        parser::header_field{"C", e_cell_data_type::undetermined}};
     h_and_d.all_data_fields = {
         {parser::data_field{"1", e_cell_data_type::integer},
          parser::data_field{"hello", e_cell_data_type::text},
          parser::data_field{"3", e_cell_data_type::integer}},
         {parser::data_field{"2", e_cell_data_type::integer},
          parser::data_field{"42", e_cell_data_type::integer},
-         parser::data_field{"4", e_cell_data_type::integer}}
-    };
+         parser::data_field{"4", e_cell_data_type::integer}}};
     testing::internal::CaptureStderr();
-    const auto result = parser::deduce_data_types_for_all_columns(h_and_d, true);
+    const auto result =
+        parser::deduce_data_types_for_all_columns(h_and_d, true);
     const string stderr_output = testing::internal::GetCapturedStderr();
     EXPECT_FALSE(result.has_value());
+    EXPECT_EQ(result.error(), parser::error::file_parse_error);
     EXPECT_NE(stderr_output.find("column 2"), string::npos);
 }
 
 // Test created by JBT, based on the previous test.
-TEST_F(parser_test_fixture, DeduceTypesInvalidColumnReportedDoNotCheckAllDataRows) {
-    // Similar to the previous test, but because the validity check is short-circuited,
-    // the invalid data row is not detected.
+TEST_F(parser_test_fixture,
+       DeduceTypesInvalidColumnReportedDoNotCheckAllDataRows) {
+    // Similar to the previous test, but because the validity check is
+    // short-circuited, the invalid data row is not detected.
     parser::header_and_data h_and_d;
     h_and_d.header_fields = {
         parser::header_field{"A", e_cell_data_type::undetermined},
         parser::header_field{"B", e_cell_data_type::undetermined},
-        parser::header_field{"C", e_cell_data_type::undetermined}
-    };
+        parser::header_field{"C", e_cell_data_type::undetermined}};
     h_and_d.all_data_fields = {
         {parser::data_field{"1", e_cell_data_type::integer},
          parser::data_field{"hello", e_cell_data_type::text},
          parser::data_field{"3", e_cell_data_type::integer}},
         {parser::data_field{"2", e_cell_data_type::integer},
          parser::data_field{"42", e_cell_data_type::integer},
-         parser::data_field{"4", e_cell_data_type::integer}}
-    };
+         parser::data_field{"4", e_cell_data_type::integer}}};
     testing::internal::CaptureStderr();
-    const auto result = parser::deduce_data_types_for_all_columns(h_and_d, false);
+    const auto result =
+        parser::deduce_data_types_for_all_columns(h_and_d, false);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ((*result)[1], e_cell_data_type::text);
 }
@@ -580,7 +600,8 @@ TEST_F(parser_test_fixture, ParseFileParseLinesRvalue) {
     EXPECT_TRUE(result_.has_value());
     const parser::header_and_data result = *result_;
     EXPECT_FALSE(result.header_fields.empty());
-    EXPECT_EQ(result.header_fields.size(), parser_test_fixture::sample_header_fields.size());
+    EXPECT_EQ(result.header_fields.size(),
+              parser_test_fixture::sample_header_fields.size());
     EXPECT_EQ(result.all_data_fields.size(), expected_data_row_count);
 }
 
@@ -601,7 +622,8 @@ TEST_F(parser_test_fixture, ParseFileParseLinesHeaderOnly) {
     const auto result_ = parse_lines(input);
     EXPECT_TRUE(result_.has_value());
     const parser::header_and_data result = *result_;
-    EXPECT_EQ(result.header_fields.size(), parser_test_fixture::sample_header_fields.size());
+    EXPECT_EQ(result.header_fields.size(),
+              parser_test_fixture::sample_header_fields.size());
     EXPECT_TRUE(result.all_data_fields.empty());
 }
 
@@ -623,8 +645,7 @@ TEST_F(parser_test_fixture, ParseFileParseLinesUnparsableDataRow) {
     // (integer then text), deduce_data_types_for_all_columns returns
     // file_parse_error, which parse_lines propagates.
     const vector<string> input{
-        "A,B",
-        "1,hello",
+        "A,B", "1,hello",
         "world,2"  // column A: integer then text → invalid type
     };
     const auto result_ = parse_lines(input);
@@ -646,10 +667,9 @@ TEST_F(parser_test_fixture, ParseFileParseLinesIfstreamCorrectResult) {
     EXPECT_EQ(result.header_fields.size(), sample_header_fields.size());
     EXPECT_EQ(result.all_data_fields.size(), 5u);
     const vector<ecdt> expected_types = {
-        ecdt::text, ecdt::text, ecdt::floating,
-        ecdt::integer, ecdt::integer, ecdt::integer,
-        ecdt::geo_coordinate, ecdt::boolean, ecdt::text,
-        ecdt::integer, ecdt::text, ecdt::text,
+        ecdt::text,    ecdt::text,    ecdt::floating,       ecdt::integer,
+        ecdt::integer, ecdt::integer, ecdt::geo_coordinate, ecdt::boolean,
+        ecdt::text,    ecdt::integer, ecdt::text,           ecdt::text,
         ecdt::tags};
     for (size_t i = 0; i < result.header_fields.size(); ++i) {
         EXPECT_EQ(result.header_fields[i].text, sample_header_fields[i]);
@@ -659,7 +679,8 @@ TEST_F(parser_test_fixture, ParseFileParseLinesIfstreamCorrectResult) {
 
 // Test created by Claude Code.
 TEST_F(parser_test_fixture, ParseFileParseLinesIfstreamBadStream) {
-    // A default-constructed (not-open) ifstream returns unexpected(file_empty_error).
+    // A default-constructed (not-open) ifstream returns
+    // unexpected(file_empty_error).
     std::ifstream ifs;
     const auto result_ = parse_lines(ifs);
     EXPECT_FALSE(result_.has_value());
@@ -684,7 +705,8 @@ TEST_F(parser_test_fixture, ParseFileParseLinesIfstreamHeaderOnly) {
 TEST_F(parser_test_fixture, ParseFileParseLinesIfstreamColumnMismatch) {
     // An ifstream over a file whose data row has fewer columns than the header
     // returns unexpected(file_parse_error).
-    const string filename{dimroom_PROJECT_HOME "/test/data/column_mismatch.csv"};
+    const string filename{dimroom_PROJECT_HOME
+                          "/test/data/column_mismatch.csv"};
     std::ifstream ifs{filename};
     ASSERT_TRUE(ifs.good());
     const auto result_ = parse_lines(ifs);

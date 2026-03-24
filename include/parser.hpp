@@ -276,7 +276,8 @@ class parser {
     /// @brief Splits the header row at the columns.
     /// @param header string (first line of CSV file).
     /// @return header fields, or an error.
-    /// @note An empty or all blank header string is considered an error.
+    /// @note An empty header, or a header with an empty or whitespace column
+    /// name is considered an error.
     static expected<header_fields_t, parser::error> parse_header(
         const string& header) {
         using std::operator""sv;
@@ -299,9 +300,25 @@ class parser {
                             : e_cell_data_type::undetermined;
                     return header_field{trimmed_header_text, header_field_type};
                 });
+            // Check empty header.
+
+            // Header line was zero-length or all white space.
             if (result.empty()) {
                 return unexpected(parser::error::header_empty_error);
             }
+
+            // Check for presence of empty column names; their data_type is
+            // invalid.
+            const auto invalid_header_count =
+                ranges::count_if(result, [](const auto& hf) {
+                    return hf.data_type == e_cell_data_type::invalid;
+                });
+
+            if (invalid_header_count > 0) {
+                return unexpected(parser::error::header_invalid_error);
+            }
+
+            // Happy path result.
             return result;
         } catch (const std::exception& e) {
             println(stderr, "error while parsing header row: {}", e.what());
@@ -314,7 +331,8 @@ class parser {
     /// @tparam STRING
     /// @param header string-like object (first line of CSV file).
     /// @return header fields, or an error.
-    /// @note An empty or all blank header string is considered an error.
+    /// @note An empty header, or a header with an empty or whitespace column
+    /// name is considered an error.
     template <class STRING>
     static expected<header_fields_t, parser::error> parse_header(
         STRING&& header) {
@@ -370,7 +388,6 @@ static inline expected<parser::header_and_data, parser::error> __parse_lines(
         return unexpected(parser::error::file_parse_error);
     }
     parser::header_and_data result(*h_and_d);
-    auto data_range = ranges::subrange(second_line_it, last_line_it);
 
     size_t data_col_idx = 1;
     for (auto current_line_it = second_line_it; current_line_it != last_line_it;
