@@ -4,7 +4,7 @@ project(
   dimroom
   DESCRIPTION "Parser and query engine for photo metadata"
   LANGUAGES CXX
-  VERSION 2.26
+  VERSION 2.27
 )
 
 set(CMAKE_CXX_STANDARD 23)
@@ -27,8 +27,8 @@ FetchContent_MakeAvailable(googletest)
 # find_package(googletest)
 
 set(dimroom_VERSION_MAJOR 2)
-set(dimroom_VERSION_MINOR 26)
-set(dimroom_VERSION 2.26)
+set(dimroom_VERSION_MINOR 27)
+set(dimroom_VERSION 2.27)
 set(dimroom_PROJECT_HOME "${PROJECT_SOURCE_DIR}")
 
 configure_file(${PROJECT_SOURCE_DIR}/include/dimroomConfig.h.in ${PROJECT_SOURCE_DIR}/include/dimroomConfig.h)
